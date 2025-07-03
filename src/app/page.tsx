@@ -1,4 +1,5 @@
 import ProjectList from "@/components/projects/project-list";
+import { CreateProjectDialog } from "@/components/projects/create-project-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getProjects } from "@/lib/data";
 import { DollarSign, ListChecks, Briefcase } from "lucide-react";
@@ -59,6 +60,7 @@ export default async function Home() {
           <h2 className="text-2xl font-semibold tracking-tight font-headline">
             Mis Proyectos
           </h2>
+          <CreateProjectDialog />
         </div>
         <ProjectList projects={projects} />
       </div>

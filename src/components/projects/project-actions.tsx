@@ -6,12 +6,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-import { CreateProjectDialog } from "./create-project-dialog";
+import { MoreHorizontal, Trash2 } from "lucide-react";
 import { DeleteProjectDialog } from "./delete-project-dialog";
 
 interface ProjectActionsProps {
@@ -19,7 +17,6 @@ interface ProjectActionsProps {
 }
 
 export function ProjectActions({ project }: ProjectActionsProps) {
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // This wrapper div is to stop propagation to the parent Link component
@@ -31,11 +28,6 @@ export function ProjectActions({ project }: ProjectActionsProps) {
 
   return (
     <div onClick={stopPropagation}>
-      <CreateProjectDialog
-        project={project}
-        open={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
-      />
       <DeleteProjectDialog
         projectId={project.id}
         open={isDeleteDialogOpen}
@@ -53,11 +45,6 @@ export function ProjectActions({ project }: ProjectActionsProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onSelect={() => setIsEditDialogOpen(true)}>
-            <Pencil className="mr-2 h-4 w-4" />
-            Editar
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
           <DropdownMenuItem
             onSelect={() => setIsDeleteDialogOpen(true)}
             className="text-destructive focus:text-destructive focus:bg-destructive/10"
