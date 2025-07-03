@@ -17,7 +17,7 @@ export default function ProjectList({ projects }: ProjectListProps) {
           <div className="absolute top-2 right-2 z-10">
             <ProjectActions project={project} />
           </div>
-          <Link href={`/projects/${project.id}`} className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg contents" aria-label={`Ver detalles de ${project.name}`}>
+          <Link href={`/projects/${project.id}`} className="flex flex-col flex-grow focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg" aria-label={`Ver detalles de ${project.name}`}>
             <CardHeader>
               <div className="relative h-40 w-full mb-4">
                 <Image
