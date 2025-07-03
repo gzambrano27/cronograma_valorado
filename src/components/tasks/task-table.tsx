@@ -116,12 +116,20 @@ const columns: ColumnDef<Task>[] = [
   {
     accessorKey: "startDate",
     header: "Fecha Inicio",
-    cell: ({ row }) => format(new Date(row.getValue("startDate")), "dd/MM/yyyy"),
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("startDate"));
+      const adjustedDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000));
+      return format(adjustedDate, "dd/MM/yyyy");
+    },
   },
     {
     accessorKey: "endDate",
     header: "Fecha Fin",
-    cell: ({ row }) => format(new Date(row.getValue("endDate")), "dd/MM/yyyy"),
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("endDate"));
+      const adjustedDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000));
+      return format(adjustedDate, "dd/MM/yyyy");
+    },
   },
 ]
 

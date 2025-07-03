@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { Task } from "@/lib/types";
@@ -22,9 +21,16 @@ interface DailyConsumptionTrackerProps {
 
 export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) {
   const { toast } = useToast();
+
+  const adjustDateForTimezone = (date: Date | string): Date => {
+    const d = new Date(date);
+    const userTimezoneOffset = d.getTimezoneOffset() * 60000;
+    return new Date(d.getTime() + userTimezoneOffset);
+  };
+
   const [consumptions, setConsumptions] = useState<Record<string, number>>(
     (task.dailyConsumption || []).reduce((acc, curr) => {
-      acc[format(new Date(curr.date), "yyyy-MM-dd")] = curr.consumedQuantity;
+      acc[format(adjustDateForTimezone(curr.date), "yyyy-MM-dd")] = curr.consumedQuantity;
       return acc;
     }, {} as Record<string, number>)
   );
@@ -39,12 +45,10 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
   };
 
   const handleSave = (date: string) => {
-    // Here you would typically save to a backend.
-    // We'll just show a toast for now.
     toast({
       title: "Consumo Guardado",
       description: `El consumo para el ${format(
-        new Date(date),
+        adjustDateForTimezone(date),
         "PPP"
       )} ha sido guardado.`,
     });
@@ -52,9 +56,10 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
 
   const getDates = (startDate: Date, endDate: Date) => {
     const dates = [];
-    let currentDate = new Date(startDate);
-    let end = new Date(endDate);
-    while (currentDate <= end) {
+    let currentDate = adjustDateForTimezone(startDate);
+    const finalDate = adjustDateForTimezone(endDate);
+    
+    while (currentDate <= finalDate) {
       dates.push(new Date(currentDate));
       currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -62,7 +67,10 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
   };
 
   const dates = getDates(task.startDate, task.endDate);
-  const durationInDays = differenceInCalendarDays(new Date(task.endDate), new Date(task.startDate)) + 1;
+  
+  const adjustedStartDate = adjustDateForTimezone(task.startDate);
+  const adjustedEndDate = adjustDateForTimezone(task.endDate);
+  const durationInDays = differenceInCalendarDays(adjustedEndDate, adjustedStartDate) + 1;
   const dailyPlannedQuantity = durationInDays > 0 ? task.quantity / durationInDays : 0;
 
 
