@@ -4,7 +4,7 @@
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -20,6 +20,7 @@ interface MapPickerProps {
   onLocationSelect: (location: { lat: number; lng: number }) => void;
 }
 
+// This component now only handles events and the marker
 function LocationMarker({ onLocationSelect }: { onLocationSelect: (location: { lat: number; lng: number }) => void }) {
   const [position, setPosition] = useState<L.LatLng | null>(null);
 
@@ -35,10 +36,8 @@ function LocationMarker({ onLocationSelect }: { onLocationSelect: (location: { l
     },
   });
 
-  useEffect(() => {
-    // Try to auto-locate the user on initial load
-    map.locate();
-  }, [map]);
+  // The useEffect for map.locate() has been removed from here
+  // to ensure it's called only after the map is fully ready.
 
   return position === null ? null : <Marker position={position}></Marker>;
 }
@@ -50,6 +49,11 @@ export function MapPicker({ onLocationSelect }: MapPickerProps) {
       zoom={13}
       scrollWheelZoom={true}
       style={{ height: "100%", width: "100%" }}
+      whenReady={(mapInstance) => {
+        // This function runs only after the map has been fully initialized and displayed.
+        // Now we ask for the user's location.
+        mapInstance.target.locate();
+      }}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
