@@ -25,7 +25,7 @@ export type Task = {
   dailyValue: number;
   location: string;
   imageUrl?: string;
-  status: 'pending' | 'in-progress' | 'completed';
+  status: 'pendiente' | 'en-progreso' | 'completado';
   dailyConsumption?: DailyConsumption[];
 };
 

@@ -41,6 +41,12 @@ import { Badge } from "@/components/ui/badge"
 import type { Task } from "@/lib/types"
 import { DailyConsumptionTracker } from "./daily-consumption-tracker"
 
+const statusTranslations: Record<Task['status'], string> = {
+    'pendiente': 'Pendiente',
+    'en-progreso': 'En Progreso',
+    'completado': 'Completado',
+}
+
 const columns: ColumnDef<Task>[] = [
   {
     id: 'expander',
@@ -61,6 +67,7 @@ const columns: ColumnDef<Task>[] = [
         </Button>
       )
     },
+    enableHiding: false,
   },
   {
     accessorKey: "name",
@@ -81,15 +88,21 @@ const columns: ColumnDef<Task>[] = [
     accessorKey: "status",
     header: "Estado",
     cell: ({ row }) => {
-      const status = row.getValue("status") as string;
-      const variant = status === 'completed' ? 'default' : status === 'in-progress' ? 'secondary' : 'outline';
-      if (variant === 'default') {
-          return <Badge className="bg-green-500 hover:bg-green-600 text-white">{status}</Badge>
+      const status = row.getValue("status") as Task['status'];
+      const translatedStatus = statusTranslations[status] || status;
+
+      let badgeVariant: "default" | "secondary" | "outline" = "outline";
+      let className = "";
+
+      if (status === 'completado') {
+        badgeVariant = 'default';
+        className = 'bg-green-500 hover:bg-green-600 text-white';
+      } else if (status === 'en-progreso') {
+        badgeVariant = 'secondary';
+        className = 'bg-yellow-500 hover:bg-yellow-600 text-white';
       }
-      if (variant === 'secondary') {
-        return <Badge variant={variant} className="bg-yellow-500 hover:bg-yellow-600 text-white">{status}</Badge>
-      }
-      return <Badge variant={variant}>{status}</Badge>
+
+      return <Badge variant={badgeVariant} className={className}>{translatedStatus}</Badge>
     },
   },
   {
@@ -105,7 +118,7 @@ const columns: ColumnDef<Task>[] = [
     header: () => <div className="text-right">Valor</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("value"))
-      const formatted = new Intl.NumberFormat("en-US", {
+      const formatted = new Intl.NumberFormat("es-ES", {
         style: "currency",
         currency: "USD",
       }).format(amount)
@@ -132,6 +145,16 @@ const columns: ColumnDef<Task>[] = [
     },
   },
 ]
+
+const columnTranslations: Record<string, string> = {
+    name: "Tarea",
+    status: "Estado",
+    quantity: "Cantidad Total",
+    value: "Valor",
+    startDate: "Fecha Inicio",
+    endDate: "Fecha Fin",
+    expander: "Expandir"
+};
 
 export function TaskTable({ data }: { data: Task[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -194,7 +217,7 @@ export function TaskTable({ data }: { data: Task[] }) {
                       column.toggleVisibility(!!value)
                     }
                   >
-                    {column.id === 'expander' ? 'Expandir' : column.id}
+                    {columnTranslations[column.id] || column.id}
                   </DropdownMenuCheckboxItem>
                 )
               })}

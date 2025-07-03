@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
   title: 'ProjectValuator',
-  description: 'Evaluate your projects with precision.',
+  description: 'Evalúa tus proyectos con precisión.',
 };
 
 export default function RootLayout({

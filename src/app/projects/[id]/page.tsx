@@ -90,11 +90,11 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
                         </li>
                         <li className="flex items-center">
                             <ListTodo className="h-5 w-5 text-yellow-500 mr-3"/>
-                            <span className="font-medium">{projectTasks.filter(t => t.status === 'in-progress').length} Tareas en Progreso</span>
+                            <span className="font-medium">{projectTasks.filter(t => t.status === 'en-progreso').length} Tareas en Progreso</span>
                         </li>
                          <li className="flex items-center">
                             <ListTodo className="h-5 w-5 text-gray-500 mr-3"/>
-                            <span className="font-medium">{projectTasks.filter(t => t.status === 'pending').length} Tareas Pendientes</span>
+                            <span className="font-medium">{projectTasks.filter(t => t.status === 'pendiente').length} Tareas Pendientes</span>
                         </li>
                     </ul>
                 </CardContent>

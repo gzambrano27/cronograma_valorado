@@ -35,24 +35,24 @@ export const projects: Project[] = [
 
 export const tasks: Task[] = [
   // Project 1 Tasks
-  { id: 'task-1-1', projectId: 'proj-1', name: 'Excavación de cimientos', quantity: 500, value: 150000, startDate: new Date('2024-08-01'), endDate: new Date('2024-08-10'), dailyValue: 15000, location: 'Sector A-1', status: 'completed',
+  { id: 'task-1-1', projectId: 'proj-1', name: 'Excavación de cimientos', quantity: 500, value: 150000, startDate: new Date('2024-08-01'), endDate: new Date('2024-08-10'), dailyValue: 15000, location: 'Sector A-1', status: 'completado',
     dailyConsumption: [
       { date: new Date('2024-08-01'), consumedQuantity: 50 },
       { date: new Date('2024-08-02'), consumedQuantity: 55 },
       { date: new Date('2024-08-03'), consumedQuantity: 48 },
     ]
   },
-  { id: 'task-1-2', projectId: 'proj-1', name: 'Vaciado de hormigón', quantity: 300, value: 200000, startDate: new Date('2024-08-11'), endDate: new Date('2024-08-20'), dailyValue: 20000, location: 'Sector A-1', status: 'in-progress' },
-  { id: 'task-1-3', projectId: 'proj-1', name: 'Montaje de estructura de acero', quantity: 1, value: 450000, startDate: new Date('2024-08-21'), endDate: new Date('2024-09-15'), dailyValue: 18000, location: 'General', status: 'pending' },
+  { id: 'task-1-2', projectId: 'proj-1', name: 'Vaciado de hormigón', quantity: 300, value: 200000, startDate: new Date('2024-08-11'), endDate: new Date('2024-08-20'), dailyValue: 20000, location: 'Sector A-1', status: 'en-progreso' },
+  { id: 'task-1-3', projectId: 'proj-1', name: 'Montaje de estructura de acero', quantity: 1, value: 450000, startDate: new Date('2024-08-21'), endDate: new Date('2024-09-15'), dailyValue: 18000, location: 'General', status: 'pendiente' },
   
   // Project 2 Tasks
-  { id: 'task-2-1', projectId: 'proj-2', name: 'Demolición de pavimento antiguo', quantity: 2000, value: 50000, startDate: new Date('2024-07-15'), endDate: new Date('2024-07-25'), dailyValue: 5000, location: 'Km 1-5', status: 'completed' },
-  { id: 'task-2-2', projectId: 'proj-2', name: 'Nivelación de terreno', quantity: 2000, value: 80000, startDate: new Date('2024-07-26'), endDate: new Date('2024-08-05'), dailyValue: 8000, location: 'Km 1-5', status: 'completed' },
-  { id: 'task-2-3', projectId: 'proj-2', name: 'Asfaltado de calzada', quantity: 1, value: 300000, startDate: new Date('2024-08-06'), endDate: new Date('2024-08-20'), dailyValue: 20000, location: 'Km 1-5', status: 'in-progress' },
+  { id: 'task-2-1', projectId: 'proj-2', name: 'Demolición de pavimento antiguo', quantity: 2000, value: 50000, startDate: new Date('2024-07-15'), endDate: new Date('2024-07-25'), dailyValue: 5000, location: 'Km 1-5', status: 'completado' },
+  { id: 'task-2-2', projectId: 'proj-2', name: 'Nivelación de terreno', quantity: 2000, value: 80000, startDate: new Date('2024-07-26'), endDate: new Date('2024-08-05'), dailyValue: 8000, location: 'Km 1-5', status: 'completado' },
+  { id: 'task-2-3', projectId: 'proj-2', name: 'Asfaltado de calzada', quantity: 1, value: 300000, startDate: new Date('2024-08-06'), endDate: new Date('2024-08-20'), dailyValue: 20000, location: 'Km 1-5', status: 'en-progreso' },
 
   // Project 3 Tasks
-  { id: 'task-3-1', projectId: 'proj-3', name: 'Preparación del terreno', quantity: 10000, value: 300000, startDate: new Date('2024-09-01'), endDate: new Date('2024-09-15'), dailyValue: 20000, location: 'Área Norte', status: 'pending' },
-  { id: 'task-3-2', projectId: 'proj-3', name: 'Instalación de soportes', quantity: 5000, value: 700000, startDate: new Date('2024-09-16'), endDate: new Date('2024-10-15'), dailyValue: 23333, location: 'Área Norte', status: 'pending' },
+  { id: 'task-3-1', projectId: 'proj-3', name: 'Preparación del terreno', quantity: 10000, value: 300000, startDate: new Date('2024-09-01'), endDate: new Date('2024-09-15'), dailyValue: 20000, location: 'Área Norte', status: 'pendiente' },
+  { id: 'task-3-2', projectId: 'proj-3', name: 'Instalación de soportes', quantity: 5000, value: 700000, startDate: new Date('2024-09-16'), endDate: new Date('2024-10-15'), dailyValue: 23333, location: 'Área Norte', status: 'pendiente' },
 ];
 
 
