@@ -42,6 +42,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import type { Task } from "@/lib/types"
 import { DailyConsumptionTracker } from "./daily-consumption-tracker"
+import { TaskActions } from "./task-actions"
 
 const statusTranslations: Record<Task['status'], string> = {
     'pendiente': 'Pendiente',
@@ -150,6 +151,15 @@ const columns: ColumnDef<Task>[] = [
       return format(date, "dd/MM/yyyy", { locale: es });
     },
   },
+  {
+    id: "actions",
+    header: () => <div className="text-right">Acciones</div>,
+    cell: ({ row }) => (
+      <div className="flex justify-end">
+        <TaskActions task={row.original} />
+      </div>
+    ),
+  },
 ]
 
 const columnTranslations: Record<string, string> = {
@@ -159,7 +169,8 @@ const columnTranslations: Record<string, string> = {
     value: "Valor",
     startDate: "Fecha Inicio",
     endDate: "Fecha Fin",
-    expander: "Expandir"
+    expander: "Expandir",
+    actions: "Acciones"
 };
 
 export function TaskTable({ data }: { data: Task[] }) {

@@ -60,6 +60,7 @@ export async function createProject(formData: FormData) {
     await writeDb(db);
 
     revalidatePath('/');
+    redirect('/');
 }
 
 export async function updateProject(formData: FormData) {
@@ -104,4 +105,17 @@ export async function deleteProject(projectId: string) {
 
     revalidatePath('/');
     revalidatePath(`/projects`); // In case a project page was cached
+    redirect('/');
+}
+
+
+export async function deleteTask(taskId: string, projectId: string) {
+    const db = await readDb();
+
+    db.tasks = db.tasks.filter(t => t.id !== taskId);
+
+    await writeDb(db);
+
+    revalidatePath('/');
+    revalidatePath(`/projects/${projectId}`);
 }
