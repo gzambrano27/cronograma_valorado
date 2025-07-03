@@ -35,7 +35,7 @@ export default function AppShell({
           <div className="flex items-center gap-2 p-2">
             <Building2 className="w-8 h-8 text-primary" />
             <h2 className="text-xl font-bold font-headline tracking-tight">
-              ProjectValuator
+              Cronograma Valorado
             </h2>
           </div>
         </SidebarHeader>

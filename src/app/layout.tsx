@@ -5,7 +5,7 @@ import AppShell from '@/components/layout/app-shell';
 import { getProjects } from '@/lib/data';
 
 export const metadata: Metadata = {
-  title: 'ProjectValuator',
+  title: 'Cronograma Valorado',
   description: 'Evalúa tus proyectos con precisión.',
 };
 
