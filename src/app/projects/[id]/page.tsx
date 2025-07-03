@@ -7,14 +7,14 @@ import { XmlImport } from "@/components/tasks/xml-import";
 import { DollarSign, CheckCircle, ListTodo } from "lucide-react";
 import { AddTaskSheet } from "@/components/tasks/add-task-sheet";
 
-export default async function ProjectPage({ params }: { params: { id: string } }) {
-  const project = await getProjectById(params.id);
+export default async function ProjectPage({ params: { id } }: { params: { id: string } }) {
+  const project = await getProjectById(id);
   
   if (!project) {
     notFound();
   }
 
-  const projectTasks = await getTasksByProjectId(params.id);
+  const projectTasks = await getTasksByProjectId(id);
   const sCurve = generateSCurveData(projectTasks, project.totalValue);
 
   const progressPercentage = project.taskCount > 0 ? (project.completedTasks / project.taskCount) * 100 : 0;
