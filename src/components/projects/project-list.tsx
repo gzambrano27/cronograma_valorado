@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Progress } from "@/components/ui/progress";
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "../ui/button";
+import { ViewDetailsButton } from "./view-details-button";
 
 interface ProjectListProps {
   projects: Project[];
@@ -42,9 +42,7 @@ export default function ProjectList({ projects }: ProjectListProps) {
                 <p className="text-xs text-muted-foreground">Valor del Proyecto</p>
                 <p className="text-lg font-bold">${project.totalValue.toLocaleString()}</p>
               </div>
-              <Button variant="secondary" size="sm" asChild>
-                <div onClick={(e) => e.preventDefault()}>Ver Detalles</div>
-              </Button>
+              <ViewDetailsButton />
             </CardFooter>
           </Card>
         </Link>
