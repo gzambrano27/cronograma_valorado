@@ -19,9 +19,9 @@ import { Calendar } from "../ui/calendar"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useActionState } from "react"
 import { useToast } from "@/hooks/use-toast"
-import { useFormState, useFormStatus } from "react-dom"
+import { useFormStatus } from "react-dom"
 import { createTask } from "@/lib/actions"
 
 function SubmitButton() {
@@ -43,7 +43,7 @@ export function AddTaskSheet({ projectId }: { projectId: string }) {
 
   const createTaskWithProjectId = createTask.bind(null, projectId);
 
-  const [state, formAction] = useFormState(async (_prevState: any, formData: FormData) => {
+  const [state, formAction] = useActionState(async (_prevState: any, formData: FormData) => {
     // Add dates to formData
     if (startDate) {
         formData.set('startDate', format(startDate, 'yyyy-MM-dd'));
