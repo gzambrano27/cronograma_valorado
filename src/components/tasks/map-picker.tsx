@@ -38,10 +38,6 @@ export function MapPicker({ onLocationSelect }: MapPickerProps) {
       <Map
         center={center}
         zoom={zoom}
-        onBoundsChanged={({ center, zoom }) => {
-          setCenter(center);
-          setZoom(zoom);
-        }}
         onClick={handleMapClick}
       >
         {markerPosition && (
