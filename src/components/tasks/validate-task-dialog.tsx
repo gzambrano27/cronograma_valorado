@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { validateTask } from "@/lib/actions";
 import type { Task } from "@/lib/types";
 import { UploadCloud, MapPin, Loader2 } from "lucide-react";
-import React, { useState, useRef, useCallback, useMemo } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { useFormStatus } from "react-dom";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
@@ -53,10 +53,12 @@ export function ValidateTaskDialog({
   const formRef = useRef<HTMLFormElement>(null);
   const [location, setLocation] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [showMap, setShowMap] = useState(false);
   const { toast } = useToast();
 
   const handleLocationSelect = useCallback((loc: { lat: number; lng: number }) => {
     setLocation(`${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}`);
+    setShowMap(false);
   }, []);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,10 +89,6 @@ export function ValidateTaskDialog({
     }
   };
   
-  // Memoize the MapPicker component to prevent re-initialization on re-renders
-  const mapComponent = useMemo(() => {
-    return <MapPicker onLocationSelect={handleLocationSelect} />;
-  }, [handleLocationSelect]);
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
@@ -99,6 +97,7 @@ export function ValidateTaskDialog({
             // Reset state when closing
             setImagePreview(null);
             setLocation(null);
+            setShowMap(false);
         }
     }}>
       <DialogContent className="sm:max-w-md">
@@ -130,16 +129,30 @@ export function ValidateTaskDialog({
             </div>
 
             <div className="space-y-2">
-                <Label>Seleccionar Ubicación</Label>
-                 <div className="h-[300px] w-full rounded-md border overflow-hidden">
-                    {open && mapComponent}
-                </div>
-                {location && (
-                   <div className="flex items-center gap-2 p-2 mt-2 border rounded-md bg-muted">
-                       <MapPin className="h-5 w-5 text-primary" />
-                       <span className="text-sm font-mono text-muted-foreground">{location}</span>
+                <Label>Ubicación</Label>
+                {showMap ? (
+                   <div className="h-[300px] w-full rounded-md border overflow-hidden">
+                       <MapPicker onLocationSelect={handleLocationSelect} />
                    </div>
-               )}
+                ) : (
+                    <>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setShowMap(true)}
+                            className="w-full"
+                        >
+                            <MapPin className="mr-2 h-4 w-4" />
+                            Seleccionar en el mapa
+                        </Button>
+                        {location && (
+                           <div className="flex items-center gap-2 p-2 mt-2 border rounded-md bg-muted">
+                               <MapPin className="h-5 w-5 text-primary" />
+                               <span className="text-sm font-mono text-muted-foreground">{location}</span>
+                           </div>
+                       )}
+                   </>
+                )}
             </div>
           </div>
           <DialogFooter>
