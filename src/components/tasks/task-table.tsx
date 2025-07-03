@@ -20,6 +20,8 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import { format } from "date-fns"
+import { es } from "date-fns/locale"
+
 
 import { Button } from "@/components/ui/button"
 import {
@@ -46,6 +48,12 @@ const statusTranslations: Record<Task['status'], string> = {
     'en-progreso': 'En Progreso',
     'completado': 'Completado',
 }
+
+const adjustDateForTimezone = (date: Date | string): Date => {
+    const d = new Date(date);
+    const userTimezoneOffset = d.getTimezoneOffset() * 60000;
+    return new Date(d.getTime() + userTimezoneOffset);
+};
 
 const columns: ColumnDef<Task>[] = [
   {
@@ -110,7 +118,7 @@ const columns: ColumnDef<Task>[] = [
     header: () => <div className="text-right">Cantidad Total</div>,
     cell: ({ row }) => {
       const quantity = parseFloat(row.getValue("quantity"))
-      return <div className="text-right font-mono">{quantity.toLocaleString()}</div>
+      return <div className="text-right font-mono">{quantity.toLocaleString('es-ES')}</div>
     },
   },
   {
@@ -130,18 +138,16 @@ const columns: ColumnDef<Task>[] = [
     accessorKey: "startDate",
     header: "Fecha Inicio",
     cell: ({ row }) => {
-      const date = new Date(row.getValue("startDate"));
-      const adjustedDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000));
-      return format(adjustedDate, "dd/MM/yyyy");
+      const date = adjustDateForTimezone(row.getValue("startDate"));
+      return format(date, "dd/MM/yyyy", { locale: es });
     },
   },
     {
     accessorKey: "endDate",
     header: "Fecha Fin",
     cell: ({ row }) => {
-      const date = new Date(row.getValue("endDate"));
-      const adjustedDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000));
-      return format(adjustedDate, "dd/MM/yyyy");
+      const date = adjustDateForTimezone(row.getValue("endDate"));
+      return format(date, "dd/MM/yyyy", { locale: es });
     },
   },
 ]
