@@ -64,14 +64,26 @@ export async function createProject(formData: FormData) {
     }
 
     const { name, description } = validatedFields.data;
+    
+    const imageFile = formData.get('image') as File | null;
+    let imageUrl = 'https://placehold.co/600x400.png';
+    let dataAiHint = 'project building';
+
+    if (imageFile && imageFile.size > 0) {
+        const bytes = await imageFile.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        imageUrl = `data:${imageFile.type};base64,${buffer.toString('base64')}`;
+        dataAiHint = 'custom project image';
+    }
+
     const db = await readDb();
 
     const newProject: Omit<Project, 'totalValue' | 'taskCount' | 'completedTasks'> = {
         id: `proj-${Date.now()}`,
         name,
         description,
-        imageUrl: 'https://placehold.co/600x400.png',
-        dataAiHint: 'project building'
+        imageUrl,
+        dataAiHint
     };
 
     db.projects.unshift(newProject as Project);
@@ -101,10 +113,23 @@ export async function updateProject(formData: FormData) {
         throw new Error('Proyecto no encontrado.');
     }
 
+    const imageFile = formData.get('image') as File | null;
+    let imageUrl = db.projects[projectIndex].imageUrl;
+    let dataAiHint = db.projects[projectIndex].dataAiHint;
+
+    if (imageFile && imageFile.size > 0) {
+        const bytes = await imageFile.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        imageUrl = `data:${imageFile.type};base64,${buffer.toString('base64')}`;
+        dataAiHint = 'custom project image';
+    }
+
     db.projects[projectIndex] = {
         ...db.projects[projectIndex],
         name,
         description,
+        imageUrl,
+        dataAiHint,
     };
 
     await writeDb(db);

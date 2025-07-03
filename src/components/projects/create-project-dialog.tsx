@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createProject, updateProject } from "@/lib/actions";
 import type { Project } from "@/lib/types";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, UploadCloud } from "lucide-react";
 import React from "react";
 import { useFormStatus } from "react-dom";
 
@@ -102,6 +102,17 @@ export function CreateProjectDialog({
                 className="col-span-3"
                 required
               />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="image">Imagen del Proyecto (Opcional)</Label>
+                <div className="relative flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted">
+                    <Input id="image" name="image" type="file" accept="image/*" className="absolute w-full h-full opacity-0 cursor-pointer" />
+                    <div className="text-center">
+                        <UploadCloud className="w-8 h-8 mx-auto text-muted-foreground" />
+                        <p className="mt-2 text-sm text-muted-foreground">Arrastra y suelta o haz clic para subir</p>
+                        <p className="text-xs text-muted-foreground">PNG, JPG, etc.</p>
+                    </div>
+                </div>
             </div>
           </div>
           <DialogFooter>
