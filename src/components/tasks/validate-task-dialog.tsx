@@ -59,6 +59,14 @@ export function ValidateTaskDialog({
     setLocation(`${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}`);
   }, []);
 
+  const handleLocationError = useCallback((message: string) => {
+    toast({
+        variant: "destructive",
+        title: "Error de Ubicación",
+        description: message,
+    });
+  }, [toast]);
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -128,7 +136,7 @@ export function ValidateTaskDialog({
             <div className="space-y-2">
                 <Label>Ubicación</Label>
                  <div className="h-[300px] w-full rounded-md border overflow-hidden">
-                     <MapPicker onLocationSelect={handleLocationSelect} />
+                     <MapPicker onLocationSelect={handleLocationSelect} onLocationError={handleLocationError} />
                  </div>
                  {location ? (
                     <div className="flex items-center gap-2 p-2 mt-2 border rounded-md bg-muted">
