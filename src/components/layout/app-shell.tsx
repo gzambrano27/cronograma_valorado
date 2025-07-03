@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Briefcase, Building2 } from "lucide-react";
+import React from "react";
 
 import type { Project } from "@/lib/types";
 import {
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "../ui/button";
 import { Breadcrumb } from "./breadcrumb";
+import { Skeleton } from "../ui/skeleton";
 
 export default function AppShell({ 
   children,
@@ -29,6 +31,11 @@ export default function AppShell({
   title: string
 }) {
   const pathname = usePathname();
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   return (
     <SidebarProvider>
@@ -36,8 +43,8 @@ export default function AppShell({
         <SidebarHeader>
           <div className="flex items-center gap-2 p-2">
             <Building2 className="w-8 h-8 text-primary" />
-            <h2 className="text-xl font-bold font-headline tracking-tight">
-              {title}
+            <h2 className="text-xl font-bold font-headline tracking-tight h-7">
+              {isClient ? title : <Skeleton className="h-full w-40" />}
             </h2>
           </div>
         </SidebarHeader>
