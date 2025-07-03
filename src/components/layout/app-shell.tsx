@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Briefcase, Building2 } from "lucide-react";
 
-import { projects } from "@/lib/data";
+import type { Project } from "@/lib/types";
 import {
   SidebarProvider,
   Sidebar,
@@ -18,7 +18,13 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "../ui/button";
 
-export default function AppShell({ children }: { children: React.ReactNode }) {
+export default function AppShell({ 
+  children,
+  projects
+}: { 
+  children: React.ReactNode,
+  projects: Project[]
+}) {
   const pathname = usePathname();
 
   return (
