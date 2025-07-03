@@ -18,12 +18,12 @@ export type Project = {
 export type Task = {
   id: string;
   projectId: string;
-  name: string;
+  name:string;
   quantity: number;
   value: number;
   startDate: Date;
   endDate: Date;
-  location: string;
+  location?: string;
   imageUrl?: string;
   status: 'pendiente' | 'en-progreso' | 'completado';
   dailyConsumption?: DailyConsumption[];

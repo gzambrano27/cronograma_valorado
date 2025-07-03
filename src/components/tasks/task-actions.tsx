@@ -6,11 +6,13 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Trash2 } from "lucide-react";
+import { MoreHorizontal, Trash2, Camera } from "lucide-react";
 import { DeleteTaskDialog } from "./delete-task-dialog";
+import { ValidateTaskDialog } from "./validate-task-dialog";
 
 interface TaskActionsProps {
   task: Task;
@@ -18,6 +20,7 @@ interface TaskActionsProps {
 
 export function TaskActions({ task }: TaskActionsProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isValidateDialogOpen, setIsValidateDialogOpen] = useState(false);
 
   return (
     <>
@@ -26,6 +29,11 @@ export function TaskActions({ task }: TaskActionsProps) {
         projectId={task.projectId}
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
+      />
+      <ValidateTaskDialog
+        task={task}
+        open={isValidateDialogOpen}
+        onOpenChange={setIsValidateDialogOpen}
       />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -39,6 +47,11 @@ export function TaskActions({ task }: TaskActionsProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          <DropdownMenuItem onSelect={() => setIsValidateDialogOpen(true)}>
+            <Camera className="mr-2 h-4 w-4" />
+            Validar Tarea
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             onSelect={() => setIsDeleteDialogOpen(true)}
             className="text-destructive focus:text-destructive focus:bg-destructive/10"

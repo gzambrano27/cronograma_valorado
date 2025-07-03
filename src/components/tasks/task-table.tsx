@@ -152,6 +152,14 @@ const columns: ColumnDef<Task>[] = [
     },
   },
   {
+    accessorKey: "location",
+    header: "Ubicación",
+    cell: ({ row }) => {
+      const location = row.getValue("location") as string | undefined;
+      return location ? <div className="font-mono text-xs">{location}</div> : <div className="text-muted-foreground italic text-xs">Sin ubicación</div>;
+    },
+  },
+  {
     id: "actions",
     header: () => <div className="text-right">Acciones</div>,
     cell: ({ row }) => (
@@ -169,6 +177,7 @@ const columnTranslations: Record<string, string> = {
     value: "Valor",
     startDate: "Fecha Inicio",
     endDate: "Fecha Fin",
+    location: "Ubicación",
     expander: "Expandir",
     actions: "Acciones"
 };

@@ -47,7 +47,6 @@ const TaskSchema = z.object({
     value: z.coerce.number().min(0, { message: 'El valor no puede ser negativo.' }),
     startDate: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: 'Fecha de inicio inválida.' }),
     endDate: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: 'Fecha de fin inválida.' }),
-    location: z.string().min(1, { message: 'La ubicación es requerida.' }),
 });
 
 
@@ -158,7 +157,6 @@ export async function createTask(projectId: string, formData: FormData) {
     value: formData.get('value'),
     startDate: formData.get('startDate'),
     endDate: formData.get('endDate'),
-    location: formData.get('location'),
   });
 
   if (!validatedFields.success) {
@@ -166,7 +164,7 @@ export async function createTask(projectId: string, formData: FormData) {
     throw new Error('Datos de la tarea inválidos.');
   }
 
-  const { name, quantity, value, startDate, endDate, location } = validatedFields.data;
+  const { name, quantity, value, startDate, endDate } = validatedFields.data;
   
   if (new Date(startDate) > new Date(endDate)) {
       throw new Error('La fecha de inicio no puede ser posterior a la fecha de fin.');
@@ -182,7 +180,6 @@ export async function createTask(projectId: string, formData: FormData) {
     value,
     startDate: new Date(startDate),
     endDate: new Date(endDate),
-    location,
     status: 'pendiente',
     dailyConsumption: []
   };
@@ -255,4 +252,48 @@ export async function updateTaskConsumption(taskId: string, date: string, consum
 
     revalidatePath(`/projects/${task.projectId}`);
     revalidatePath(`/`);
+}
+
+const ValidateTaskSchema = z.object({
+  taskId: z.string(),
+  projectId: z.string(),
+  location: z.string(),
+});
+
+export async function validateTask(formData: FormData) {
+    const validatedFields = ValidateTaskSchema.safeParse({
+        taskId: formData.get('taskId'),
+        projectId: formData.get('projectId'),
+        location: formData.get('location'),
+    });
+
+    if (!validatedFields.success) {
+        console.error(validatedFields.error.flatten().fieldErrors);
+        throw new Error('Datos de validación inválidos.');
+    }
+    
+    const { taskId, projectId, location } = validatedFields.data;
+    const imageFile = formData.get('image') as File | null;
+
+    if (!imageFile || imageFile.size === 0) {
+        throw new Error('La imagen de evidencia es requerida.');
+    }
+
+    const db = await readDb();
+    const taskIndex = db.tasks.findIndex(t => t.id === taskId);
+
+    if (taskIndex === -1) {
+        throw new Error('Tarea no encontrada.');
+    }
+
+    const bytes = await imageFile.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    const imageUrl = `data:${imageFile.type};base64,${buffer.toString('base64')}`;
+
+    db.tasks[taskIndex].imageUrl = imageUrl;
+    db.tasks[taskIndex].location = location;
+
+    await writeDb(db);
+
+    revalidatePath(`/projects/${projectId}`);
 }

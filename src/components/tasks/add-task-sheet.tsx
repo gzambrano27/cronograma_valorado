@@ -12,8 +12,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { CalendarIcon, Plus, UploadCloud, MapPin } from "lucide-react"
-import { Textarea } from "../ui/textarea"
+import { CalendarIcon, Plus } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { Calendar } from "../ui/calendar"
 import { cn } from "@/lib/utils"
@@ -154,24 +153,6 @@ export function AddTaskSheet({ projectId }: { projectId: string }) {
                                 <Calendar mode="single" selected={endDate} onSelect={setEndDate} initialFocus />
                             </PopoverContent>
                         </Popover>
-                    </div>
-                </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="location">Ubicación</Label>
-                    <div className="relative">
-                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"/>
-                        <Input id="location" name="location" placeholder="Ej: Sector A-1, Km 5" className="pl-10" required />
-                    </div>
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="image-upload">Validación Visual (Opcional)</Label>
-                    <div className="relative flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted">
-                        <Input id="image-upload" name="image" type="file" className="absolute w-full h-full opacity-0 cursor-pointer" />
-                        <div className="text-center">
-                            <UploadCloud className="w-8 h-8 mx-auto text-muted-foreground" />
-                            <p className="mt-2 text-sm text-muted-foreground">Arrastra y suelta o haz clic para subir</p>
-                            <p className="text-xs text-muted-foreground">PNG, JPG (MAX. 5MB)</p>
-                        </div>
                     </div>
                 </div>
             </div>
