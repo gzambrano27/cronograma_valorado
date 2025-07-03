@@ -2,9 +2,10 @@
 
 import * as React from "react"
 import {
-  CaretSortIcon,
-  ChevronDownIcon,
-} from "@radix-ui/react-icons"
+  ArrowUpDown,
+  ChevronDown,
+  ChevronRight,
+} from "lucide-react"
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -15,6 +16,7 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  getExpandedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
 
@@ -36,8 +38,29 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import type { Task } from "@/lib/types"
+import { DailyConsumptionTracker } from "./daily-consumption-tracker"
 
 const columns: ColumnDef<Task>[] = [
+  {
+    id: 'expander',
+    header: () => null,
+    cell: ({ row }) => {
+      return (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={row.getToggleExpandedHandler()}
+          className="w-8 p-0 data-[state=open]:bg-muted"
+        >
+          {row.getIsExpanded() ? (
+            <ChevronDown className="h-4 w-4" />
+          ) : (
+            <ChevronRight className="h-4 w-4" />
+          )}
+        </Button>
+      )
+    },
+  },
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -47,7 +70,7 @@ const columns: ColumnDef<Task>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Tarea
-          <CaretSortIcon className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )
     },
@@ -98,6 +121,7 @@ export function TaskTable({ data }: { data: Task[] }) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
+  const [expanded, setExpanded] = React.useState({})
 
   const table = useReactTable({
     data,
@@ -110,11 +134,15 @@ export function TaskTable({ data }: { data: Task[] }) {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    getExpandedRowModel: getExpandedRowModel(),
+    onExpandedChange: setExpanded,
+    getRowCanExpand: () => true,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
+      expanded,
     },
   })
 
@@ -132,7 +160,7 @@ export function TaskTable({ data }: { data: Task[] }) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
-              Columnas <ChevronDownIcon className="ml-2 h-4 w-4" />
+              Columnas <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -149,7 +177,7 @@ export function TaskTable({ data }: { data: Task[] }) {
                       column.toggleVisibility(!!value)
                     }
                   >
-                    {column.id}
+                    {column.id === 'expander' ? 'Expandir' : column.id}
                   </DropdownMenuCheckboxItem>
                 )
               })}
@@ -163,7 +191,7 @@ export function TaskTable({ data }: { data: Task[] }) {
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} style={{ width: header.getSize() !== 150 ? undefined : header.getSize() }}>
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -179,19 +207,27 @@ export function TaskTable({ data }: { data: Task[] }) {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                <React.Fragment key={row.id}>
+                  <TableRow
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                  {row.getIsExpanded() && (
+                     <TableRow>
+                        <TableCell colSpan={row.getVisibleCells().length}>
+                           <DailyConsumptionTracker task={row.original} />
+                        </TableCell>
+                     </TableRow>
+                  )}
+                </React.Fragment>
               ))
             ) : (
               <TableRow>

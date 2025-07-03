@@ -1,4 +1,4 @@
-import type { Project, Task, SCurveData } from './types';
+import type { Project, Task, SCurveData, DailyConsumption } from './types';
 
 export const projects: Project[] = [
   {
@@ -35,7 +35,13 @@ export const projects: Project[] = [
 
 export const tasks: Task[] = [
   // Project 1 Tasks
-  { id: 'task-1-1', projectId: 'proj-1', name: 'Excavación de cimientos', quantity: 500, value: 150000, startDate: new Date('2024-08-01'), endDate: new Date('2024-08-10'), dailyValue: 15000, location: 'Sector A-1', status: 'completed' },
+  { id: 'task-1-1', projectId: 'proj-1', name: 'Excavación de cimientos', quantity: 500, value: 150000, startDate: new Date('2024-08-01'), endDate: new Date('2024-08-10'), dailyValue: 15000, location: 'Sector A-1', status: 'completed',
+    dailyConsumption: [
+      { date: new Date('2024-08-01'), consumedQuantity: 50 },
+      { date: new Date('2024-08-02'), consumedQuantity: 55 },
+      { date: new Date('2024-08-03'), consumedQuantity: 48 },
+    ]
+  },
   { id: 'task-1-2', projectId: 'proj-1', name: 'Vaciado de hormigón', quantity: 300, value: 200000, startDate: new Date('2024-08-11'), endDate: new Date('2024-08-20'), dailyValue: 20000, location: 'Sector A-1', status: 'in-progress' },
   { id: 'task-1-3', projectId: 'proj-1', name: 'Montaje de estructura de acero', quantity: 1, value: 450000, startDate: new Date('2024-08-21'), endDate: new Date('2024-09-15'), dailyValue: 18000, location: 'General', status: 'pending' },
   

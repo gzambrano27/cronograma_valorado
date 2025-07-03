@@ -1,3 +1,8 @@
+export type DailyConsumption = {
+  date: Date;
+  consumedQuantity: number;
+};
+
 export type Project = {
   id: string;
   name: string;
@@ -21,6 +26,7 @@ export type Task = {
   location: string;
   imageUrl?: string;
   status: 'pending' | 'in-progress' | 'completed';
+  dailyConsumption?: DailyConsumption[];
 };
 
 export type SCurveData = {
