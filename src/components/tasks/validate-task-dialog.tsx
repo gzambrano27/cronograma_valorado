@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { validateTask } from "@/lib/actions";
 import type { Task } from "@/lib/types";
 import { UploadCloud, MapPin, Loader2 } from "lucide-react";
-import React, { useState, useRef, useCallback, useMemo } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { useFormStatus } from "react-dom";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
@@ -84,15 +84,16 @@ export function ValidateTaskDialog({
       });
     }
   };
-
-  const mapDisplay = useMemo(() => (
-    <div className="h-[300px] w-full rounded-md border overflow-hidden">
-        <MapPicker onLocationSelect={handleLocationSelect} />
-    </div>
-  ), [handleLocationSelect]);
   
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(isOpen) => {
+        onOpenChange(isOpen);
+        if (!isOpen) {
+            // Reset state when closing
+            setImagePreview(null);
+            setLocation(null);
+        }
+    }}>
       <DialogContent className="sm:max-w-md">
         <form ref={formRef} action={action}>
           <DialogHeader>
@@ -123,7 +124,9 @@ export function ValidateTaskDialog({
 
             <div className="space-y-2">
                 <Label>Seleccionar Ubicación</Label>
-                {mapDisplay}
+                 <div className="h-[300px] w-full rounded-md border overflow-hidden">
+                    <MapPicker onLocationSelect={handleLocationSelect} />
+                </div>
                 {location && (
                    <div className="flex items-center gap-2 p-2 mt-2 border rounded-md bg-muted">
                        <MapPin className="h-5 w-5 text-primary" />
