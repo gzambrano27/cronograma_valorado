@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Map, Marker } from "pigeon-maps";
@@ -30,10 +31,22 @@ export function MapPicker({ onLocationSelect, onLocationError }: MapPickerProps)
     setIsLocating(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const { latitude, longitude } = position.coords;
+        const { latitude, longitude, accuracy } = position.coords;
         const userLocation: [number, number] = [latitude, longitude];
+        
+        let newZoom = 13;
+        if (accuracy < 20) {
+            newZoom = 18;
+        } else if (accuracy < 50) {
+            newZoom = 17;
+        } else if (accuracy < 100) {
+            newZoom = 16;
+        } else if (accuracy < 500) {
+            newZoom = 15;
+        }
+
         setCenter(userLocation);
-        setZoom(16);
+        setZoom(newZoom);
         setMarkerPosition(userLocation);
         onLocationSelect({ lat: latitude, lng: longitude });
         setIsLocating(false);
@@ -46,6 +59,11 @@ export function MapPicker({ onLocationSelect, onLocationError }: MapPickerProps)
         }
         onLocationError(message);
         setIsLocating(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
       }
     );
   };
