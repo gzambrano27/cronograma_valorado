@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getProjectById, getTasksByProjectId, sCurveData } from "@/lib/data";
+import { getProjectById, getTasksByProjectId, generateSCurveData } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SCurveChart } from "@/components/tasks/s-curve-chart";
 import { TaskTable } from "@/components/tasks/task-table";
@@ -9,11 +9,13 @@ import { AddTaskSheet } from "@/components/tasks/add-task-sheet";
 
 export default async function ProjectPage({ params }: { params: { id: string } }) {
   const project = await getProjectById(params.id);
-  const projectTasks = await getTasksByProjectId(params.id);
-
+  
   if (!project) {
     notFound();
   }
+
+  const projectTasks = await getTasksByProjectId(params.id);
+  const sCurve = generateSCurveData(projectTasks, project.totalValue);
 
   const progressPercentage = project.taskCount > 0 ? (project.completedTasks / project.taskCount) * 100 : 0;
 
@@ -25,7 +27,7 @@ export default async function ProjectPage({ params }: { params: { id: string } }
         </h1>
         <div className="flex items-center space-x-2">
           <XmlImport />
-          <AddTaskSheet />
+          <AddTaskSheet projectId={project.id} />
         </div>
       </div>
 
@@ -71,7 +73,7 @@ export default async function ProjectPage({ params }: { params: { id: string } }
               </CardDescription>
               </CardHeader>
               <CardContent className="pl-2">
-                  <SCurveChart data={sCurveData} />
+                  <SCurveChart data={sCurve} />
               </CardContent>
           </Card>
           <Card className="lg:col-span-2">

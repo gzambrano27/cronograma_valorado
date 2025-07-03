@@ -1,10 +1,11 @@
 import type { Project, Task, SCurveData } from './types';
 import fs from 'fs/promises';
 import path from 'path';
+import { differenceInCalendarDays, eachDayOfInterval, format } from 'date-fns';
 
 // Define a type for the structure of our JSON database
 interface Database {
-  projects: Project[];
+  projects: Omit<Project, 'totalValue' | 'taskCount' | 'completedTasks'>[];
   tasks: Task[];
 }
 
@@ -41,11 +42,13 @@ export async function getProjects(): Promise<Project[]> {
     const projectTasks = tasks.filter(task => task.projectId === project.id);
     const completedTasks = projectTasks.filter(task => task.status === 'completado').length;
     const taskCount = projectTasks.length;
+    const totalValue = projectTasks.reduce((sum, task) => sum + task.value, 0);
     
     return {
       ...project,
       taskCount,
       completedTasks,
+      totalValue,
     };
   });
 }
@@ -65,42 +68,66 @@ export async function getTasksByProjectId(id: string): Promise<Task[]> {
     return tasks.filter(t => t.projectId === id);
 }
 
-
-function createCumulativeData(days: number): SCurveData[] {
-  const data: SCurveData[] = [];
-  let cumulativePlanned = 0;
-  let cumulativeActual = 0;
-
-  const plannedCurve = (day: number) => {
-    // Sigmoid-like function for a typical S-curve
-    return 1 / (1 + Math.exp(-0.2 * (day - days / 2)));
-  };
-
-  for (let i = 1; i <= days; i++) {
-    const plannedIncrement = plannedCurve(i) * (100 / (days * 0.65)); // Scaled increment
-    cumulativePlanned += Math.min(plannedIncrement, 100 - cumulativePlanned);
-
-    let actualIncrement = 0;
-    if (i < days * 0.75) { // Simulate actual progress lagging then catching up
-      actualIncrement = plannedIncrement * (Math.random() * 0.4 + 0.5); // 50-90% of planned
-    } else {
-      actualIncrement = plannedIncrement * (Math.random() * 0.3 + 0.9); // 90-120% of planned
-    }
-    cumulativeActual += Math.min(actualIncrement, 100 - cumulativeActual);
-    
-    data.push({
-      day: i,
-      planned: Math.round(Math.min(100, cumulativePlanned)),
-      actual: Math.round(Math.min(100, cumulativeActual)),
-    });
+export function generateSCurveData(tasks: Task[], totalProjectValue: number): SCurveData[] {
+  if (tasks.length === 0 || totalProjectValue === 0) {
+    return [{ day: 1, planned: 0, actual: 0 }];
   }
 
-  // Ensure curves end at or near 100 and 90 respectively for this example
-  data[data.length - 1].planned = 100;
-  if(data[data.length-1].actual > 95) data[data.length-1].actual = 95;
+  const projectStartDate = new Date(Math.min(...tasks.map(t => new Date(t.startDate).getTime())));
+  const projectEndDate = new Date(Math.max(...tasks.map(t => new Date(t.endDate).getTime())));
 
+  if (projectStartDate > projectEndDate) {
+    return [{ day: 1, planned: 0, actual: 0 }];
+  }
 
-  return data;
+  const projectInterval = eachDayOfInterval({ start: projectStartDate, end: projectEndDate });
+
+  let cumulativePlannedValue = 0;
+  let cumulativeActualValue = 0;
+
+  const sCurve: SCurveData[] = projectInterval.map((day, index) => {
+    let dailyPlannedValue = 0;
+    let dailyActualValue = 0;
+
+    tasks.forEach(task => {
+      const taskStartDate = new Date(task.startDate);
+      const taskEndDate = new Date(task.endDate);
+
+      // Adjust date to avoid timezone issues
+      const adjustedDay = new Date(day.getFullYear(), day.getMonth(), day.getDate());
+
+      if (adjustedDay >= taskStartDate && adjustedDay <= taskEndDate) {
+        const duration = differenceInCalendarDays(taskEndDate, taskStartDate) + 1;
+        if (duration > 0) {
+          dailyPlannedValue += task.value / duration;
+        }
+      }
+
+      if (task.dailyConsumption) {
+        const consumptionToday = task.dailyConsumption.find(
+          c => format(new Date(c.date), 'yyyy-MM-dd') === format(adjustedDay, 'yyyy-MM-dd')
+        );
+        if (consumptionToday && task.quantity > 0) {
+          const valuePerUnit = task.value / task.quantity;
+          dailyActualValue += consumptionToday.consumedQuantity * valuePerUnit;
+        }
+      }
+    });
+
+    cumulativePlannedValue += dailyPlannedValue;
+    cumulativeActualValue += dailyActualValue;
+
+    return {
+      day: index + 1,
+      planned: Math.round((cumulativePlannedValue / totalProjectValue) * 100),
+      actual: Math.round((cumulativeActualValue / totalProjectValue) * 100),
+    };
+  });
+
+  // Clamp values between 0 and 100
+  return sCurve.map(d => ({
+      ...d,
+      planned: Math.max(0, Math.min(100, d.planned)),
+      actual: Math.max(0, Math.min(100, d.actual)),
+  }));
 }
-
-export const sCurveData: SCurveData[] = createCumulativeData(30);

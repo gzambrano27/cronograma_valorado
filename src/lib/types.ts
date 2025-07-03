@@ -22,7 +22,6 @@ export type Task = {
   value: number;
   startDate: Date;
   endDate: Date;
-  dailyValue: number;
   location: string;
   imageUrl?: string;
   status: 'pendiente' | 'en-progreso' | 'completado';
