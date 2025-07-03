@@ -18,7 +18,7 @@
       "startDate": "2025-07-07T00:00:00.000Z",
       "endDate": "2025-07-11T00:00:00.000Z",
       "location": "Sector Tarea 1",
-      "status": "completado",
+      "status": "en-progreso",
       "dailyConsumption": [
         {
           "date": "2025-07-07T00:00:00.000Z",
@@ -35,10 +35,6 @@
         {
           "date": "2025-07-09T00:00:00.000Z",
           "consumedQuantity": 5
-        },
-        {
-          "date": "2025-07-11T00:00:00.000Z",
-          "consumedQuantity": 40
         }
       ]
     }
