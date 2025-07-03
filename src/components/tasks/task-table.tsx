@@ -43,6 +43,7 @@ import { Badge } from "@/components/ui/badge"
 import type { Task } from "@/lib/types"
 import { DailyConsumptionTracker } from "./daily-consumption-tracker"
 import { TaskActions } from "./task-actions"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 const statusTranslations: Record<Task['status'], string> = {
     'pendiente': 'Pendiente',
@@ -173,7 +174,23 @@ const columnTranslations: Record<string, string> = {
 export function TaskTable({ data }: { data: Task[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
+  
+  const isMobile = useIsMobile();
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  
+  React.useEffect(() => {
+    if (isMobile) {
+      setColumnVisibility({
+        quantity: false,
+        value: false,
+        startDate: false,
+        endDate: false,
+      });
+    } else {
+      setColumnVisibility({});
+    }
+  }, [isMobile]);
+
   const [rowSelection, setRowSelection] = React.useState({})
   const [expanded, setExpanded] = React.useState({})
 

@@ -6,6 +6,7 @@ import { TaskTable } from "@/components/tasks/task-table";
 import { XmlImport } from "@/components/tasks/xml-import";
 import { DollarSign, CheckCircle, ListTodo } from "lucide-react";
 import { AddTaskSheet } from "@/components/tasks/add-task-sheet";
+import { Progress } from "@/components/ui/progress";
 
 export default async function ProjectPage({ params: { id } }: { params: { id: string } }) {
   const project = await getProjectById(id);
@@ -18,6 +19,9 @@ export default async function ProjectPage({ params: { id } }: { params: { id: st
   const sCurve = generateSCurveData(projectTasks, project.totalValue);
 
   const progressPercentage = project.taskCount > 0 ? (project.completedTasks / project.taskCount) * 100 : 0;
+  const tasksInProgress = projectTasks.filter(t => t.status === 'en-progreso').length;
+  const tasksPending = projectTasks.filter(t => t.status === 'pendiente').length;
+
 
   return (
     <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
@@ -81,22 +85,36 @@ export default async function ProjectPage({ params: { id } }: { params: { id: st
                   <CardTitle className="font-headline">Resumen de Tareas</CardTitle>
                   <CardDescription>Vista rápida del estado de las tareas.</CardDescription>
               </CardHeader>
-              <CardContent>
-                  {/* Placeholder for task summary content */}
-                  <ul className="space-y-4">
-                      <li className="flex items-center">
-                          <CheckCircle className="h-5 w-5 text-primary mr-3"/>
-                          <span className="font-medium">{project.completedTasks} Tareas Completadas</span>
-                      </li>
-                      <li className="flex items-center">
-                          <ListTodo className="h-5 w-5 text-accent-foreground mr-3"/>
-                          <span className="font-medium">{projectTasks.filter(t => t.status === 'en-progreso').length} Tareas en Progreso</span>
-                      </li>
-                       <li className="flex items-center">
-                          <ListTodo className="h-5 w-5 text-muted-foreground mr-3"/>
-                          <span className="font-medium">{projectTasks.filter(t => t.status === 'pendiente').length} Tareas Pendientes</span>
-                      </li>
-                  </ul>
+              <CardContent className="space-y-6">
+                {project.taskCount > 0 ? (
+                  <>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="font-medium text-muted-foreground">Completadas</span>
+                        <span className="font-semibold">{project.completedTasks} / {project.taskCount}</span>
+                      </div>
+                      <Progress value={progressPercentage} aria-label={`${progressPercentage.toFixed(0)}% completado`} />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="font-medium text-muted-foreground">En Progreso</span>
+                        <span className="font-semibold">{tasksInProgress}</span>
+                      </div>
+                      <Progress value={(tasksInProgress / project.taskCount) * 100} className="[&>div]:bg-secondary-foreground" aria-label={`${tasksInProgress} tareas en progreso`} />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="font-medium text-muted-foreground">Pendientes</span>
+                        <span className="font-semibold">{tasksPending}</span>
+                      </div>
+                      <Progress value={(tasksPending / project.taskCount) * 100} className="[&>div]:bg-muted-foreground" aria-label={`${tasksPending} tareas pendientes`} />
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center text-muted-foreground py-10">
+                    Aún no hay tareas en este proyecto.
+                  </div>
+                )}
               </CardContent>
           </Card>
       </div>
