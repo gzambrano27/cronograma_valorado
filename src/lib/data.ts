@@ -35,7 +35,19 @@ async function readDb(): Promise<Database> {
 // Functions to get data
 export async function getProjects(): Promise<Project[]> {
   const db = await readDb();
-  return db.projects;
+  const { projects, tasks } = db;
+
+  return projects.map(project => {
+    const projectTasks = tasks.filter(task => task.projectId === project.id);
+    const completedTasks = projectTasks.filter(task => task.status === 'completado').length;
+    const taskCount = projectTasks.length;
+    
+    return {
+      ...project,
+      taskCount,
+      completedTasks,
+    };
+  });
 }
 
 export async function getTasks(): Promise<Task[]> {
