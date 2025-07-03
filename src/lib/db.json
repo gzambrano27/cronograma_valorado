@@ -8,5 +8,18 @@
       "dataAiHint": "project building"
     }
   ],
-  "tasks": []
+  "tasks": [
+    {
+      "id": "task-1751569224036",
+      "projectId": "proj-1751568818238",
+      "name": "Tarea 1",
+      "quantity": 150,
+      "value": 5000,
+      "startDate": "2025-07-07T00:00:00.000Z",
+      "endDate": "2025-07-11T00:00:00.000Z",
+      "location": "Sector Tarea 1",
+      "status": "pendiente",
+      "dailyConsumption": []
+    }
+  ]
 }

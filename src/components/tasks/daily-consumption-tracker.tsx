@@ -1,7 +1,7 @@
 "use client";
 
 import type { Task } from "@/lib/types";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { format, differenceInCalendarDays } from "date-fns";
+import { updateTaskConsumption } from "@/lib/actions";
 
 interface DailyConsumptionTrackerProps {
   task: Task;
@@ -21,6 +22,7 @@ interface DailyConsumptionTrackerProps {
 
 export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) {
   const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
 
   const adjustDateForTimezone = (date: Date | string): Date => {
     const d = new Date(date);
@@ -37,20 +39,36 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
 
   const handleConsumptionChange = (date: string, value: string) => {
     const newConsumptions = { ...consumptions };
-    const numericValue = Number(value);
-    if (!isNaN(numericValue) && numericValue >= 0) {
-      newConsumptions[date] = numericValue;
-      setConsumptions(newConsumptions);
+    if (value === "") {
+        delete newConsumptions[date];
+    } else {
+        const numericValue = Number(value);
+        if (!isNaN(numericValue) && numericValue >= 0) {
+            newConsumptions[date] = numericValue;
+        }
     }
+    setConsumptions(newConsumptions);
   };
 
   const handleSave = (date: string) => {
-    toast({
-      title: "Consumo Guardado",
-      description: `El consumo para el ${format(
-        adjustDateForTimezone(date),
-        "PPP"
-      )} ha sido guardado.`,
+    const consumedQuantity = consumptions[date] || 0;
+    startTransition(async () => {
+      try {
+        await updateTaskConsumption(task.id, date, consumedQuantity);
+        toast({
+          title: "Consumo Guardado",
+          description: `El consumo para el ${format(
+            adjustDateForTimezone(date),
+            "PPP"
+          )} ha sido actualizado.`,
+        });
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "No se pudo guardar el consumo.",
+        });
+      }
     });
   };
 
@@ -97,17 +115,22 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
                     <TableCell>
                     <Input
                         type="number"
-                        value={consumptions[dateString] || ""}
+                        value={consumptions[dateString] ?? ""}
                         onChange={(e) =>
                         handleConsumptionChange(dateString, e.target.value)
                         }
                         placeholder="0"
                         className="h-8"
+                        disabled={isPending}
                     />
                     </TableCell>
                     <TableCell className="text-right">
-                    <Button size="sm" onClick={() => handleSave(dateString)}>
-                        Guardar
+                    <Button 
+                        size="sm" 
+                        onClick={() => handleSave(dateString)}
+                        disabled={isPending}
+                    >
+                        {isPending ? "Guardando..." : "Guardar"}
                     </Button>
                     </TableCell>
                 </TableRow>

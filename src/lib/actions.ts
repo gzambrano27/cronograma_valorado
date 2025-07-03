@@ -12,7 +12,18 @@ const dbPath = path.join(process.cwd(), 'src', 'lib', 'db.json');
 async function readDb(): Promise<Database> {
   try {
     const fileContent = await fs.readFile(dbPath, 'utf-8');
-    return JSON.parse(fileContent);
+    const db = JSON.parse(fileContent) as Database;
+    // Dates are stored as ISO strings, convert them back to Date objects
+    db.tasks.forEach(task => {
+        task.startDate = new Date(task.startDate);
+        task.endDate = new Date(task.endDate);
+        if (task.dailyConsumption) {
+            task.dailyConsumption.forEach(dc => {
+                dc.date = new Date(dc.date);
+            });
+        }
+    });
+    return db;
   } catch (error) {
     console.error('Error reading database:', error);
     // Return a default structure if the file doesn't exist or is empty
@@ -163,5 +174,60 @@ export async function deleteTask(taskId: string, projectId: string) {
     db.tasks = db.tasks.filter(t => t.id !== taskId);
     await writeDb(db);
     revalidatePath(`/projects/${projectId}`);
+    revalidatePath(`/`);
+}
+
+export async function updateTaskConsumption(taskId: string, date: string, consumedQuantity: number) {
+    const db = await readDb();
+    const taskIndex = db.tasks.findIndex(t => t.id === taskId);
+
+    if (taskIndex === -1) {
+        throw new Error('Tarea no encontrada.');
+    }
+
+    const task = db.tasks[taskIndex];
+    if (!task.dailyConsumption) {
+        task.dailyConsumption = [];
+    }
+    
+    // date is 'yyyy-MM-dd'. We want to treat it as a UTC date to avoid timezone issues.
+    const [year, month, day] = date.split('-').map(Number);
+    const consumptionDate = new Date(Date.UTC(year, month - 1, day));
+
+    const consumptionIndex = task.dailyConsumption.findIndex(
+        c => new Date(c.date).getTime() === consumptionDate.getTime()
+    );
+    
+    if (consumedQuantity > 0) {
+        if (consumptionIndex > -1) {
+            // Update existing consumption
+            task.dailyConsumption[consumptionIndex].consumedQuantity = consumedQuantity;
+        } else {
+            // Add new consumption
+            task.dailyConsumption.push({ date: consumptionDate, consumedQuantity });
+        }
+    } else {
+        // If consumption is 0 or less, remove it from the array
+        if (consumptionIndex > -1) {
+            task.dailyConsumption.splice(consumptionIndex, 1);
+        }
+    }
+
+
+    // Update task status based on consumption
+    const totalConsumed = task.dailyConsumption.reduce((sum, c) => sum + c.consumedQuantity, 0);
+
+    if (totalConsumed >= task.quantity) {
+        task.status = 'completado';
+    } else if (totalConsumed > 0) {
+        task.status = 'en-progreso';
+    } else {
+        task.status = 'pendiente';
+    }
+    
+    db.tasks[taskIndex] = task;
+    await writeDb(db);
+
+    revalidatePath(`/projects/${task.projectId}`);
     revalidatePath(`/`);
 }
