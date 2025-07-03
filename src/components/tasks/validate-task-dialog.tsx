@@ -15,20 +15,12 @@ import { Label } from "@/components/ui/label";
 import { validateTask } from "@/lib/actions";
 import type { Task } from "@/lib/types";
 import { UploadCloud, MapPin, Loader2 } from "lucide-react";
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
-import dynamic from "next/dynamic";
+import { MapPicker } from "./map-picker";
 import { Skeleton } from "../ui/skeleton";
-
-const MapPicker = dynamic(
-  () => import("./map-picker").then((mod) => mod.MapPicker),
-  {
-    ssr: false,
-    loading: () => <Skeleton className="h-full w-full" />,
-  }
-);
 
 function SubmitButton({ disabled }: { disabled: boolean }) {
     const { pending } = useFormStatus();
@@ -52,6 +44,11 @@ export function ValidateTaskDialog({
   const [location, setLocation] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { toast } = useToast();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleLocationSelect = useCallback((loc: { lat: number; lng: number }) => {
     setLocation(`${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}`);
@@ -85,6 +82,11 @@ export function ValidateTaskDialog({
     }
   };
   
+  // Memoize the map component to prevent re-initialization on parent re-renders
+  const mapComponent = useMemo(() => {
+    return <MapPicker onLocationSelect={handleLocationSelect} />;
+  }, [handleLocationSelect]);
+
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
         onOpenChange(isOpen);
@@ -125,7 +127,7 @@ export function ValidateTaskDialog({
             <div className="space-y-2">
                 <Label>Seleccionar Ubicación</Label>
                  <div className="h-[300px] w-full rounded-md border overflow-hidden">
-                    <MapPicker onLocationSelect={handleLocationSelect} />
+                    {isClient ? mapComponent : <Skeleton className="h-full w-full" />}
                 </div>
                 {location && (
                    <div className="flex items-center gap-2 p-2 mt-2 border rounded-md bg-muted">
