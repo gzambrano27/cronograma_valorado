@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Progress } from "@/components/ui/progress";
 import Image from "next/image";
 import Link from "next/link";
-import { ViewDetailsButton } from "./view-details-button";
+import { ProjectActions } from "./project-actions";
 
 interface ProjectListProps {
   projects: Project[];
@@ -13,8 +13,11 @@ export default function ProjectList({ projects }: ProjectListProps) {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {projects.map((project) => (
-        <Link key={project.id} href={`/projects/${project.id}`} className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg">
-          <Card className="hover:border-primary transition-all duration-300 h-full flex flex-col">
+        <Card key={project.id} className="hover:border-primary transition-all duration-300 h-full flex flex-col relative group">
+          <div className="absolute top-2 right-2 z-10">
+            <ProjectActions project={project} />
+          </div>
+          <Link href={`/projects/${project.id}`} className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-lg contents" aria-label={`Ver detalles de ${project.name}`}>
             <CardHeader>
               <div className="relative h-40 w-full mb-4">
                 <Image
@@ -35,17 +38,16 @@ export default function ProjectList({ projects }: ProjectListProps) {
                   {project.completedTasks} / {project.taskCount} tareas
                 </span>
               </div>
-              <Progress value={(project.completedTasks / project.taskCount) * 100} className="w-full" />
+              <Progress value={project.taskCount > 0 ? (project.completedTasks / project.taskCount) * 100 : 0} className="w-full" />
             </CardContent>
             <CardFooter className="flex justify-between items-end">
               <div>
                 <p className="text-xs text-muted-foreground">Valor del Proyecto</p>
                 <p className="text-lg font-bold">${project.totalValue.toLocaleString()}</p>
               </div>
-              <ViewDetailsButton />
             </CardFooter>
-          </Card>
-        </Link>
+          </Link>
+        </Card>
       ))}
     </div>
   );
