@@ -49,14 +49,14 @@ export function CreateProjectDialog({
   
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      {children || (
+      {children || (!isEditing && (
         <DialogTrigger asChild>
           <Button>
             <PlusCircle className="mr-2 h-4 w-4" />
             Crear Proyecto
           </Button>
         </DialogTrigger>
-      )}
+      ))}
       <DialogContent className="sm:max-w-[425px]">
         <form 
           ref={formRef} 
