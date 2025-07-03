@@ -27,7 +27,7 @@ const MapPicker = dynamic(
   () => import("./map-picker").then((mod) => mod.MapPicker),
   {
     ssr: false,
-    loading: () => <Skeleton className="h-full w-full" />,
+    loading: () => <Skeleton className="h-[300px] w-full" />,
   }
 );
 
@@ -53,12 +53,10 @@ export function ValidateTaskDialog({
   const formRef = useRef<HTMLFormElement>(null);
   const [location, setLocation] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [showMap, setShowMap] = useState(false);
   const { toast } = useToast();
 
   const handleLocationSelect = useCallback((loc: { lat: number; lng: number }) => {
     setLocation(`${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}`);
-    setShowMap(false);
   }, []);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,7 +95,6 @@ export function ValidateTaskDialog({
             // Reset state when closing
             setImagePreview(null);
             setLocation(null);
-            setShowMap(false);
         }
     }}>
       <DialogContent className="sm:max-w-md">
@@ -105,7 +102,7 @@ export function ValidateTaskDialog({
           <DialogHeader>
             <DialogTitle className="font-headline">Validar Tarea: {task.name}</DialogTitle>
             <DialogDescription>
-              Sube una imagen de evidencia y selecciona la ubicación en el mapa.
+              Sube una imagen de evidencia. La ubicación se detectará automáticamente.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -130,29 +127,20 @@ export function ValidateTaskDialog({
 
             <div className="space-y-2">
                 <Label>Ubicación</Label>
-                {showMap ? (
-                   <div className="h-[300px] w-full rounded-md border overflow-hidden">
-                       <MapPicker onLocationSelect={handleLocationSelect} />
-                   </div>
-                ) : (
-                    <>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => setShowMap(true)}
-                            className="w-full"
-                        >
-                            <MapPin className="mr-2 h-4 w-4" />
-                            Seleccionar en el mapa
-                        </Button>
-                        {location && (
-                           <div className="flex items-center gap-2 p-2 mt-2 border rounded-md bg-muted">
-                               <MapPin className="h-5 w-5 text-primary" />
-                               <span className="text-sm font-mono text-muted-foreground">{location}</span>
-                           </div>
-                       )}
-                   </>
-                )}
+                 <div className="h-[300px] w-full rounded-md border overflow-hidden">
+                     <MapPicker onLocationSelect={handleLocationSelect} />
+                 </div>
+                 {location ? (
+                    <div className="flex items-center gap-2 p-2 mt-2 border rounded-md bg-muted">
+                        <MapPin className="h-5 w-5 text-primary" />
+                        <span className="text-sm font-mono text-muted-foreground">{location}</span>
+                    </div>
+                 ) : (
+                    <div className="flex items-center gap-2 p-2 mt-2 border rounded-md bg-muted">
+                        <Loader2 className="h-5 w-5 text-primary animate-spin" />
+                        <span className="text-sm text-muted-foreground">Obteniendo ubicación...</span>
+                    </div>
+                 )}
             </div>
           </div>
           <DialogFooter>

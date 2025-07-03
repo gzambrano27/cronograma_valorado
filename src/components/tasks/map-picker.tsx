@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Map, Marker } from "pigeon-maps";
@@ -14,19 +13,28 @@ export function MapPicker({ onLocationSelect }: MapPickerProps) {
   const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const { latitude, longitude } = position.coords;
-          setCenter([latitude, longitude]);
-          setZoom(15);
+          if (isMounted) {
+            const { latitude, longitude } = position.coords;
+            const userLocation: [number, number] = [latitude, longitude];
+            setCenter(userLocation);
+            setZoom(16);
+            setMarkerPosition(userLocation);
+            onLocationSelect({ lat: latitude, lng: longitude });
+          }
         },
         () => {
           console.error("No se pudo obtener la geolocalización.");
         }
       );
     }
-  }, []);
+    return () => {
+      isMounted = false;
+    };
+  }, [onLocationSelect]);
 
   const handleMapClick = ({ latLng }: { latLng: [number, number] }) => {
     setMarkerPosition(latLng);
@@ -38,6 +46,10 @@ export function MapPicker({ onLocationSelect }: MapPickerProps) {
       <Map
         center={center}
         zoom={zoom}
+        onBoundsChanged={({ center, zoom }) => {
+          setCenter(center);
+          setZoom(zoom);
+        }}
         onClick={handleMapClick}
       >
         {markerPosition && (
