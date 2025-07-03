@@ -110,7 +110,7 @@ export function ValidateTaskDialog({
           <DialogHeader>
             <DialogTitle className="font-headline">Validar Tarea: {task.name}</DialogTitle>
             <DialogDescription>
-              Sube una imagen de evidencia. La ubicación se detectará automáticamente.
+              Sube una imagen de evidencia y selecciona la ubicación en el mapa.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -144,9 +144,9 @@ export function ValidateTaskDialog({
                         <span className="text-sm font-mono text-muted-foreground">{location}</span>
                     </div>
                  ) : (
-                    <div className="flex items-center gap-2 p-2 mt-2 border rounded-md bg-muted">
-                        <Loader2 className="h-5 w-5 text-primary animate-spin" />
-                        <span className="text-sm text-muted-foreground">Obteniendo ubicación...</span>
+                    <div className="flex items-center gap-2 p-2 mt-2 border rounded-md bg-muted/80">
+                        <MapPin className="h-5 w-5 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">Seleccione una ubicación en el mapa...</span>
                     </div>
                  )}
             </div>

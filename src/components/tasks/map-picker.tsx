@@ -1,7 +1,9 @@
 "use client";
 
 import { Map, Marker } from "pigeon-maps";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { Button } from "../ui/button";
+import { LocateFixed, Loader2 } from "lucide-react";
 
 interface MapPickerProps {
   onLocationSelect: (location: { lat: number; lng: number }) => void;
@@ -12,24 +14,29 @@ export function MapPicker({ onLocationSelect, onLocationError }: MapPickerProps)
   const [center, setCenter] = useState<[number, number]>([-12.046374, -77.042793]);
   const [zoom, setZoom] = useState(13);
   const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
 
-  useEffect(() => {
-    let isMounted = true;
+  const handleMapClick = ({ latLng }: { latLng: [number, number] }) => {
+    setMarkerPosition(latLng);
+    onLocationSelect({ lat: latLng[0], lng: latLng[1] });
+  };
+  
+  const handleLocateMe = () => {
     if (!navigator.geolocation) {
       onLocationError("La geolocalización no es compatible con su navegador.");
       return;
     }
 
+    setIsLocating(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        if (isMounted) {
-          const { latitude, longitude } = position.coords;
-          const userLocation: [number, number] = [latitude, longitude];
-          setCenter(userLocation);
-          setZoom(16);
-          setMarkerPosition(userLocation);
-          onLocationSelect({ lat: latitude, lng: longitude });
-        }
+        const { latitude, longitude } = position.coords;
+        const userLocation: [number, number] = [latitude, longitude];
+        setCenter(userLocation);
+        setZoom(16);
+        setMarkerPosition(userLocation);
+        onLocationSelect({ lat: latitude, lng: longitude });
+        setIsLocating(false);
       },
       (error) => {
         console.error("Error de geolocalización:", error);
@@ -38,22 +45,13 @@ export function MapPicker({ onLocationSelect, onLocationError }: MapPickerProps)
             message = "Permiso de ubicación denegado. Por favor, habilite los permisos o seleccione una ubicación manualmente."
         }
         onLocationError(message);
+        setIsLocating(false);
       }
     );
-    
-    return () => {
-      isMounted = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run only once on mount
-
-  const handleMapClick = ({ latLng }: { latLng: [number, number] }) => {
-    setMarkerPosition(latLng);
-    onLocationSelect({ lat: latLng[0], lng: latLng[1] });
   };
-  
+
   return (
-    <div style={{ height: '100%', width: '100%' }}>
+    <div className="relative h-full w-full">
       <Map
         center={center}
         zoom={zoom}
@@ -71,6 +69,20 @@ export function MapPicker({ onLocationSelect, onLocationError }: MapPickerProps)
           />
         )}
       </Map>
+      <Button
+        type="button"
+        size="icon"
+        className="absolute top-2 right-2 z-[1000] rounded-full shadow-lg"
+        onClick={handleLocateMe}
+        disabled={isLocating}
+        aria-label="Obtener mi ubicación actual"
+      >
+        {isLocating ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+        ) : (
+            <LocateFixed className="h-5 w-5" />
+        )}
+      </Button>
     </div>
   );
 }
