@@ -92,6 +92,14 @@ const columns: ColumnDef<Task>[] = [
     },
   },
   {
+    accessorKey: "quantity",
+    header: () => <div className="text-right">Cantidad Total</div>,
+    cell: ({ row }) => {
+      const quantity = parseFloat(row.getValue("quantity"))
+      return <div className="text-right font-mono">{quantity.toLocaleString()}</div>
+    },
+  },
+  {
     accessorKey: "value",
     header: () => <div className="text-right">Valor</div>,
     cell: ({ row }) => {
