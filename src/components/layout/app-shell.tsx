@@ -21,10 +21,12 @@ import { Breadcrumb } from "./breadcrumb";
 
 export default function AppShell({ 
   children,
-  projects
+  projects,
+  title
 }: { 
   children: React.ReactNode,
-  projects: Project[]
+  projects: Project[],
+  title: string
 }) {
   const pathname = usePathname();
 
@@ -35,7 +37,7 @@ export default function AppShell({
           <div className="flex items-center gap-2 p-2">
             <Building2 className="w-8 h-8 text-primary" />
             <h2 className="text-xl font-bold font-headline tracking-tight">
-              Cronograma Valorado
+              {title}
             </h2>
           </div>
         </SidebarHeader>

@@ -15,6 +15,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const projects = await getProjects();
+  const title = "Cronograma Valorado";
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -23,7 +25,7 @@ export default async function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <AppShell projects={projects}>
+        <AppShell projects={projects} title={title}>
           {children}
         </AppShell>
         <Toaster />
