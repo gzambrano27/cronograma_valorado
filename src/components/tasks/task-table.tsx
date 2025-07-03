@@ -19,6 +19,7 @@ import {
   getExpandedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
+import { format } from "date-fns"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -115,12 +116,12 @@ const columns: ColumnDef<Task>[] = [
   {
     accessorKey: "startDate",
     header: "Fecha Inicio",
-    cell: ({ row }) => new Date(row.getValue("startDate")).toLocaleDateString(),
+    cell: ({ row }) => format(new Date(row.getValue("startDate")), "dd/MM/yyyy"),
   },
     {
     accessorKey: "endDate",
     header: "Fecha Fin",
-    cell: ({ row }) => new Date(row.getValue("endDate")).toLocaleDateString(),
+    cell: ({ row }) => format(new Date(row.getValue("endDate")), "dd/MM/yyyy"),
   },
 ]
 
