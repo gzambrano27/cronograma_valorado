@@ -3,6 +3,13 @@ export type DailyConsumption = {
   consumedQuantity: number;
 };
 
+export type TaskValidation = {
+  id: string;
+  date: Date;
+  imageUrl: string;
+  location: string;
+};
+
 export type Project = {
   id: string;
   name: string;
@@ -23,8 +30,7 @@ export type Task = {
   value: number;
   startDate: Date;
   endDate: Date;
-  location?: string;
-  imageUrl?: string;
+  validations?: TaskValidation[];
   status: 'pendiente' | 'en-progreso' | 'completado';
   dailyConsumption?: DailyConsumption[];
 };

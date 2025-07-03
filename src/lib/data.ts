@@ -25,6 +25,11 @@ async function readDb(): Promise<Database> {
           dc.date = new Date(dc.date);
         });
       }
+      if (task.validations) {
+        task.validations.forEach(v => {
+          v.date = new Date(v.date);
+        });
+      }
     });
     return data;
   } catch (error) {

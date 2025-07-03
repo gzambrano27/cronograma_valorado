@@ -1,6 +1,6 @@
 'use server';
 
-import type { Database, Project, Task } from './types';
+import type { Database, Project, Task, TaskValidation } from './types';
 import fs from 'fs/promises';
 import path from 'path';
 import { z } from 'zod';
@@ -20,6 +20,11 @@ async function readDb(): Promise<Database> {
         if (task.dailyConsumption) {
             task.dailyConsumption.forEach(dc => {
                 dc.date = new Date(dc.date);
+            });
+        }
+        if (task.validations) {
+            task.validations.forEach(v => {
+                v.date = new Date(v.date);
             });
         }
     });
@@ -290,8 +295,18 @@ export async function validateTask(formData: FormData) {
     const buffer = Buffer.from(bytes);
     const imageUrl = `data:${imageFile.type};base64,${buffer.toString('base64')}`;
 
-    db.tasks[taskIndex].imageUrl = imageUrl;
-    db.tasks[taskIndex].location = location;
+    const newValidation: TaskValidation = {
+      id: `val-${Date.now()}`,
+      date: new Date(),
+      imageUrl: imageUrl,
+      location: location
+    };
+
+    if (!db.tasks[taskIndex].validations) {
+      db.tasks[taskIndex].validations = [];
+    }
+
+    db.tasks[taskIndex].validations?.push(newValidation);
 
     await writeDb(db);
 

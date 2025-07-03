@@ -10,9 +10,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Trash2, Camera } from "lucide-react";
+import { MoreHorizontal, Trash2, Camera, GalleryThumbnails } from "lucide-react";
 import { DeleteTaskDialog } from "./delete-task-dialog";
 import { ValidateTaskDialog } from "./validate-task-dialog";
+import { ViewValidationsDialog } from "./view-validations-dialog";
 
 interface TaskActionsProps {
   task: Task;
@@ -21,6 +22,9 @@ interface TaskActionsProps {
 export function TaskActions({ task }: TaskActionsProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isValidateDialogOpen, setIsValidateDialogOpen] = useState(false);
+  const [isViewValidationsOpen, setIsViewValidationsOpen] = useState(false);
+
+  const hasValidations = task.validations && task.validations.length > 0;
 
   return (
     <>
@@ -35,6 +39,14 @@ export function TaskActions({ task }: TaskActionsProps) {
         open={isValidateDialogOpen}
         onOpenChange={setIsValidateDialogOpen}
       />
+      {hasValidations && (
+        <ViewValidationsDialog
+          validations={task.validations!}
+          taskName={task.name}
+          open={isViewValidationsOpen}
+          onOpenChange={setIsViewValidationsOpen}
+        />
+      )}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -50,6 +62,10 @@ export function TaskActions({ task }: TaskActionsProps) {
           <DropdownMenuItem onSelect={() => setIsValidateDialogOpen(true)}>
             <Camera className="mr-2 h-4 w-4" />
             Validar Tarea
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setIsViewValidationsOpen(true)} disabled={!hasValidations}>
+            <GalleryThumbnails className="mr-2 h-4 w-4" />
+            Ver Validaciones
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem

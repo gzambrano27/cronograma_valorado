@@ -41,7 +41,7 @@ export function ValidateTaskDialog({
   const formRef = useRef<HTMLFormElement>(null);
   const [location, setLocation] = useState<string | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(task.imageUrl || null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export function ValidateTaskDialog({
       // Reset state on open
       setLocation(null);
       setLocationError(null);
-      setImagePreview(task.imageUrl || null);
+      setImagePreview(null);
 
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -62,7 +62,7 @@ export function ValidateTaskDialog({
         }
       );
     }
-  }, [open, task.imageUrl]);
+  }, [open]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -97,7 +97,7 @@ export function ValidateTaskDialog({
       <DialogContent className="sm:max-w-md">
         <form ref={formRef} action={action}>
           <DialogHeader>
-            <DialogTitle className="font-headline">Validar Tarea</DialogTitle>
+            <DialogTitle className="font-headline">Validar Tarea: {task.name}</DialogTitle>
             <DialogDescription>
               Sube una imagen de evidencia. La ubicación se capturará automáticamente.
             </DialogDescription>
@@ -110,7 +110,7 @@ export function ValidateTaskDialog({
             <div className="space-y-2">
                 <Label htmlFor="image">Imagen de Evidencia</Label>
                 <div className="relative flex items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted">
-                    <Input id="image" name="image" type="file" accept="image/*" className="absolute w-full h-full opacity-0 cursor-pointer" onChange={handleImageChange} />
+                    <Input id="image" name="image" type="file" accept="image/*" className="absolute w-full h-full opacity-0 cursor-pointer" onChange={handleImageChange} required />
                     {imagePreview ? (
                         <Image src={imagePreview} alt="Previsualización" fill objectFit="contain" className="rounded-lg p-1" />
                     ) : (
