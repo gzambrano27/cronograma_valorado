@@ -101,17 +101,14 @@ const columns: ColumnDef<Task>[] = [
       const translatedStatus = statusTranslations[status] || status;
 
       let badgeVariant: "default" | "secondary" | "outline" = "outline";
-      let className = "";
-
+      
       if (status === 'completado') {
         badgeVariant = 'default';
-        className = 'bg-green-500 hover:bg-green-600 text-white';
       } else if (status === 'en-progreso') {
         badgeVariant = 'secondary';
-        className = 'bg-yellow-500 hover:bg-yellow-600 text-white';
       }
 
-      return <Badge variant={badgeVariant} className={className}>{translatedStatus}</Badge>
+      return <Badge variant={badgeVariant}>{translatedStatus}</Badge>
     },
   },
   {

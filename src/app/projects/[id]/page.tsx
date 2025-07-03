@@ -85,15 +85,15 @@ export default async function ProjectPage({ params: { id } }: { params: { id: st
                   {/* Placeholder for task summary content */}
                   <ul className="space-y-4">
                       <li className="flex items-center">
-                          <CheckCircle className="h-5 w-5 text-green-500 mr-3"/>
+                          <CheckCircle className="h-5 w-5 text-primary mr-3"/>
                           <span className="font-medium">{project.completedTasks} Tareas Completadas</span>
                       </li>
                       <li className="flex items-center">
-                          <ListTodo className="h-5 w-5 text-yellow-500 mr-3"/>
+                          <ListTodo className="h-5 w-5 text-accent-foreground mr-3"/>
                           <span className="font-medium">{projectTasks.filter(t => t.status === 'en-progreso').length} Tareas en Progreso</span>
                       </li>
                        <li className="flex items-center">
-                          <ListTodo className="h-5 w-5 text-gray-500 mr-3"/>
+                          <ListTodo className="h-5 w-5 text-muted-foreground mr-3"/>
                           <span className="font-medium">{projectTasks.filter(t => t.status === 'pendiente').length} Tareas Pendientes</span>
                       </li>
                   </ul>
