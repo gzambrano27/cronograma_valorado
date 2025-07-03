@@ -1,4 +1,3 @@
-import { CreateProjectDialog } from "@/components/projects/create-project-dialog";
 import ProjectList from "@/components/projects/project-list";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getProjects } from "@/lib/data";
@@ -16,7 +15,6 @@ export default async function Home() {
         <h1 className="text-3xl font-bold tracking-tight font-headline">
           Panel Principal
         </h1>
-        <CreateProjectDialog />
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
