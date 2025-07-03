@@ -132,7 +132,7 @@ export function ValidateTaskDialog({
             <div className="space-y-2">
                 <Label>Seleccionar Ubicación</Label>
                  <div className="h-[300px] w-full rounded-md border overflow-hidden">
-                    {mapComponent}
+                    {open && mapComponent}
                 </div>
                 {location && (
                    <div className="flex items-center gap-2 p-2 mt-2 border rounded-md bg-muted">
