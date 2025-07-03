@@ -1,7 +1,7 @@
 
 "use client";
 
-import type { Task, DailyConsumption } from "@/lib/types";
+import type { Task } from "@/lib/types";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
+import { format, differenceInCalendarDays } from "date-fns";
 
 interface DailyConsumptionTrackerProps {
   task: Task;
@@ -62,6 +62,9 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
   };
 
   const dates = getDates(task.startDate, task.endDate);
+  const durationInDays = differenceInCalendarDays(new Date(task.endDate), new Date(task.startDate)) + 1;
+  const dailyPlannedQuantity = durationInDays > 0 ? task.quantity / durationInDays : 0;
+
 
   return (
     <div className="p-4 bg-muted/50 rounded-md">
@@ -71,6 +74,7 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
             <TableHeader className="sticky top-0 bg-muted">
             <TableRow>
                 <TableHead>Fecha</TableHead>
+                <TableHead>Cant. Planificada</TableHead>
                 <TableHead className="w-[180px]">Consumo Registrado</TableHead>
                 <TableHead className="w-[100px] text-right">Acción</TableHead>
             </TableRow>
@@ -81,6 +85,7 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
                 return (
                 <TableRow key={dateString}>
                     <TableCell>{format(date, "PPP")}</TableCell>
+                    <TableCell>{dailyPlannedQuantity.toFixed(2)}</TableCell>
                     <TableCell>
                     <Input
                         type="number"
