@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -65,7 +66,14 @@ export function ViewValidationsDialog({
                              </div>
                              <div className="flex items-center gap-2 text-white text-sm mt-1">
                                 <MapPin className="h-4 w-4" />
-                                <span className="font-mono">{validation.location}</span>
+                                <a
+                                  href={`https://www.google.com/maps/search/?api=1&query=${validation.location}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="font-mono hover:underline"
+                                >
+                                  {validation.location}
+                                </a>
                              </div>
                            </div>
                         </CardContent>

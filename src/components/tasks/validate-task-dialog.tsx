@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -14,11 +15,20 @@ import { Label } from "@/components/ui/label";
 import { validateTask } from "@/lib/actions";
 import type { Task } from "@/lib/types";
 import { UploadCloud, MapPin, Loader2 } from "lucide-react";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { useFormStatus } from "react-dom";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import dynamic from "next/dynamic";
+import { Skeleton } from "../ui/skeleton";
+
+const MapPicker = dynamic(
+  () => import("./map-picker").then((mod) => mod.MapPicker),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-full w-full" />,
+  }
+);
 
 function SubmitButton({ disabled }: { disabled: boolean }) {
     const { pending } = useFormStatus();
@@ -40,29 +50,12 @@ export function ValidateTaskDialog({
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const [location, setLocation] = useState<string | null>(null);
-  const [locationError, setLocationError] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (open) {
-      // Reset state on open
-      setLocation(null);
-      setLocationError(null);
-      setImagePreview(null);
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setLocation(`${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-          setLocationError("No se pudo obtener la ubicación. Por favor, habilite los permisos de ubicación en su navegador.");
-        }
-      );
-    }
-  }, [open]);
+  const handleLocationSelect = (loc: { lat: number; lng: number }) => {
+    setLocation(`${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}`);
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -99,7 +92,7 @@ export function ValidateTaskDialog({
           <DialogHeader>
             <DialogTitle className="font-headline">Validar Tarea: {task.name}</DialogTitle>
             <DialogDescription>
-              Sube una imagen de evidencia. La ubicación se capturará automáticamente.
+              Sube una imagen de evidencia y selecciona la ubicación en el mapa.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -123,25 +116,16 @@ export function ValidateTaskDialog({
             </div>
 
             <div className="space-y-2">
-                <Label>Ubicación Capturada</Label>
+                <Label>Seleccionar Ubicación</Label>
+                <div className="h-[300px] w-full rounded-md border overflow-hidden">
+                   <MapPicker onLocationSelect={handleLocationSelect} />
+               </div>
                 {location && (
-                    <div className="flex items-center gap-2 p-2 border rounded-md bg-muted">
-                        <MapPin className="h-5 w-5 text-primary" />
-                        <span className="text-sm font-mono text-muted-foreground">{location}</span>
-                    </div>
-                )}
-                {locationError && (
-                    <Alert variant="destructive">
-                      <AlertTitle>Error de Ubicación</AlertTitle>
-                      <AlertDescription>{locationError}</AlertDescription>
-                    </Alert>
-                )}
-                {!location && !locationError && (
-                     <div className="flex items-center gap-2 p-2 border rounded-md bg-muted">
-                        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                        <span className="text-sm text-muted-foreground">Obteniendo ubicación...</span>
-                    </div>
-                )}
+                   <div className="flex items-center gap-2 p-2 mt-2 border rounded-md bg-muted">
+                       <MapPin className="h-5 w-5 text-primary" />
+                       <span className="text-sm font-mono text-muted-foreground">{location}</span>
+                   </div>
+               )}
             </div>
           </div>
           <DialogFooter>
