@@ -4,7 +4,7 @@
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -43,7 +43,7 @@ function LocationMarker({ onLocationSelect }: { onLocationSelect: (location: { l
   return position === null ? null : <Marker position={position}></Marker>;
 }
 
-export function MapPicker({ onLocationSelect }: MapPickerProps) {
+const MapPickerComponent = ({ onLocationSelect }: MapPickerProps) => {
   return (
     <MapContainer
       center={[-12.046374, -77.042793]} // Default to Lima, Peru
@@ -59,3 +59,5 @@ export function MapPicker({ onLocationSelect }: MapPickerProps) {
     </MapContainer>
   );
 }
+
+export const MapPicker = memo(MapPickerComponent);

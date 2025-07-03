@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { validateTask } from "@/lib/actions";
 import type { Task } from "@/lib/types";
 import { UploadCloud, MapPin, Loader2 } from "lucide-react";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { useFormStatus } from "react-dom";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
@@ -53,9 +53,9 @@ export function ValidateTaskDialog({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleLocationSelect = (loc: { lat: number; lng: number }) => {
+  const handleLocationSelect = useCallback((loc: { lat: number; lng: number }) => {
     setLocation(`${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}`);
-  };
+  }, []);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
