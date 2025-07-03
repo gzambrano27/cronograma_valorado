@@ -8,6 +8,7 @@ export type Project = {
   name: string;
   description: string;
   totalValue: number;
+  consumedValue: number;
   taskCount: number;
   completedTasks: number;
   imageUrl: string;

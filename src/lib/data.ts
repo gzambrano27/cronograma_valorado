@@ -5,7 +5,7 @@ import { differenceInCalendarDays, eachDayOfInterval, format } from 'date-fns';
 
 // Define a type for the structure of our JSON database
 interface Database {
-  projects: Omit<Project, 'totalValue' | 'taskCount' | 'completedTasks'>[];
+  projects: Omit<Project, 'totalValue' | 'taskCount' | 'completedTasks' | 'consumedValue'>[];
   tasks: Task[];
 }
 
@@ -44,11 +44,24 @@ export async function getProjects(): Promise<Project[]> {
     const taskCount = projectTasks.length;
     const totalValue = projectTasks.reduce((sum, task) => sum + task.value, 0);
     
+    const consumedValue = projectTasks.reduce((projectSum, task) => {
+      if (!task.dailyConsumption || !task.quantity) {
+        return projectSum;
+      }
+      const valuePerUnit = task.value / task.quantity;
+      const totalConsumedQuantity = task.dailyConsumption.reduce(
+        (taskSum, consumption) => taskSum + consumption.consumedQuantity,
+        0
+      );
+      return projectSum + totalConsumedQuantity * valuePerUnit;
+    }, 0);
+
     return {
       ...project,
       taskCount,
       completedTasks,
       totalValue,
+      consumedValue,
     };
   });
 }

@@ -40,10 +40,14 @@ export default function ProjectList({ projects }: ProjectListProps) {
               </div>
               <Progress value={project.taskCount > 0 ? (project.completedTasks / project.taskCount) * 100 : 0} className="w-full" />
             </CardContent>
-            <CardFooter className="flex justify-between items-end">
+            <CardFooter className="flex justify-between items-end w-full">
               <div>
                 <p className="text-xs text-muted-foreground">Valor del Proyecto</p>
-                <p className="text-lg font-bold">${project.totalValue.toLocaleString()}</p>
+                <p className="text-lg font-bold">${project.totalValue.toLocaleString('es-ES')}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-muted-foreground">Valor Consumido</p>
+                <p className="text-lg font-bold text-primary">${project.consumedValue.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
               </div>
             </CardFooter>
           </Link>
