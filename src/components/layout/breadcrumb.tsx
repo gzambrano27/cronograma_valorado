@@ -59,8 +59,8 @@ export function Breadcrumb({ projects }: BreadcrumbProps) {
         {breadcrumbs.map((crumb) => (
           <li key={crumb.href} className="flex items-center gap-1.5">
             <ChevronRight className="h-4 w-4" />
-            {crumb.isLast ? (
-              <span className="font-medium text-foreground">{crumb.name}</span>
+            {crumb.isLast || crumb.href === '/projects' ? (
+              <span className={crumb.isLast ? "font-medium text-foreground" : ""}>{crumb.name}</span>
             ) : (
               <Link href={crumb.href} className="transition-colors hover:text-foreground">
                 {crumb.name}
