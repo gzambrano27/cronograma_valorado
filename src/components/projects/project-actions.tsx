@@ -2,16 +2,15 @@
 
 import { useState } from "react";
 import type { Project } from "@/lib/types";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { DeleteProjectDialog } from "./delete-project-dialog";
 import { CreateProjectDialog } from "./create-project-dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ProjectActionsProps {
   project: Project;
@@ -21,15 +20,16 @@ export function ProjectActions({ project }: ProjectActionsProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  // This wrapper div is to stop propagation to the parent Link component
   const stopPropagation = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
   };
 
-
   return (
-    <div onClick={stopPropagation}>
+    <div
+      onClick={stopPropagation}
+      className="flex items-center space-x-1 rounded-full bg-background/80 p-1 backdrop-blur-sm"
+    >
       <CreateProjectDialog
         project={project}
         open={isEditDialogOpen}
@@ -40,31 +40,40 @@ export function ProjectActions({ project }: ProjectActionsProps) {
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
       />
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+
+      <Tooltip>
+        <TooltipTrigger asChild>
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 bg-background/50 hover:bg-background/75"
+            className="h-7 w-7"
+            onClick={() => setIsEditDialogOpen(true)}
           >
-            <MoreHorizontal className="h-4 w-4" />
-            <span className="sr-only">Más opciones</span>
+            <Pencil className="h-4 w-4" />
+            <span className="sr-only">Editar Proyecto</span>
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onSelect={() => setIsEditDialogOpen(true)}>
-            <Pencil className="mr-2 h-4 w-4" />
-            Editar
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onSelect={() => setIsDeleteDialogOpen(true)}
-            className="text-destructive focus:text-destructive focus:bg-destructive/10"
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Editar</p>
+        </TooltipContent>
+      </Tooltip>
+
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-destructive hover:bg-destructive/10 hover:text-destructive"
+            onClick={() => setIsDeleteDialogOpen(true)}
           >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Eliminar
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+            <Trash2 className="h-4 w-4" />
+            <span className="sr-only">Eliminar Proyecto</span>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Eliminar</p>
+        </TooltipContent>
+      </Tooltip>
     </div>
   );
 }

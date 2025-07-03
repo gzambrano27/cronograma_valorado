@@ -24,7 +24,7 @@ export default function ProjectList({ projects }: ProjectListProps) {
                   data-ai-hint={project.dataAiHint}
                 />
             </Link>
-            <div className="absolute top-3 right-3 z-10">
+            <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <ProjectActions project={project} />
             </div>
           </CardHeader>
