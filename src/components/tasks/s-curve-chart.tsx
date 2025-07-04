@@ -90,10 +90,27 @@ export function SCurveChart({ data }: SCurveChartProps) {
           </defs>
           <Tooltip
             cursor
-            formatter={(value) => `${value}%`}
             content={
               <ChartTooltipContent
                 indicator="dot"
+                formatter={(value, name, item) => (
+                  <>
+                    <div
+                      className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                      style={{
+                        backgroundColor: item.color,
+                      }}
+                    />
+                    <div className="flex flex-1 justify-between">
+                      <p className="text-muted-foreground">
+                        {chartConfig[name as keyof typeof chartConfig]?.label}
+                      </p>
+                      <p className="font-mono font-medium tabular-nums text-foreground">
+                        {`${value}%`}
+                      </p>
+                    </div>
+                  </>
+                )}
               />
             }
           />
