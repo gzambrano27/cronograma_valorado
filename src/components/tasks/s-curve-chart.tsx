@@ -4,7 +4,6 @@ import {
   Area,
   AreaChart,
   CartesianGrid,
-  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -13,6 +12,8 @@ import {
 
 import {
   ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
@@ -97,7 +98,7 @@ export function SCurveChart({ data }: SCurveChartProps) {
               />
             }
           />
-          <Legend align="right" verticalAlign="top" wrapperStyle={{paddingBottom: '1rem'}}/>
+          <ChartLegend content={<ChartLegendContent />} align="right" verticalAlign="top" wrapperStyle={{paddingBottom: '1rem'}}/>
           <Area
             dataKey="planned"
             type="monotone"
