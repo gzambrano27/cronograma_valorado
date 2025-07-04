@@ -5,7 +5,6 @@ import {
   AreaChart,
   CartesianGrid,
   Legend,
-  Line,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -76,6 +75,18 @@ export function SCurveChart({ data }: SCurveChartProps) {
                 stopOpacity={0.1}
               />
             </linearGradient>
+            <linearGradient id="fillActual" x1="0" y1="0" x2="0" y2="1">
+              <stop
+                offset="5%"
+                stopColor="var(--color-actual)"
+                stopOpacity={0.4}
+              />
+              <stop
+                offset="95%"
+                stopColor="var(--color-actual)"
+                stopOpacity={0.1}
+              />
+            </linearGradient>
           </defs>
           <Tooltip
             cursor
@@ -95,13 +106,13 @@ export function SCurveChart({ data }: SCurveChartProps) {
             strokeWidth={2}
             dot={false}
           />
-          <Line
+          <Area
             dataKey="actual"
             type="monotone"
+            fill="url(#fillActual)"
             stroke="var(--color-actual)"
-            strokeWidth={3}
+            strokeWidth={2}
             dot={false}
-            activeDot={{ r: 6 }}
           />
         </AreaChart>
       </ResponsiveContainer>
