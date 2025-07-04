@@ -92,6 +92,7 @@ export function SCurveChart({ data }: SCurveChartProps) {
             cursor
             content={
               <ChartTooltipContent
+                className="w-56"
                 indicator="dot"
                 formatter={(value, name, item) => (
                   <>
@@ -101,7 +102,7 @@ export function SCurveChart({ data }: SCurveChartProps) {
                         backgroundColor: item.color,
                       }}
                     />
-                    <div className="flex flex-1 justify-between">
+                    <div className="flex flex-1 justify-between gap-4">
                       <p className="text-muted-foreground">
                         {chartConfig[name as keyof typeof chartConfig]?.label}
                       </p>
