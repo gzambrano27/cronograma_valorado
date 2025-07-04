@@ -50,11 +50,10 @@ export function SCurveChart({ data }: SCurveChartProps) {
         >
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis
-            dataKey="day"
+            dataKey="date"
             tickLine={false}
             axisLine={false}
             tickMargin={8}
-            tickFormatter={(value) => `Día ${value}`}
           />
           <YAxis
             tickLine={false}

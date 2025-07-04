@@ -36,7 +36,7 @@ export type Task = {
 };
 
 export type SCurveData = {
-  day: number;
+  date: string;
   planned: number;
   actual: number;
 };

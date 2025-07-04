@@ -2,6 +2,7 @@ import type { Project, Task, SCurveData } from './types';
 import fs from 'fs/promises';
 import path from 'path';
 import { differenceInCalendarDays, eachDayOfInterval, format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 // Define a type for the structure of our JSON database
 interface Database {
@@ -88,14 +89,14 @@ export async function getTasksByProjectId(id: string): Promise<Task[]> {
 
 export function generateSCurveData(tasks: Task[], totalProjectValue: number): SCurveData[] {
   if (tasks.length === 0 || totalProjectValue === 0) {
-    return [{ day: 1, planned: 0, actual: 0 }];
+    return [];
   }
 
   const projectStartDate = new Date(Math.min(...tasks.map(t => new Date(t.startDate).getTime())));
   const projectEndDate = new Date(Math.max(...tasks.map(t => new Date(t.endDate).getTime())));
 
   if (projectStartDate > projectEndDate) {
-    return [{ day: 1, planned: 0, actual: 0 }];
+    return [];
   }
 
   const projectInterval = eachDayOfInterval({ start: projectStartDate, end: projectEndDate });
@@ -103,7 +104,7 @@ export function generateSCurveData(tasks: Task[], totalProjectValue: number): SC
   let cumulativePlannedValue = 0;
   let cumulativeActualValue = 0;
 
-  const sCurve: SCurveData[] = projectInterval.map((day, index) => {
+  const sCurve: SCurveData[] = projectInterval.map((day) => {
     let dailyPlannedValue = 0;
     let dailyActualValue = 0;
 
@@ -136,7 +137,7 @@ export function generateSCurveData(tasks: Task[], totalProjectValue: number): SC
     cumulativeActualValue += dailyActualValue;
 
     return {
-      day: index + 1,
+      date: format(day, "d MMM", { locale: es }),
       planned: Math.round((cumulativePlannedValue / totalProjectValue) * 100),
       actual: Math.round((cumulativeActualValue / totalProjectValue) * 100),
     };
