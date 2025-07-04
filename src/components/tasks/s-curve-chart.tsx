@@ -90,10 +90,10 @@ export function SCurveChart({ data }: SCurveChartProps) {
           </defs>
           <Tooltip
             cursor
+            formatter={(value) => `${value}%`}
             content={
               <ChartTooltipContent
                 indicator="dot"
-                formatter={(value) => `${value}%`}
               />
             }
           />
