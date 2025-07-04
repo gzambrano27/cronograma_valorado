@@ -24,11 +24,11 @@ interface SCurveChartProps {
 
 const chartConfig = {
   planned: {
-    label: "Planificado",
+    label: "Avance Planificado",
     color: "hsl(var(--muted-foreground))",
   },
   actual: {
-    label: "Real",
+    label: "Avance Real",
     color: "hsl(var(--primary))",
   },
 } satisfies ChartConfig
