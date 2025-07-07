@@ -23,7 +23,7 @@ export default async function Home() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalValue.toLocaleString('es-ES')}</div>
+            <div className="text-xl font-bold">${totalValue.toLocaleString('es-ES')}</div>
             <p className="text-xs text-muted-foreground">
               Valor combinado de todos los proyectos
             </p>
@@ -35,7 +35,7 @@ export default async function Home() {
             <Briefcase className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalProjects}</div>
+            <div className="text-xl font-bold">{totalProjects}</div>
             <p className="text-xs text-muted-foreground">
               Total de proyectos gestionados
             </p>
@@ -47,7 +47,7 @@ export default async function Home() {
             <ListChecks className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+{completedTasks}</div>
+            <div className="text-xl font-bold">+{completedTasks}</div>
             <p className="text-xs text-muted-foreground">
               Tareas completadas en todos los proyectos
             </p>

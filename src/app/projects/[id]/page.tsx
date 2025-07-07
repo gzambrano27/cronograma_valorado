@@ -42,7 +42,7 @@ export default async function ProjectPage({ params: { id } }: { params: { id: st
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${project.totalValue.toLocaleString('es-ES')}</div>
+            <div className="text-xl font-bold">${project.totalValue.toLocaleString('es-ES')}</div>
             <p className="text-xs text-muted-foreground">Valor estimado del proyecto</p>
           </CardContent>
         </Card>
@@ -52,7 +52,7 @@ export default async function ProjectPage({ params: { id } }: { params: { id: st
             <ListTodo className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{project.taskCount}</div>
+            <div className="text-xl font-bold">{project.taskCount}</div>
             <p className="text-xs text-muted-foreground">Total de tareas planificadas</p>
           </CardContent>
         </Card>
@@ -62,7 +62,7 @@ export default async function ProjectPage({ params: { id } }: { params: { id: st
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{progressPercentage.toFixed(1)}%</div>
+            <div className="text-xl font-bold">{progressPercentage.toFixed(1)}%</div>
             <p className="text-xs text-muted-foreground">{project.completedTasks} de {project.taskCount} tareas completadas</p>
           </CardContent>
         </Card>
