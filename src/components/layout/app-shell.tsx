@@ -58,7 +58,7 @@ export default function AppShell({
                 <Link href={`/projects/${project.id}`} passHref>
                   <SidebarMenuButton
                     asChild
-                    isActive={pathname === `/projects/${project.id}`}
+                    isActive={isClient ? pathname === `/projects/${project.id}`: false}
                     tooltip={{ children: project.name }}
                   >
                     <span>
@@ -74,8 +74,8 @@ export default function AppShell({
       </Sidebar>
       <SidebarInset>
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-          <SidebarTrigger />
-          <Breadcrumb projects={projects} />
+          {isClient ? <SidebarTrigger /> : <div className="h-7 w-7" />}
+          {isClient ? <Breadcrumb projects={projects} /> : null}
           <div className="flex-1" />
            <ThemeToggle />
            <Link href="/settings" passHref>
