@@ -440,6 +440,6 @@ export async function validateTask(formData: FormData) {
 }
 
 export async function getSettings(): Promise<AppConfig> {
-  const config = await getAppAppConfig();
+  const config = await getAppConfig();
   return config;
 }
