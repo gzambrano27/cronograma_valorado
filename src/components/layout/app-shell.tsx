@@ -43,17 +43,20 @@ export default function AppShell({
     <SidebarProvider title={title} defaultOpen={sidebarOpen}>
       <Sidebar>
         <SidebarHeader>
-          <div className="flex items-center gap-2 p-2">
-            <Building2 className="w-8 h-8 text-primary" />
-            <h2 className="text-xl font-bold font-headline tracking-tight h-7 group-data-[state=collapsed]/sidebar:hidden">
-              {title}
-            </h2>
+          <div className="flex items-center justify-between p-2">
+            <div className="flex items-center gap-2">
+              <Building2 className="w-8 h-8 text-primary" />
+              <h2 className="text-xl font-bold font-headline tracking-tight h-7 group-data-[state=collapsed]/sidebar:hidden">
+                {title}
+              </h2>
+            </div>
+             {isClient ? <SidebarTrigger className="group-data-[state=expanded]/sidebar:hidden" /> : <div className="h-7 w-7"/>}
           </div>
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
             {projects.map((project, index) => (
-              <SidebarMenuItem key={project.id}>
+              <SidebarMenuItem key={project.id} className="group-data-[state=collapsed]/sidebar:flex group-data-[state=collapsed]/sidebar:justify-center">
                 <SidebarMenuButton
                   asChild
                   isActive={pathname === `/projects/${project.id}`}
@@ -83,7 +86,7 @@ export default function AppShell({
       </Sidebar>
       <SidebarMain>
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-          <div className="h-9 w-9" />
+          {isClient ? <SidebarTrigger /> : <div className="h-9 w-9" />}
           <Breadcrumb projects={projects} />
           <div className="flex-1" />
            <ThemeToggle />
@@ -101,5 +104,3 @@ export default function AppShell({
     </SidebarProvider>
   );
 }
-
-    
