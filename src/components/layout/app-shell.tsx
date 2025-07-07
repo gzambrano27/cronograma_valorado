@@ -38,7 +38,7 @@ export default function AppShell({
   }, []);
 
   return (
-    <SidebarProvider>
+    <SidebarProvider title={title}>
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2 p-2">
