@@ -223,7 +223,7 @@ const SidebarTrigger = React.forwardRef<
       data-sidebar="trigger"
       variant="ghost"
       size="icon"
-      className={cn("h-7 w-7", isMobile && "md:hidden", className)}
+      className={cn("h-7 w-7", isMobile ? "flex" : "hidden md:flex", className)}
       onClick={(event) => {
         onClick?.(event)
         toggleSidebar()
@@ -415,7 +415,7 @@ const SidebarMenu = React.forwardRef<
     ref={ref}
     data-sidebar="menu"
     className={cn(
-      "flex min-w-0 flex-col gap-1 group-data-[state=expanded]/sidebar:w-full group-data-[state=collapsed]/sidebar:justify-center",
+      "flex w-full min-w-0 flex-col gap-1",
       className
     )}
     {...props}
@@ -579,17 +579,20 @@ const SidebarMenuSkeleton = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="menu-skeleton"
-      className={cn("flex h-8 items-center gap-2 rounded-md", className)}
+      className={cn(
+        "flex h-8 items-center gap-2 rounded-md p-2 group-data-[state=collapsed]/sidebar:!size-8 group-data-[state=collapsed]/sidebar:!p-2 group-data-[state=collapsed]/sidebar:justify-center",
+        className
+      )}
       {...props}
     >
       {showIcon && (
         <Skeleton
-          className="size-4 rounded-md"
+          className="size-4 shrink-0 rounded-md"
           data-sidebar="menu-skeleton-icon"
         />
       )}
       <Skeleton
-        className="h-4 w-3/4"
+        className="h-4 w-3/4 group-data-[state=collapsed]/sidebar:hidden"
         data-sidebar="menu-skeleton-text"
       />
     </div>
