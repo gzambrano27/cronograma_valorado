@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Briefcase, Building2, Cog } from "lucide-react";
+import { Building2, Cog } from "lucide-react";
 import React from "react";
 
 import type { Project } from "@/lib/types";
@@ -21,7 +21,6 @@ import {
 import { Button } from "../ui/button";
 import { Breadcrumb } from "./breadcrumb";
 import { ThemeToggle } from "./theme-toggle";
-import { Skeleton } from "../ui/skeleton";
 
 export default function AppShell({ 
   children,
@@ -54,7 +53,7 @@ export default function AppShell({
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
-            {projects.map((project) => (
+            {projects.map((project, index) => (
               <SidebarMenuItem key={project.id}>
                 <Link href={`/projects/${project.id}`} passHref>
                   <SidebarMenuButton
@@ -63,7 +62,9 @@ export default function AppShell({
                     tooltip={{ children: project.name }}
                   >
                     <span>
-                      <Briefcase />
+                      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-muted text-muted-foreground text-xs font-bold shrink-0">
+                        {index + 1}
+                      </div>
                       <span className="truncate group-data-[state=collapsed]/sidebar:hidden">{project.name}</span>
                     </span>
                   </SidebarMenuButton>
@@ -82,8 +83,8 @@ export default function AppShell({
       </Sidebar>
       <SidebarMain>
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-          {isClient ? <SidebarTrigger /> : <div className="h-7 w-7 md:flex" />}
-          {isClient ? <Breadcrumb projects={projects} /> : <div className="h-4" />}
+          {isClient ? <SidebarTrigger /> : <div className="h-9 w-9 md:flex" />}
+          {isClient ? <Breadcrumb projects={projects} /> : <div className="h-6" />}
           <div className="flex-1" />
            <ThemeToggle />
            <Link href="/settings" passHref>
