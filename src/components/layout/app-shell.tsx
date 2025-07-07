@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -39,15 +40,15 @@ export default function AppShell({
     setIsClient(true);
   }, []);
   
-  const skeletonCount = 3;
+  const skeletonCount = projects.length > 0 ? projects.length : 1;
 
   return (
     <SidebarProvider title={title}>
       <Sidebar>
-        <SidebarHeader>
+        <SidebarHeader suppressHydrationWarning>
           <div className="flex items-center gap-2 p-2">
             <Building2 className="w-8 h-8 text-primary" />
-            <h2 className="text-xl font-bold font-headline tracking-tight h-7 group-data-[state=collapsed]/sidebar:hidden" suppressHydrationWarning>
+            <h2 className="text-xl font-bold font-headline tracking-tight h-7" suppressHydrationWarning>
               {isClient ? title : <Skeleton className="h-full w-40" />}
             </h2>
           </div>
@@ -55,15 +56,15 @@ export default function AppShell({
         <SidebarContent>
           <SidebarMenu className="mx-2">
             {!isClient ? (
-               <>
-                {[...Array(skeletonCount)].map((_, i) => (
-                  <SidebarMenuItem key={i}>
-                    <SidebarMenuSkeleton showIcon={true} />
-                  </SidebarMenuItem>
-                ))}
-              </>
-            ) : (
-               projects.map((project) => (
+              // Server-side and initial client-render. Render skeletons.
+              [...Array(skeletonCount)].map((_, i) => (
+                <SidebarMenuItem key={i}>
+                  <SidebarMenuSkeleton showIcon={true} />
+                </SidebarMenuItem>
+              ))
+            ) : projects.length > 0 ? (
+              // After hydration, if projects exist, render them.
+              projects.map((project) => (
                 <SidebarMenuItem key={project.id}>
                   <Link href={`/projects/${project.id}`} passHref>
                     <SidebarMenuButton
@@ -79,16 +80,27 @@ export default function AppShell({
                   </Link>
                 </SidebarMenuItem>
               ))
+            ) : (
+              // After hydration, if NO projects, render a message.
+              <SidebarMenuItem>
+                <span className="flex items-center gap-2 p-2 text-sm text-sidebar-foreground/70 group-data-[state=collapsed]/sidebar:hidden">
+                  No hay proyectos.
+                </span>
+              </SidebarMenuItem>
             )}
           </SidebarMenu>
         </SidebarContent>
       </Sidebar>
       <SidebarMain>
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-          <div className="md:hidden">
-            <SidebarTrigger />
-          </div>
-          {isClient && <Breadcrumb projects={projects} />}
+          {isClient && (
+            <>
+              <div className="md:hidden">
+                <SidebarTrigger />
+              </div>
+              <Breadcrumb projects={projects} />
+            </>
+          )}
           <div className="flex-1" />
            <ThemeToggle />
            <Link href="/settings" passHref>
