@@ -16,6 +16,7 @@ import {
   SidebarMenuButton,
   SidebarTrigger,
   SidebarMenuSkeleton,
+  SidebarMain,
 } from "@/components/ui/sidebar";
 import { Button } from "../ui/button";
 import { Breadcrumb } from "./breadcrumb";
@@ -46,7 +47,7 @@ export default function AppShell({
         <SidebarHeader>
           <div className="flex items-center gap-2 p-2">
             <Building2 className="w-8 h-8 text-primary" />
-            <h2 className="text-xl font-bold font-headline tracking-tight h-7" suppressHydrationWarning>
+            <h2 className="text-xl font-bold font-headline tracking-tight h-7 group-data-[state=collapsed]/sidebar:hidden" suppressHydrationWarning>
               {isClient ? title : <Skeleton className="h-full w-40" />}
             </h2>
           </div>
@@ -64,7 +65,7 @@ export default function AppShell({
                     >
                       <span>
                         <Briefcase />
-                        <span>{project.name}</span>
+                        <span className="truncate group-data-[state=collapsed]/sidebar:hidden">{project.name}</span>
                       </span>
                     </SidebarMenuButton>
                   </Link>
@@ -82,9 +83,9 @@ export default function AppShell({
           </SidebarMenu>
         </SidebarContent>
       </Sidebar>
-      <main className="flex-1">
+      <SidebarMain>
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-          {isClient && <SidebarTrigger />}
+          <SidebarTrigger />
           {isClient && <Breadcrumb projects={projects} />}
           <div className="flex-1" />
            <ThemeToggle />
@@ -98,7 +99,7 @@ export default function AppShell({
           </Link>
         </header>
         {children}
-      </main>
+      </SidebarMain>
     </SidebarProvider>
   );
 }

@@ -137,6 +137,7 @@ const SidebarProvider = React.forwardRef<
       <SidebarContext.Provider value={contextValue}>
         <TooltipProvider delayDuration={0}>
           <div
+            data-state={state}
             style={
               {
                 "--sidebar-width": SIDEBAR_WIDTH,
@@ -196,7 +197,7 @@ const Sidebar = React.forwardRef<
       data-state={state}
       data-side={side}
       className={cn(
-        "group hidden md:flex h-svh flex-col bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-in-out",
+        "group/sidebar hidden md:flex h-svh flex-col bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-in-out",
         state === "expanded" ? "w-[--sidebar-width]" : "w-[--sidebar-width-icon]",
         side === "left" ? "border-r border-sidebar-border" : "border-l border-sidebar-border",
         className
@@ -235,7 +236,7 @@ const SidebarTrigger = React.forwardRef<
 })
 SidebarTrigger.displayName = "SidebarTrigger"
 
-const SidebarInset = React.forwardRef<
+const SidebarMain = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"main">
 >(({ className, ...props }, ref) => {
@@ -250,7 +251,7 @@ const SidebarInset = React.forwardRef<
     />
   )
 })
-SidebarInset.displayName = "SidebarInset"
+SidebarMain.displayName = "SidebarMain"
 
 const SidebarInput = React.forwardRef<
   React.ElementRef<typeof Input>,
@@ -359,8 +360,8 @@ const SidebarGroupLabel = React.forwardRef<
       ref={ref}
       data-sidebar="group-label"
       className={cn(
-        "duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
-        "group-data-[state=collapsed]:-mt-8 group-data-[state=collapsed]:opacity-0",
+        "flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-opacity duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+        "group-data-[state=collapsed]/sidebar:hidden",
         className
       )}
       {...props}
@@ -655,7 +656,7 @@ export {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarInput,
-  SidebarInset,
+  SidebarMain,
   SidebarMenu,
   SidebarMenuAction,
   SidebarMenuBadge,
