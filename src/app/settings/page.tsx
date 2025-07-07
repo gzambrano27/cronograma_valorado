@@ -1,14 +1,67 @@
-import { getAppConfig } from "@/lib/data";
-import { updateSettings, syncProjectsFromEndpoint } from "@/lib/actions";
+'use client';
+
+import { useState, useEffect } from "react";
+import { getSettings, updateSettings, syncProjectsFromEndpoint } from "@/lib/actions";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal, DownloadCloud } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export default async function SettingsPage() {
-    const config = await getAppConfig();
+export default function SettingsPage() {
+    const [url, setUrl] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        getSettings().then(config => {
+            setUrl(config.endpointUrl || '');
+            setIsLoading(false);
+        }).catch(error => {
+            console.error("Failed to load settings:", error);
+            setIsLoading(false);
+        });
+    }, []);
+
+    if (isLoading) {
+        return (
+            <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
+                <div className="flex items-center justify-between space-y-2">
+                    <Skeleton className="h-9 w-48" />
+                </div>
+                <div className="grid gap-6 lg:grid-cols-2">
+                    <Card>
+                        <CardHeader>
+                            <Skeleton className="h-6 w-1/2" />
+                            <Skeleton className="h-4 w-3/4" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-2">
+                                <Skeleton className="h-4 w-24" />
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+                        </CardContent>
+                        <CardFooter className="border-t px-6 py-4">
+                            <Skeleton className="h-10 w-32" />
+                        </CardFooter>
+                    </Card>
+                    <Card>
+                        <CardHeader>
+                            <Skeleton className="h-6 w-1/2" />
+                            <Skeleton className="h-4 w-3/4" />
+                        </CardHeader>
+                        <CardContent>
+                            <Skeleton className="h-20 w-full" />
+                        </CardContent>
+                        <CardFooter className="border-t px-6 py-4">
+                            <Skeleton className="h-10 w-48" />
+                        </CardFooter>
+                    </Card>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
@@ -35,7 +88,8 @@ export default async function SettingsPage() {
                                     name="url" 
                                     type="url"
                                     placeholder="https://tu-api.com/projects"
-                                    defaultValue={config.endpointUrl}
+                                    value={url}
+                                    onChange={(e) => setUrl(e.target.value)}
                                     required
                                 />
                             </div>

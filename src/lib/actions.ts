@@ -398,3 +398,8 @@ export async function validateTask(formData: FormData) {
 
     revalidatePath(`/projects/${projectId}`);
 }
+
+export async function getSettings(): Promise<AppConfig> {
+  const config = await getAppConfig();
+  return config;
+}
