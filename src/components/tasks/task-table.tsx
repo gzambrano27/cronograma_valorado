@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -44,6 +45,7 @@ import type { Task } from "@/lib/types"
 import { DailyConsumptionTracker } from "./daily-consumption-tracker"
 import { TaskActions } from "./task-actions"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 
 const statusTranslations: Record<Task['status'], string> = {
     'pendiente': 'Pendiente',
@@ -111,6 +113,9 @@ const columns: ColumnDef<Task>[] = [
 
       return <Badge variant={badgeVariant}>{translatedStatus}</Badge>
     },
+    filterFn: (row, id, value) => {
+        return value.includes(row.getValue(id))
+    }
   },
   {
     accessorKey: "quantity",
@@ -219,18 +224,35 @@ export function TaskTable({ data }: { data: Task[] }) {
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
+      <div className="flex flex-col sm:flex-row items-center gap-4 py-4">
         <Input
-          placeholder="Filtrar tareas..."
+          placeholder="Filtrar por nombre..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="w-full sm:max-w-sm"
         />
+        <Select
+            value={(table.getColumn("status")?.getFilterValue() as string) ?? "all"}
+            onValueChange={(value) =>
+                table.getColumn("status")?.setFilterValue(value === "all" ? undefined : value)
+            }
+        >
+            <SelectTrigger className="w-full sm:w-[220px]">
+                <SelectValue placeholder="Filtrar por estado" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectItem value="all">Todos los Estados</SelectItem>
+                {Object.entries(statusTranslations).map(([status, translation]) => (
+                    <SelectItem key={status} value={status}>{translation}</SelectItem>
+                ))}
+            </SelectContent>
+        </Select>
+        <div className="flex-1" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button variant="outline" className="w-full sm:w-auto">
               Columnas <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
