@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -43,20 +44,20 @@ export default function AppShell({
     <SidebarProvider title={title} defaultOpen={sidebarOpen}>
       <Sidebar>
         <SidebarHeader>
-          <div className="flex items-center justify-between p-2">
+          <div className="flex items-center group-data-[state=expanded]/sidebar:justify-between group-data-[state=collapsed]/sidebar:justify-center p-2">
             <div className="flex items-center gap-2">
               <Building2 className="w-8 h-8 text-primary" />
               <h2 className="text-xl font-bold font-headline tracking-tight h-7 group-data-[state=collapsed]/sidebar:hidden">
                 {title}
               </h2>
             </div>
-             {isClient ? <SidebarTrigger className="group-data-[state=expanded]/sidebar:hidden" /> : <div className="h-7 w-7"/>}
+             {isClient ? <SidebarTrigger className="group-data-[state=expanded]/sidebar:hidden group-data-[state=collapsed]/sidebar:hidden" /> : <div className="h-7 w-7"/>}
           </div>
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
             {projects.map((project, index) => (
-              <SidebarMenuItem key={project.id} className="group-data-[state=collapsed]/sidebar:flex group-data-[state=collapsed]/sidebar:justify-center">
+              <SidebarMenuItem key={project.id}>
                 <SidebarMenuButton
                   asChild
                   isActive={pathname === `/projects/${project.id}`}
