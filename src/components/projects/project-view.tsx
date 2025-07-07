@@ -17,7 +17,7 @@ export function ProjectView({ projects }: { projects: Project[] }) {
           Mis Proyectos
         </h2>
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 p-1 border rounded-lg bg-muted">
+          <div className="flex items-center gap-1 p-1 border rounded-lg">
             <Button
               variant={view === "grid" ? "secondary" : "ghost"}
               size="icon"

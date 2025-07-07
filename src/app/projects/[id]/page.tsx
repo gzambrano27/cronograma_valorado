@@ -25,11 +25,11 @@ export default async function ProjectPage({ params: { id } }: { params: { id: st
 
   return (
     <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-2 md:space-y-0">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
         <h1 className="text-3xl font-bold tracking-tight font-headline">
           {project.name}
         </h1>
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <XmlImport />
           <AddTaskSheet projectId={project.id} />
         </div>
@@ -100,14 +100,14 @@ export default async function ProjectPage({ params: { id } }: { params: { id: st
                         <span className="font-medium text-muted-foreground">En Progreso</span>
                         <span className="font-semibold">{tasksInProgress}</span>
                       </div>
-                      <Progress value={(tasksInProgress / project.taskCount) * 100} className="[&>div]:bg-secondary-foreground" aria-label={`${tasksInProgress} tareas en progreso`} />
+                      <Progress value={(tasksInProgress / project.taskCount) * 100} aria-label={`${tasksInProgress} tareas en progreso`} />
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between items-center text-sm">
                         <span className="font-medium text-muted-foreground">Pendientes</span>
                         <span className="font-semibold">{tasksPending}</span>
                       </div>
-                      <Progress value={(tasksPending / project.taskCount) * 100} className="[&>div]:bg-muted-foreground" aria-label={`${tasksPending} tareas pendientes`} />
+                      <Progress value={(tasksPending / project.taskCount) * 100} className="[&>div]:bg-muted-foreground/60" aria-label={`${tasksPending} tareas pendientes`} />
                     </div>
                   </>
                 ) : (

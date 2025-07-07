@@ -22,7 +22,7 @@ interface ProjectListProps {
 export default function ProjectList({ projects, view }: ProjectListProps) {
   if (view === "grid") {
     return (
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {projects.map((project) => (
           <Card key={project.id} className="flex flex-col overflow-hidden transition-all duration-300 group hover:shadow-xl border">
             <CardHeader className="relative p-0">
@@ -87,8 +87,8 @@ export default function ProjectList({ projects, view }: ProjectListProps) {
             <TableRow>
               <TableHead className="w-[40%]">Proyecto</TableHead>
               <TableHead>Progreso</TableHead>
-              <TableHead className="text-right">Valor Consumido</TableHead>
-              <TableHead className="text-right">Valor Total</TableHead>
+              <TableHead className="text-right hidden sm:table-cell">Valor Consumido</TableHead>
+              <TableHead className="text-right hidden sm:table-cell">Valor Total</TableHead>
               <TableHead className="w-[100px] text-right">Acciones</TableHead>
             </TableRow>
           </TableHeader>
@@ -97,14 +97,14 @@ export default function ProjectList({ projects, view }: ProjectListProps) {
                 projects.map((project) => (
                     <TableRow key={project.id}>
                     <TableCell>
-                        <Link href={`/projects/${project.id}`} className="font-medium hover:underline">{project.name}</Link>
+                        <Link href={`/projects/${project.id}`} className="font-medium hover:underline line-clamp-2">{project.name}</Link>
                         <div className="flex items-center text-sm text-muted-foreground gap-1.5 mt-1">
                           <Building2 className="h-4 w-4 flex-shrink-0" />
                           <p className="line-clamp-1">{project.company}</p>
                         </div>
                     </TableCell>
                     <TableCell>
-                        <div className="flex flex-col gap-1.5 w-40">
+                        <div className="flex flex-col gap-1.5 w-32 sm:w-40">
                             <div className="flex justify-between items-center text-xs text-muted-foreground">
                                 <span>{project.completedTasks} / {project.taskCount} tareas</span>
                                 <span>{`${Math.round(project.taskCount > 0 ? (project.completedTasks / project.taskCount) * 100 : 0)}%`}</span>
@@ -112,14 +112,16 @@ export default function ProjectList({ projects, view }: ProjectListProps) {
                             <Progress value={project.taskCount > 0 ? (project.completedTasks / project.taskCount) * 100 : 0} className="h-2" />
                         </div>
                     </TableCell>
-                    <TableCell className="text-right font-mono">
+                    <TableCell className="text-right font-mono hidden sm:table-cell">
                         ${project.consumedValue.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </TableCell>
-                    <TableCell className="text-right font-mono">
+                    <TableCell className="text-right font-mono hidden sm:table-cell">
                         ${project.totalValue.toLocaleString('es-ES')}
                     </TableCell>
                     <TableCell className="text-right">
-                        <ProjectActions project={project} />
+                        <div className="flex justify-end">
+                            <ProjectActions project={project} />
+                        </div>
                     </TableCell>
                     </TableRow>
                 ))
