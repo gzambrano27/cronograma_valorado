@@ -66,11 +66,11 @@ export default function ProjectList({ projects, view }: ProjectListProps) {
             <CardFooter className="flex flex-col gap-2 bg-muted/40 p-4 border-t">
               <div className="flex justify-between items-baseline w-full">
                 <p className="text-xs text-muted-foreground">Valor Consumido</p>
-                <p className="text-lg font-bold text-primary">${project.consumedValue.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                <p className="text-base font-bold text-primary">${project.consumedValue.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
               </div>
               <div className="flex justify-between items-baseline w-full">
                 <p className="text-xs text-muted-foreground">Valor Total</p>
-                <p className="text-lg font-bold">${project.totalValue.toLocaleString('es-ES')}</p>
+                <p className="text-base font-bold">${project.totalValue.toLocaleString('es-ES')}</p>
               </div>
             </CardFooter>
           </Card>
