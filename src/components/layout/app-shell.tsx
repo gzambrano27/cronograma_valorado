@@ -42,7 +42,7 @@ export default function AppShell({
   return (
     <SidebarProvider title={title}>
       <Sidebar>
-        <SidebarHeader>
+        <SidebarHeader suppressHydrationWarning>
           <div className="flex items-center gap-2 p-2">
             <Building2 className="w-8 h-8 text-primary" />
             <h2 className="text-xl font-bold font-headline tracking-tight h-7">
@@ -72,10 +72,10 @@ export default function AppShell({
           </SidebarMenu>
         </SidebarContent>
       </Sidebar>
-      <SidebarInset>
+      <main className="flex-1">
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-          {isClient ? <SidebarTrigger /> : <div className="h-7 w-7" />}
-          {isClient ? <Breadcrumb projects={projects} /> : null}
+          <SidebarTrigger />
+          {isClient && <Breadcrumb projects={projects} />}
           <div className="flex-1" />
            <ThemeToggle />
            <Link href="/settings" passHref>
@@ -87,8 +87,8 @@ export default function AppShell({
              <Button variant="outline">Panel Principal</Button>
           </Link>
         </header>
-        <main>{children}</main>
-      </SidebarInset>
+        {children}
+      </main>
     </SidebarProvider>
   );
 }
