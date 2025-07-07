@@ -45,16 +45,16 @@ export default function AppShell({
   return (
     <SidebarProvider title={title}>
       <Sidebar>
-        <SidebarHeader suppressHydrationWarning>
+        <SidebarHeader>
           <div className="flex items-center gap-2 p-2">
             <Building2 className="w-8 h-8 text-primary" />
-            <h2 className="text-xl font-bold font-headline tracking-tight h-7" suppressHydrationWarning>
+            <h2 className="text-xl font-bold font-headline tracking-tight h-7 group-data-[state=collapsed]/sidebar:hidden" suppressHydrationWarning>
               {isClient ? title : <Skeleton className="h-full w-40" />}
             </h2>
           </div>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarMenu className="mx-2">
+          <SidebarMenu>
             {!isClient ? (
               // Server-side and initial client-render. Render skeletons.
               [...Array(skeletonCount)].map((_, i) => (
@@ -93,13 +93,9 @@ export default function AppShell({
       </Sidebar>
       <SidebarMain>
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+          <SidebarTrigger />
           {isClient && (
-            <>
-              <div className="md:hidden">
-                <SidebarTrigger />
-              </div>
-              <Breadcrumb projects={projects} />
-            </>
+            <Breadcrumb projects={projects} />
           )}
           <div className="flex-1" />
            <ThemeToggle />
