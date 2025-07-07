@@ -1,13 +1,15 @@
 'use server';
 
-import type { Database, Project, Task, TaskValidation } from './types';
+import type { Database, Project, Task, TaskValidation, AppConfig } from './types';
 import fs from 'fs/promises';
 import path from 'path';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { getAppConfig } from './data';
 
 const dbPath = path.join(process.cwd(), 'src', 'lib', 'db.json');
+const configPath = path.join(process.cwd(), 'src', 'lib', 'config.json');
 
 async function readDb(): Promise<Database> {
   try {
@@ -40,6 +42,90 @@ async function writeDb(db: Database): Promise<void> {
   await fs.writeFile(dbPath, JSON.stringify(db, null, 2), 'utf-8');
 }
 
+async function writeConfig(config: AppConfig): Promise<void> {
+  await fs.writeFile(configPath, JSON.stringify(config, null, 2), 'utf-8');
+}
+
+export async function updateSettings(formData: FormData) {
+  const url = formData.get('url') as string;
+
+  try {
+    new URL(url);
+  } catch (_) {
+    throw new Error('La URL del endpoint no es válida.');
+  }
+
+  const config = await getAppConfig();
+  config.endpointUrl = url;
+  await writeConfig(config);
+
+  revalidatePath('/settings');
+}
+
+const ExternalProjectSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    company_id: z.tuple([z.number(), z.string()]),
+});
+
+const ApiResponseSchema = z.object({
+  data: z.object({
+    'project.project': z.array(ExternalProjectSchema),
+  }),
+});
+
+export async function syncProjectsFromEndpoint() {
+  const config = await getAppConfig();
+  const url = config.endpointUrl;
+
+  if (!url) {
+    throw new Error('No se ha configurado un endpoint en la página de Configuración.');
+  }
+
+  try {
+    const response = await fetch(url, { cache: 'no-store' });
+    if (!response.ok) {
+      throw new Error(`Error al obtener los datos: ${response.statusText}`);
+    }
+    const jsonData = await response.json();
+    
+    const parsedData = ApiResponseSchema.safeParse(jsonData);
+
+    if (!parsedData.success) {
+      console.error(parsedData.error);
+      throw new Error('La respuesta del endpoint no tiene el formato JSON esperado.');
+    }
+
+    const externalProjects = parsedData.data.data['project.project'];
+    const db = await readDb();
+
+    const newProjects = externalProjects.map(extProj => ({
+      id: `ext-${extProj.id}`,
+      name: extProj.name,
+      company: extProj.company_id[1],
+      imageUrl: 'https://placehold.co/600x400.png',
+      dataAiHint: 'project building'
+    }));
+    
+    db.projects = newProjects as Project[];
+    db.tasks = [];
+
+    await writeDb(db);
+
+    revalidatePath('/');
+    revalidatePath('/settings');
+    redirect('/');
+
+  } catch (error) {
+    console.error('Error sincronizando proyectos:', error);
+    if (error instanceof Error) {
+        throw error;
+    }
+    throw new Error('Ocurrió un error inesperado durante la sincronización.');
+  }
+}
+
+
 const ProjectSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(3, { message: 'El nombre debe tener al menos 3 caracteres.' }),
@@ -63,7 +149,6 @@ export async function createProject(formData: FormData) {
 
     if (!validatedFields.success) {
         console.error(validatedFields.error.flatten().fieldErrors);
-        // This could be enhanced to return errors to the UI
         throw new Error('Datos del proyecto inválidos.');
     }
 
@@ -151,7 +236,7 @@ export async function deleteProject(projectId: string) {
     await writeDb(db);
 
     revalidatePath('/');
-    revalidatePath(`/projects`); // In case a project page was cached
+    revalidatePath(`/projects`);
     redirect('/');
 }
 
@@ -217,7 +302,6 @@ export async function updateTaskConsumption(taskId: string, date: string, consum
         task.dailyConsumption = [];
     }
     
-    // date is 'yyyy-MM-dd'. We want to treat it as a UTC date to avoid timezone issues.
     const [year, month, day] = date.split('-').map(Number);
     const consumptionDate = new Date(Date.UTC(year, month - 1, day));
 
@@ -227,21 +311,17 @@ export async function updateTaskConsumption(taskId: string, date: string, consum
     
     if (consumedQuantity > 0) {
         if (consumptionIndex > -1) {
-            // Update existing consumption
             task.dailyConsumption[consumptionIndex].consumedQuantity = consumedQuantity;
         } else {
-            // Add new consumption
             task.dailyConsumption.push({ date: consumptionDate, consumedQuantity });
         }
     } else {
-        // If consumption is 0 or less, remove it from the array
         if (consumptionIndex > -1) {
             task.dailyConsumption.splice(consumptionIndex, 1);
         }
     }
 
 
-    // Update task status based on consumption
     const totalConsumed = task.dailyConsumption.reduce((sum, c) => sum + c.consumedQuantity, 0);
 
     if (totalConsumed >= task.quantity) {

@@ -40,3 +40,7 @@ export type SCurveData = {
   planned: number;
   actual: number;
 };
+
+export type AppConfig = {
+  endpointUrl: string;
+};

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Briefcase, Building2 } from "lucide-react";
+import { Briefcase, Building2, Cog } from "lucide-react";
 import React from "react";
 
 import type { Project } from "@/lib/types";
@@ -74,6 +74,11 @@ export default function AppShell({
           <SidebarTrigger className="md:hidden" />
           <Breadcrumb projects={projects} />
           <div className="flex-1" />
+           <Link href="/settings" passHref>
+              <Button variant="ghost" size="icon" aria-label="Configuración">
+                  <Cog className="h-5 w-5" />
+              </Button>
+          </Link>
           <Link href="/" passHref>
              <Button variant="outline">Panel Principal</Button>
           </Link>

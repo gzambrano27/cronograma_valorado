@@ -1,23 +1,20 @@
-import type { Project, Task, SCurveData } from './types';
+import type { Project, Task, SCurveData, AppConfig } from './types';
 import fs from 'fs/promises';
 import path from 'path';
 import { differenceInCalendarDays, eachDayOfInterval, format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-// Define a type for the structure of our JSON database
 interface Database {
   projects: Omit<Project, 'totalValue' | 'taskCount' | 'completedTasks' | 'consumedValue'>[];
   tasks: Task[];
 }
 
-// Function to read the database file
 async function readDb(): Promise<Database> {
   const filePath = path.join(process.cwd(), 'src', 'lib', 'db.json');
   try {
     const jsonData = await fs.readFile(filePath, 'utf-8');
     const data = JSON.parse(jsonData) as Database;
     
-    // Convert date strings back to Date objects
     data.tasks.forEach(task => {
       task.startDate = new Date(task.startDate);
       task.endDate = new Date(task.endDate);
@@ -39,7 +36,17 @@ async function readDb(): Promise<Database> {
   }
 }
 
-// Functions to get data
+export async function getAppConfig(): Promise<AppConfig> {
+  const filePath = path.join(process.cwd(), 'src', 'lib', 'config.json');
+  try {
+    const jsonData = await fs.readFile(filePath, 'utf-8');
+    return JSON.parse(jsonData) as AppConfig;
+  } catch (error) {
+    console.error("Could not read config.json", error);
+    return { endpointUrl: "" };
+  }
+}
+
 export async function getProjects(): Promise<Project[]> {
   const db = await readDb();
   const { projects, tasks } = db;
@@ -112,7 +119,6 @@ export function generateSCurveData(tasks: Task[], totalProjectValue: number): SC
       const taskStartDate = new Date(task.startDate);
       const taskEndDate = new Date(task.endDate);
 
-      // Adjust date to avoid timezone issues
       const adjustedDay = new Date(day.getFullYear(), day.getMonth(), day.getDate());
 
       if (adjustedDay >= taskStartDate && adjustedDay <= taskEndDate) {
@@ -143,7 +149,6 @@ export function generateSCurveData(tasks: Task[], totalProjectValue: number): SC
     };
   });
 
-  // Clamp values between 0 and 100
   return sCurve.map(d => ({
       ...d,
       planned: Math.max(0, Math.min(100, d.planned)),
