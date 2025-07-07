@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
 import { getProjectById, getTasksByProjectId, generateSCurveData } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { SCurveChart } from "@/components/tasks/s-curve-chart";
 import { TaskTable } from "@/components/tasks/task-table";
 import { XmlImport } from "@/components/tasks/xml-import";
 import { DollarSign, CheckCircle, ListTodo } from "lucide-react";
 import { AddTaskSheet } from "@/components/tasks/add-task-sheet";
 import { Progress } from "@/components/ui/progress";
+import { SCurveCard } from "@/components/tasks/s-curve-card";
 
 export default async function ProjectPage({ params: { id } }: { params: { id: string } }) {
   const project = await getProjectById(id);
@@ -69,17 +69,7 @@ export default async function ProjectPage({ params: { id } }: { params: { id: st
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-          <Card className="lg:col-span-3">
-              <CardHeader>
-              <CardTitle className="font-headline">Curva "S" de Avance</CardTitle>
-              <CardDescription>
-                  Comparación del avance valorado planificado vs. el avance real.
-              </CardDescription>
-              </CardHeader>
-              <CardContent className="pl-2">
-                  <SCurveChart data={sCurve} />
-              </CardContent>
-          </Card>
+          <SCurveCard data={sCurve} />
           <Card className="lg:col-span-2">
               <CardHeader>
                   <CardTitle className="font-headline">Resumen de Tareas</CardTitle>
