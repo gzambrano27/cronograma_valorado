@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -197,7 +198,7 @@ const Sidebar = React.forwardRef<
       data-state={state}
       data-side={side}
       className={cn(
-        "group/sidebar hidden h-svh flex-col bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-in-out md:flex",
+        "group/sidebar hidden flex-col bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-in-out md:flex",
         state === "expanded" ? "w-[--sidebar-width]" : "w-[--sidebar-width-icon]",
         side === "left" ? "border-r border-sidebar-border" : "border-l border-sidebar-border",
         className
@@ -214,7 +215,7 @@ const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
 >(({ className, onClick, ...props }, ref) => {
-  const { toggleSidebar, isMobile } = useSidebar()
+  const { toggleSidebar } = useSidebar()
 
   return (
     <Button
@@ -222,7 +223,7 @@ const SidebarTrigger = React.forwardRef<
       data-sidebar="trigger"
       variant="ghost"
       size="icon"
-      className={cn("h-7 w-7", isMobile ? "flex" : "hidden md:flex", className)}
+      className={cn("h-7 w-7", className)}
       onClick={(event) => {
         onClick?.(event)
         toggleSidebar()
@@ -244,7 +245,7 @@ const SidebarMain = React.forwardRef<
     <main
       ref={ref}
       className={cn(
-        "relative flex min-h-svh flex-1 flex-col bg-background",
+        "relative flex flex-1 flex-col bg-background",
         className
       )}
       {...props}
@@ -413,7 +414,7 @@ const SidebarMenu = React.forwardRef<
   <ul
     ref={ref}
     data-sidebar="menu"
-    className={cn("flex w-full min-w-0 flex-col gap-1 px-2", className)}
+    className={cn("flex w-full min-w-0 flex-col gap-1 px-2 mx-2", className)}
     {...props}
   />
 ))
@@ -671,5 +672,3 @@ export {
   SidebarTrigger,
   useSidebar,
 }
-
-    
