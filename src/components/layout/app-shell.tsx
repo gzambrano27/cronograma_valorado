@@ -38,8 +38,8 @@ export default function AppShell({
   React.useEffect(() => {
     setIsClient(true);
   }, []);
-
-  const skeletonCount = projects.length > 0 ? projects.length : 3;
+  
+  const skeletonCount = 3;
 
   return (
     <SidebarProvider title={title}>
@@ -53,9 +53,17 @@ export default function AppShell({
           </div>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarMenu>
-            {isClient ? (
-              projects.map((project) => (
+          <SidebarMenu className="mx-2">
+            {!isClient ? (
+               <>
+                {[...Array(skeletonCount)].map((_, i) => (
+                  <SidebarMenuItem key={i}>
+                    <SidebarMenuSkeleton showIcon={true} />
+                  </SidebarMenuItem>
+                ))}
+              </>
+            ) : (
+               projects.map((project) => (
                 <SidebarMenuItem key={project.id}>
                   <Link href={`/projects/${project.id}`} passHref>
                     <SidebarMenuButton
@@ -71,21 +79,15 @@ export default function AppShell({
                   </Link>
                 </SidebarMenuItem>
               ))
-            ) : (
-              <>
-                {[...Array(skeletonCount)].map((_, i) => (
-                  <SidebarMenuItem key={i}>
-                    <SidebarMenuSkeleton showIcon={true} />
-                  </SidebarMenuItem>
-                ))}
-              </>
             )}
           </SidebarMenu>
         </SidebarContent>
       </Sidebar>
       <SidebarMain>
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-          <SidebarTrigger />
+          <div className="md:hidden">
+            <SidebarTrigger />
+          </div>
           {isClient && <Breadcrumb projects={projects} />}
           <div className="flex-1" />
            <ThemeToggle />
