@@ -20,9 +20,8 @@ export default async function RootLayout({
 }>) {
   const projects = await getProjects();
   const title = "Cronograma";
-  const cookieStore = cookies();
-  const sidebarState = cookieStore.get(SIDEBAR_COOKIE_NAME);
-  const defaultOpen = sidebarState ? sidebarState.value === 'true' : true;
+  const sidebarStateValue = cookies().get(SIDEBAR_COOKIE_NAME)?.value;
+  const defaultOpen = sidebarStateValue ? sidebarStateValue === 'true' : true;
 
   return (
     <html lang="en" suppressHydrationWarning>
