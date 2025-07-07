@@ -5,7 +5,7 @@ import AppShell from '@/components/layout/app-shell';
 import { getProjects } from '@/lib/data';
 
 export const metadata: Metadata = {
-  title: 'Cronograma Valorado',
+  title: 'Cronograma',
   description: 'Evalúa tus proyectos con precisión.',
 };
 
@@ -15,7 +15,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const projects = await getProjects();
-  const title = "Cronograma Valorado";
+  const title = "Cronograma";
 
   return (
     <html lang="en" suppressHydrationWarning>

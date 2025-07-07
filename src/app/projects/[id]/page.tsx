@@ -121,7 +121,7 @@ export default async function ProjectPage({ params: { id } }: { params: { id: st
 
       <Card>
         <CardHeader>
-          <CardTitle className="font-headline">Cronograma Valorado</CardTitle>
+          <CardTitle className="font-headline">Cronograma</CardTitle>
           <CardDescription>
             Gestione las tareas, su valor y plazos.
           </CardDescription>
