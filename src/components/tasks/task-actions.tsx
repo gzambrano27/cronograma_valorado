@@ -61,7 +61,7 @@ export function TaskActions({ task }: TaskActionsProps) {
         <DropdownMenuContent align="end">
           <DropdownMenuItem onSelect={() => setIsValidateDialogOpen(true)}>
             <Camera className="mr-2 h-4 w-4" />
-            Validar Tarea
+            {hasValidations ? "Añadir Validación" : "Validar Tarea"}
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={() => setIsViewValidationsOpen(true)} disabled={!hasValidations}>
             <GalleryThumbnails className="mr-2 h-4 w-4" />

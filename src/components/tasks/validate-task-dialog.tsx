@@ -54,6 +54,7 @@ export function ValidateTaskDialog({
   const [location, setLocation] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { toast } = useToast();
+  const hasValidations = task.validations && task.validations.length > 0;
 
   const handleLocationSelect = useCallback((loc: { lat: number; lng: number }) => {
     setLocation(`${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}`);
@@ -108,7 +109,9 @@ export function ValidateTaskDialog({
       <DialogContent className="sm:max-w-md">
         <form ref={formRef} action={action}>
           <DialogHeader>
-            <DialogTitle className="font-headline">Validar Tarea: {task.name}</DialogTitle>
+            <DialogTitle className="font-headline">
+              {hasValidations ? 'Añadir Nueva Validación' : 'Validar Tarea'}: {task.name}
+            </DialogTitle>
             <DialogDescription>
               Sube una imagen de evidencia y selecciona la ubicación en el mapa.
             </DialogDescription>
