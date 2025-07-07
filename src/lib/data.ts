@@ -1,7 +1,7 @@
 import type { Project, Task, SCurveData, AppConfig } from './types';
 import fs from 'fs/promises';
 import path from 'path';
-import { differenceInCalendarDays, eachDayOfInterval, format } from 'date-fns';
+import { differenceInCalendarDays, eachDayOfInterval, format, startOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 interface Database {
@@ -114,14 +114,14 @@ export function generateSCurveData(tasks: Task[], totalProjectValue: number): SC
   const sCurve: SCurveData[] = projectInterval.map((day) => {
     let dailyPlannedValue = 0;
     let dailyActualValue = 0;
+    
+    const currentDay = startOfDay(day);
 
     tasks.forEach(task => {
-      const taskStartDate = new Date(task.startDate);
-      const taskEndDate = new Date(task.endDate);
+      const taskStartDate = startOfDay(new Date(task.startDate));
+      const taskEndDate = startOfDay(new Date(task.endDate));
 
-      const adjustedDay = new Date(day.getFullYear(), day.getMonth(), day.getDate());
-
-      if (adjustedDay >= taskStartDate && adjustedDay <= taskEndDate) {
+      if (currentDay >= taskStartDate && currentDay <= taskEndDate) {
         const duration = differenceInCalendarDays(taskEndDate, taskStartDate) + 1;
         if (duration > 0) {
           dailyPlannedValue += task.value / duration;
@@ -130,7 +130,7 @@ export function generateSCurveData(tasks: Task[], totalProjectValue: number): SC
 
       if (task.dailyConsumption) {
         const consumptionToday = task.dailyConsumption.find(
-          c => format(new Date(c.date), 'yyyy-MM-dd') === format(adjustedDay, 'yyyy-MM-dd')
+          c => format(new Date(c.date), 'yyyy-MM-dd') === format(currentDay, 'yyyy-MM-dd')
         );
         if (consumptionToday && task.quantity > 0) {
           const valuePerUnit = task.value / task.quantity;
