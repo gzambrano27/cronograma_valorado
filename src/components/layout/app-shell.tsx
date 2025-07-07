@@ -16,7 +16,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarTrigger,
-  SidebarMenuSkeleton,
   SidebarMain,
 } from "@/components/ui/sidebar";
 import { Button } from "../ui/button";
@@ -42,8 +41,6 @@ export default function AppShell({
     setIsClient(true);
   }, []);
   
-  const skeletonCount = projects && projects.length > 0 ? projects.length : 1;
-
   return (
     <SidebarProvider title={title} defaultOpen={sidebarOpen}>
       <Sidebar>
@@ -57,15 +54,7 @@ export default function AppShell({
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
-            {!isClient ? (
-              // Server-side and initial client-render. Render skeletons.
-              [...Array(skeletonCount)].map((_, i) => (
-                <SidebarMenuItem key={i}>
-                  <SidebarMenuSkeleton showIcon={true} />
-                </SidebarMenuItem>
-              ))
-            ) : projects.length > 0 ? (
-              // After hydration, if projects exist, render them.
+            {projects.length > 0 ? (
               projects.map((project) => (
                 <SidebarMenuItem key={project.id}>
                   <Link href={`/projects/${project.id}`} passHref>
@@ -83,7 +72,6 @@ export default function AppShell({
                 </SidebarMenuItem>
               ))
             ) : (
-              // After hydration, if NO projects, render a message.
               <SidebarMenuItem>
                 <span className="flex items-center gap-2 p-2 text-sm text-sidebar-foreground/70 group-data-[state=collapsed]/sidebar:hidden">
                   No hay proyectos.

@@ -147,7 +147,7 @@ const SidebarProvider = React.forwardRef<
               } as React.CSSProperties
             }
             className={cn(
-              "group/sidebar-wrapper flex w-full",
+              "group/sidebar-wrapper flex min-h-screen w-full",
               className
             )}
             ref={ref}
@@ -223,7 +223,7 @@ const SidebarTrigger = React.forwardRef<
       data-sidebar="trigger"
       variant="ghost"
       size="icon"
-      className={cn("h-7 w-7", isMobile ? "flex" : "hidden md:flex", className)}
+      className={cn("h-7 w-7 md:flex", isMobile && "hidden", className)}
       onClick={(event) => {
         onClick?.(event)
         toggleSidebar()
@@ -326,7 +326,7 @@ const SidebarContent = React.forwardRef<
       ref={ref}
       data-sidebar="content"
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[state=collapsed]/sidebar:overflow-hidden",
+        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto",
         className
       )}
       {...props}
@@ -583,7 +583,7 @@ const SidebarMenuSkeleton = React.forwardRef<
       ref={ref}
       data-sidebar="menu-skeleton"
       className={cn(
-        "flex h-8 items-center gap-2 rounded-md p-2 group-data-[state=collapsed]/sidebar:!size-8 group-data-[state=collapsed]/sidebar:!p-2 group-data-[state=collapsed]/sidebar:justify-center",
+        "flex h-8 items-center gap-2 rounded-md p-2 group-data-[state=collapsed]/sidebar:!size-8 group-data-[state=collapsed]/sidebar:!p-0 group-data-[state=collapsed]/sidebar:justify-center",
         className
       )}
       {...props}
@@ -681,5 +681,3 @@ export {
   SidebarTrigger,
   useSidebar,
 }
-
-    
