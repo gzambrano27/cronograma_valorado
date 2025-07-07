@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -55,20 +54,18 @@ export default function AppShell({
           <SidebarMenu>
             {projects.map((project, index) => (
               <SidebarMenuItem key={project.id}>
-                <Link href={`/projects/${project.id}`} passHref>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === `/projects/${project.id}`}
-                    tooltip={{ children: project.name }}
-                  >
-                    <span>
-                      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-muted text-muted-foreground text-xs font-bold shrink-0">
-                        {index + 1}
-                      </div>
-                      <span className="truncate group-data-[state=collapsed]/sidebar:hidden">{project.name}</span>
-                    </span>
-                  </SidebarMenuButton>
-                </Link>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === `/projects/${project.id}`}
+                  tooltip={{ children: project.name }}
+                >
+                  <Link href={`/projects/${project.id}`}>
+                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-muted text-muted-foreground text-xs font-bold shrink-0">
+                      {index + 1}
+                    </div>
+                    <span className="truncate group-data-[state=collapsed]/sidebar:hidden">{project.name}</span>
+                  </Link>
+                </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
             {projects.length === 0 && (
@@ -101,3 +98,5 @@ export default function AppShell({
     </SidebarProvider>
   );
 }
+
+    
