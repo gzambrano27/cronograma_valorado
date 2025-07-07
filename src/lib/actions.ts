@@ -83,59 +83,59 @@ export async function syncProjectsFromEndpoint() {
     throw new Error('No se ha configurado un endpoint en la página de Configuración.');
   }
 
+  let response;
   try {
-    const response = await fetch(url, { cache: 'no-store' });
-    if (!response.ok) {
-      throw new Error(`Error al obtener los datos: ${response.statusText}`);
-    }
-    const jsonData = await response.json();
-    
-    const parsedData = ApiResponseSchema.safeParse(jsonData);
-
-    if (!parsedData.success) {
-      console.error(parsedData.error);
-      throw new Error('La respuesta del endpoint no tiene el formato JSON esperado.');
-    }
-
-    const externalProjects = parsedData.data.data['project.project'];
-    const db = await readDb();
-
-    const newApiProjects = externalProjects.map(extProj => {
-      const existingProject = db.projects.find(p => p.id === `ext-${extProj.id}`);
-      return {
-        id: `ext-${extProj.id}`,
-        externalId: extProj.id,
-        name: extProj.name,
-        company: extProj.company_id[1],
-        externalCompanyId: extProj.company_id[0],
-        imageUrl: existingProject?.imageUrl || 'https://placehold.co/600x400.png',
-        dataAiHint: existingProject?.dataAiHint || 'project building'
-      };
-    });
-    
-    // Filter existing projects to keep only local ones
-    const localProjects = db.projects.filter(p => !p.id.startsWith('ext-'));
-
-    // Combine local projects with the updated list from the API
-    db.projects = [...localProjects, ...newApiProjects as Project[]];
-
-    // Filter tasks, keeping only those that belong to the new *combined* set of projects
-    const allValidProjectIds = new Set(db.projects.map(p => p.id));
-    db.tasks = db.tasks.filter(task => allValidProjectIds.has(task.projectId));
-    
-    await writeDb(db);
-
-    revalidatePath('/');
-    revalidatePath('/settings');
-    redirect('/');
-
-  } catch (error) {
-    console.error('Error sincronizando proyectos:', error);
-    if (error instanceof Error) {
-        throw error;
-    }
-    throw new Error('Ocurrió un error inesperado durante la sincronización.');
+    response = await fetch(url, { cache: 'no-store' });
+  } catch (e) {
+      console.error('Fetch error:', e);
+      throw new Error('Sincronización cancelada: No se pudo contactar el endpoint.');
   }
+  
+  if (!response.ok) {
+    throw new Error(`Sincronización cancelada: El endpoint devolvió un error (${response.statusText}).`);
+  }
+  
+  let jsonData;
+  try {
+      jsonData = await response.json();
+  } catch (e) {
+      console.error('JSON parsing error:', e);
+      throw new Error('Sincronización cancelada: La respuesta del endpoint no es un JSON válido.');
+  }
+  
+  const parsedData = ApiResponseSchema.safeParse(jsonData);
+
+  if (!parsedData.success) {
+    console.error('Zod validation error:', parsedData.error.flatten());
+    throw new Error('Sincronización cancelada: no cumple con el formato solicitado.');
+  }
+  
+  const externalProjects = parsedData.data.data['project.project'];
+  const db = await readDb();
+
+  const newApiProjects = externalProjects.map(extProj => {
+    const existingProject = db.projects.find(p => p.id === `ext-${extProj.id}`);
+    return {
+      id: `ext-${extProj.id}`,
+      externalId: extProj.id,
+      name: extProj.name,
+      company: extProj.company_id[1],
+      externalCompanyId: extProj.company_id[0],
+      imageUrl: existingProject?.imageUrl || 'https://placehold.co/600x400.png',
+      dataAiHint: existingProject?.dataAiHint || 'project building'
+    };
+  });
+  
+  const localProjects = db.projects.filter(p => !p.id.startsWith('ext-'));
+  db.projects = [...localProjects, ...newApiProjects as Project[]];
+
+  const allValidProjectIds = new Set(db.projects.map(p => p.id));
+  db.tasks = db.tasks.filter(task => allValidProjectIds.has(task.projectId));
+  
+  await writeDb(db);
+
+  revalidatePath('/');
+  revalidatePath('/settings');
 }
 
 
@@ -440,6 +440,6 @@ export async function validateTask(formData: FormData) {
 }
 
 export async function getSettings(): Promise<AppConfig> {
-  const config = await getAppConfig();
+  const config = await getAppAppConfig();
   return config;
 }

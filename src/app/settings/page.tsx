@@ -1,18 +1,24 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { getSettings, updateSettings, syncProjectsFromEndpoint } from "@/lib/actions";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Terminal, DownloadCloud } from "lucide-react";
+import { Terminal, DownloadCloud, Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 export default function SettingsPage() {
     const [url, setUrl] = useState('');
     const [isLoading, setIsLoading] = useState(true);
+    const [isSyncing, startSyncTransition] = useTransition();
+    const { toast } = useToast();
+    const router = useRouter();
+
 
     useEffect(() => {
         getSettings().then(config => {
@@ -23,6 +29,25 @@ export default function SettingsPage() {
             setIsLoading(false);
         });
     }, []);
+
+    const handleSyncSubmit = () => {
+        startSyncTransition(async () => {
+            try {
+                await syncProjectsFromEndpoint();
+                toast({
+                    title: "Sincronización Exitosa",
+                    description: "Los proyectos se han actualizado correctamente.",
+                });
+                router.push('/');
+            } catch (error) {
+                toast({
+                    variant: "destructive",
+                    title: "Error de Sincronización",
+                    description: error instanceof Error ? error.message : "Ocurrió un error inesperado.",
+                });
+            }
+        });
+    };
 
     if (isLoading) {
         return (
@@ -101,7 +126,7 @@ export default function SettingsPage() {
                 </Card>
 
                 <Card>
-                     <form action={syncProjectsFromEndpoint}>
+                     <form action={handleSyncSubmit}>
                         <CardHeader>
                             <CardTitle>Sincronización</CardTitle>
                             <CardDescription>
@@ -118,9 +143,13 @@ export default function SettingsPage() {
                             </Alert>
                         </CardContent>
                         <CardFooter className="border-t px-6 py-4">
-                            <Button type="submit" variant="secondary">
-                                <DownloadCloud className="mr-2 h-4 w-4" />
-                                Sincronizar Proyectos
+                            <Button type="submit" variant="secondary" disabled={isSyncing}>
+                                {isSyncing ? (
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                ) : (
+                                    <DownloadCloud className="mr-2 h-4 w-4" />
+                                )}
+                                {isSyncing ? "Sincronizando..." : "Sincronizar Proyectos"}
                             </Button>
                         </CardFooter>
                     </form>
