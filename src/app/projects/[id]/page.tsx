@@ -8,7 +8,8 @@ import { AddTaskSheet } from "@/components/tasks/add-task-sheet";
 import { Progress } from "@/components/ui/progress";
 import { SCurveCard } from "@/components/tasks/s-curve-card";
 
-export default async function ProjectPage({ params: { id } }: { params: { id: string } }) {
+export default async function ProjectPage({ params }: { params: { id: string } }) {
+  const { id } = params;
   const project = await getProjectById(id);
   
   if (!project) {

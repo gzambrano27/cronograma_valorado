@@ -20,7 +20,8 @@ export default async function RootLayout({
 }>) {
   const projects = await getProjects();
   const title = "Cronograma";
-  const sidebarStateValue = cookies().get(SIDEBAR_COOKIE_NAME)?.value;
+  const cookieStore = cookies();
+  const sidebarStateValue = cookieStore.get(SIDEBAR_COOKIE_NAME)?.value;
   const defaultOpen = sidebarStateValue ? sidebarStateValue === 'true' : true;
 
   return (
