@@ -68,9 +68,9 @@ export default async function ProjectPage({ params: { id } }: { params: { id: st
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <SCurveCard data={sCurve} />
-          <Card className="lg:col-span-2">
+          <Card className="lg:col-span-1">
               <CardHeader>
                   <CardTitle className="font-headline">Resumen de Tareas</CardTitle>
                   <CardDescription>Vista rápida del estado de las tareas.</CardDescription>

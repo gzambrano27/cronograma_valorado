@@ -25,7 +25,7 @@ interface SCurveCardProps {
 
 export function SCurveCard({ data }: SCurveCardProps) {
   return (
-    <Card className="lg:col-span-3">
+    <Card className="lg:col-span-2">
       <CardHeader className="flex flex-row items-start justify-between">
         <div>
           <CardTitle className="font-headline">Curva "S" de Avance</CardTitle>
