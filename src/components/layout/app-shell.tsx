@@ -16,6 +16,7 @@ import {
   SidebarMenuButton,
   SidebarTrigger,
   SidebarInset,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { Button } from "../ui/button";
 import { Breadcrumb } from "./breadcrumb";
@@ -48,6 +49,7 @@ export default function AppShell({
             </h2>
           </div>
         </SidebarHeader>
+        <SidebarSeparator />
         <SidebarContent>
           <SidebarMenu>
             {projects.map((project) => (
