@@ -21,6 +21,7 @@ import {
 import { Button } from "../ui/button";
 import { Breadcrumb } from "./breadcrumb";
 import { ThemeToggle } from "./theme-toggle";
+import { Skeleton } from "../ui/skeleton";
 
 export default function AppShell({ 
   children,
@@ -52,38 +53,37 @@ export default function AppShell({
           </div>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarMenu className="mx-2 group-data-[state=expanded]/sidebar:w-full">
-            {projects.length > 0 ? (
-              projects.map((project) => (
-                <SidebarMenuItem key={project.id} className="group-data-[state=collapsed]/sidebar:justify-center">
-                  <Link href={`/projects/${project.id}`} passHref>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={pathname === `/projects/${project.id}`}
-                      tooltip={{ children: project.name }}
-                    >
-                      <span>
-                        <Briefcase />
-                        <span className="truncate group-data-[state=collapsed]/sidebar:hidden">{project.name}</span>
-                      </span>
-                    </SidebarMenuButton>
-                  </Link>
-                </SidebarMenuItem>
-              ))
-            ) : (
-              <SidebarMenuItem>
-                <span className="flex items-center gap-2 p-2 text-sm text-sidebar-foreground/70 group-data-[state=collapsed]/sidebar:hidden">
-                  No hay proyectos.
-                </span>
+          <SidebarMenu>
+            {projects.map((project) => (
+              <SidebarMenuItem key={project.id}>
+                <Link href={`/projects/${project.id}`} passHref>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === `/projects/${project.id}`}
+                    tooltip={{ children: project.name }}
+                  >
+                    <span>
+                      <Briefcase />
+                      <span className="truncate group-data-[state=collapsed]/sidebar:hidden">{project.name}</span>
+                    </span>
+                  </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
+            ))}
+            {projects.length === 0 && (
+                <SidebarMenuItem>
+                    <span className="flex items-center gap-2 p-2 text-sm text-sidebar-foreground/70 group-data-[state=collapsed]/sidebar:hidden">
+                        No hay proyectos.
+                    </span>
+                </SidebarMenuItem>
             )}
           </SidebarMenu>
         </SidebarContent>
       </Sidebar>
       <SidebarMain>
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-          <SidebarTrigger className="md:flex" />
-          {isClient && <Breadcrumb projects={projects} />}
+          {isClient ? <SidebarTrigger /> : <div className="h-7 w-7 md:flex" />}
+          {isClient ? <Breadcrumb projects={projects} /> : <div className="h-4" />}
           <div className="flex-1" />
            <ThemeToggle />
            <Link href="/settings" passHref>
