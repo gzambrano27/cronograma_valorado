@@ -15,6 +15,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarTrigger,
+  SidebarMenuSkeleton,
 } from "@/components/ui/sidebar";
 import { Button } from "../ui/button";
 import { Breadcrumb } from "./breadcrumb";
@@ -37,6 +38,8 @@ export default function AppShell({
     setIsClient(true);
   }, []);
 
+  const skeletonCount = projects.length > 0 ? projects.length : 3;
+
   return (
     <SidebarProvider title={title}>
       <Sidebar>
@@ -50,22 +53,32 @@ export default function AppShell({
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
-            {projects.map((project) => (
-              <SidebarMenuItem key={project.id}>
-                <Link href={`/projects/${project.id}`} passHref>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isClient ? pathname === `/projects/${project.id}`: false}
-                    tooltip={{ children: project.name }}
-                  >
-                    <span>
-                      <Briefcase />
-                      <span>{project.name}</span>
-                    </span>
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
-            ))}
+            {isClient ? (
+              projects.map((project) => (
+                <SidebarMenuItem key={project.id}>
+                  <Link href={`/projects/${project.id}`} passHref>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === `/projects/${project.id}`}
+                      tooltip={{ children: project.name }}
+                    >
+                      <span>
+                        <Briefcase />
+                        <span>{project.name}</span>
+                      </span>
+                    </SidebarMenuButton>
+                  </Link>
+                </SidebarMenuItem>
+              ))
+            ) : (
+              <>
+                {[...Array(skeletonCount)].map((_, i) => (
+                  <SidebarMenuItem key={i}>
+                    <SidebarMenuSkeleton showIcon={true} />
+                  </SidebarMenuItem>
+                ))}
+              </>
+            )}
           </SidebarMenu>
         </SidebarContent>
       </Sidebar>
