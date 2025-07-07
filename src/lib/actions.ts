@@ -252,6 +252,23 @@ export async function deleteProject(projectId: string) {
     redirect('/');
 }
 
+export async function deleteMultipleProjects(projectIds: string[]) {
+    if (!projectIds || projectIds.length === 0) {
+        return;
+    }
+    const db = await readDb();
+
+    const projectIdsSet = new Set(projectIds);
+
+    db.projects = db.projects.filter(p => !projectIdsSet.has(p.id));
+    db.tasks = db.tasks.filter(t => !projectIdsSet.has(t.projectId));
+
+    await writeDb(db);
+
+    revalidatePath('/');
+    revalidatePath(`/projects`);
+}
+
 export async function createTask(projectId: string, formData: FormData) {
   const validatedFields = TaskSchema.safeParse({
     name: formData.get('name'),
