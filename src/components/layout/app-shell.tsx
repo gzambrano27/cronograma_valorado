@@ -15,8 +15,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarTrigger,
-  SidebarInset,
-  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { Button } from "../ui/button";
 import { Breadcrumb } from "./breadcrumb";
@@ -42,15 +40,14 @@ export default function AppShell({
   return (
     <SidebarProvider title={title}>
       <Sidebar>
-        <SidebarHeader suppressHydrationWarning>
+        <SidebarHeader>
           <div className="flex items-center gap-2 p-2">
             <Building2 className="w-8 h-8 text-primary" />
-            <h2 className="text-xl font-bold font-headline tracking-tight h-7">
+            <h2 className="text-xl font-bold font-headline tracking-tight h-7" suppressHydrationWarning>
               {isClient ? title : <Skeleton className="h-full w-40" />}
             </h2>
           </div>
         </SidebarHeader>
-        <SidebarSeparator />
         <SidebarContent>
           <SidebarMenu>
             {projects.map((project) => (
@@ -74,7 +71,7 @@ export default function AppShell({
       </Sidebar>
       <main className="flex-1">
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-          <SidebarTrigger />
+          {isClient && <SidebarTrigger />}
           {isClient && <Breadcrumb projects={projects} />}
           <div className="flex-1" />
            <ThemeToggle />
