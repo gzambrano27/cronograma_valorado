@@ -27,11 +27,13 @@ import { ThemeToggle } from "./theme-toggle";
 export default function AppShell({ 
   children,
   projects,
-  title
+  title,
+  sidebarOpen
 }: { 
   children: React.ReactNode,
   projects: Project[],
-  title: string
+  title: string,
+  sidebarOpen?: boolean
 }) {
   const pathname = usePathname();
   const [isClient, setIsClient] = React.useState(false);
@@ -40,10 +42,10 @@ export default function AppShell({
     setIsClient(true);
   }, []);
   
-  const skeletonCount = projects.length > 0 ? projects.length : 1;
+  const skeletonCount = projects && projects.length > 0 ? projects.length : 1;
 
   return (
-    <SidebarProvider title={title}>
+    <SidebarProvider title={title} defaultOpen={sidebarOpen}>
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2 p-2">

@@ -4,11 +4,14 @@ import { Toaster } from "@/components/ui/toaster"
 import AppShell from '@/components/layout/app-shell';
 import { getProjects } from '@/lib/data';
 import { ThemeProvider } from '@/components/layout/theme-provider';
+import { cookies } from 'next/headers';
 
 export const metadata: Metadata = {
   title: 'Cronograma',
   description: 'Evalúa tus proyectos con precisión.',
 };
+
+const SIDEBAR_COOKIE_NAME = "sidebar_state";
 
 export default async function RootLayout({
   children,
@@ -17,6 +20,9 @@ export default async function RootLayout({
 }>) {
   const projects = await getProjects();
   const title = "Cronograma";
+  const cookieStore = cookies();
+  const sidebarState = cookieStore.get(SIDEBAR_COOKIE_NAME);
+  const defaultOpen = sidebarState ? sidebarState.value === 'true' : true;
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -32,7 +38,7 @@ export default async function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <AppShell projects={projects} title={title}>
+          <AppShell projects={projects} title={title} sidebarOpen={defaultOpen}>
             {children}
           </AppShell>
           <Toaster />
