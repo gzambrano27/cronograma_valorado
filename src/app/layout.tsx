@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import AppShell from '@/components/layout/app-shell';
 import { getProjects } from '@/lib/data';
+import { ThemeProvider } from '@/components/layout/theme-provider';
 
 export const metadata: Metadata = {
   title: 'Cronograma',
@@ -25,10 +26,17 @@ export default async function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <AppShell projects={projects} title={title}>
-          {children}
-        </AppShell>
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AppShell projects={projects} title={title}>
+            {children}
+          </AppShell>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

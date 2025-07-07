@@ -21,6 +21,7 @@ import {
 import { Button } from "../ui/button";
 import { Breadcrumb } from "./breadcrumb";
 import { Skeleton } from "../ui/skeleton";
+import { ThemeToggle } from "./theme-toggle";
 
 export default function AppShell({ 
   children,
@@ -76,6 +77,7 @@ export default function AppShell({
           <SidebarTrigger className="md:hidden" />
           <Breadcrumb projects={projects} />
           <div className="flex-1" />
+           <ThemeToggle />
            <Link href="/settings" passHref>
               <Button variant="ghost" size="icon" aria-label="Configuración">
                   <Cog className="h-5 w-5" />
