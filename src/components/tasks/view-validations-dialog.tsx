@@ -37,7 +37,7 @@ export function ViewValidationsDialog({
 }: ViewValidationsDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl">
+      <DialogContent className="sm:max-w-6xl">
         <DialogHeader>
           <DialogTitle className="font-headline">Validaciones de Tarea: {taskName}</DialogTitle>
           <DialogDescription>
