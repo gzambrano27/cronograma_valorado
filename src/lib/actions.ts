@@ -107,8 +107,14 @@ export async function syncProjectsFromEndpoint() {
       dataAiHint: 'project building'
     }));
     
+    // Get the IDs of the new projects from the endpoint
+    const newProjectIds = new Set(newProjects.map(p => p.id));
+    
+    // Replace the old project list with the new one
     db.projects = newProjects as Project[];
-    db.tasks = [];
+
+    // Filter tasks, keeping only those that belong to the new set of projects
+    db.tasks = db.tasks.filter(task => newProjectIds.has(task.projectId));
 
     await writeDb(db);
 
