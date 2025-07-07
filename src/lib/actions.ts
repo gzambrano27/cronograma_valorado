@@ -99,23 +99,29 @@ export async function syncProjectsFromEndpoint() {
     const externalProjects = parsedData.data.data['project.project'];
     const db = await readDb();
 
-    const newProjects = externalProjects.map(extProj => ({
-      id: `ext-${extProj.id}`,
-      name: extProj.name,
-      company: extProj.company_id[1],
-      imageUrl: 'https://placehold.co/600x400.png',
-      dataAiHint: 'project building'
-    }));
+    const newApiProjects = externalProjects.map(extProj => {
+      const existingProject = db.projects.find(p => p.id === `ext-${extProj.id}`);
+      return {
+        id: `ext-${extProj.id}`,
+        externalId: extProj.id,
+        name: extProj.name,
+        company: extProj.company_id[1],
+        externalCompanyId: extProj.company_id[0],
+        imageUrl: existingProject?.imageUrl || 'https://placehold.co/600x400.png',
+        dataAiHint: existingProject?.dataAiHint || 'project building'
+      };
+    });
     
-    // Get the IDs of the new projects from the endpoint
-    const newProjectIds = new Set(newProjects.map(p => p.id));
+    // Filter existing projects to keep only local ones
+    const localProjects = db.projects.filter(p => !p.id.startsWith('ext-'));
+
+    // Combine local projects with the updated list from the API
+    db.projects = [...localProjects, ...newApiProjects as Project[]];
+
+    // Filter tasks, keeping only those that belong to the new *combined* set of projects
+    const allValidProjectIds = new Set(db.projects.map(p => p.id));
+    db.tasks = db.tasks.filter(task => allValidProjectIds.has(task.projectId));
     
-    // Replace the old project list with the new one
-    db.projects = newProjects as Project[];
-
-    // Filter tasks, keeping only those that belong to the new set of projects
-    db.tasks = db.tasks.filter(task => newProjectIds.has(task.projectId));
-
     await writeDb(db);
 
     revalidatePath('/');
@@ -173,7 +179,7 @@ export async function createProject(formData: FormData) {
 
     const db = await readDb();
 
-    const newProject: Omit<Project, 'totalValue' | 'taskCount' | 'completedTasks' | 'consumedValue'> = {
+    const newProject: Omit<Project, 'totalValue' | 'taskCount' | 'completedTasks' | 'consumedValue' | 'externalId' | 'externalCompanyId'> = {
         id: `proj-${Date.now()}`,
         name,
         company,

@@ -12,8 +12,10 @@ export type TaskValidation = {
 
 export type Project = {
   id: string;
+  externalId?: number;
   name: string;
   company: string;
+  externalCompanyId?: number;
   totalValue: number;
   consumedValue: number;
   taskCount: number;
