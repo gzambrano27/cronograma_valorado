@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Building2 } from "lucide-react";
 
 interface ProjectListProps {
   projects: Project[];
@@ -43,7 +44,10 @@ export default function ProjectList({ projects, view }: ProjectListProps) {
               <Link href={`/projects/${project.id}`} className="focus:outline-none focus:underline">
                 <CardTitle className="font-headline mb-1 group-hover:text-primary transition-colors">{project.name}</CardTitle>
               </Link>
-              <CardDescription className="line-clamp-2 h-10 mb-4">{project.description}</CardDescription>
+              <div className="flex items-center text-sm text-muted-foreground mb-4 gap-2">
+                <Building2 className="h-4 w-4 flex-shrink-0" />
+                <p className="truncate">{project.company}</p>
+              </div>
               
               <div className="mt-auto space-y-3">
                  <div>
@@ -94,7 +98,10 @@ export default function ProjectList({ projects, view }: ProjectListProps) {
                     <TableRow key={project.id}>
                     <TableCell>
                         <Link href={`/projects/${project.id}`} className="font-medium hover:underline">{project.name}</Link>
-                        <p className="text-sm text-muted-foreground line-clamp-1">{project.description}</p>
+                        <div className="flex items-center text-sm text-muted-foreground gap-1.5 mt-1">
+                          <Building2 className="h-4 w-4 flex-shrink-0" />
+                          <p className="line-clamp-1">{project.company}</p>
+                        </div>
                     </TableCell>
                     <TableCell>
                         <div className="flex flex-col gap-1.5 w-40">

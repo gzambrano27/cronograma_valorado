@@ -43,7 +43,7 @@ async function writeDb(db: Database): Promise<void> {
 const ProjectSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(3, { message: 'El nombre debe tener al menos 3 caracteres.' }),
-  description: z.string().min(1, { message: 'La descripción es requerida.' }),
+  company: z.string().min(1, { message: 'El nombre de la compañía es requerido.' }),
 });
 
 const TaskSchema = z.object({
@@ -58,7 +58,7 @@ const TaskSchema = z.object({
 export async function createProject(formData: FormData) {
     const validatedFields = ProjectSchema.safeParse({
         name: formData.get('name'),
-        description: formData.get('description'),
+        company: formData.get('company'),
     });
 
     if (!validatedFields.success) {
@@ -67,7 +67,7 @@ export async function createProject(formData: FormData) {
         throw new Error('Datos del proyecto inválidos.');
     }
 
-    const { name, description } = validatedFields.data;
+    const { name, company } = validatedFields.data;
     
     const imageFile = formData.get('image') as File | null;
     let imageUrl = 'https://placehold.co/600x400.png';
@@ -82,10 +82,10 @@ export async function createProject(formData: FormData) {
 
     const db = await readDb();
 
-    const newProject: Omit<Project, 'totalValue' | 'taskCount' | 'completedTasks'> = {
+    const newProject: Omit<Project, 'totalValue' | 'taskCount' | 'completedTasks' | 'consumedValue'> = {
         id: `proj-${Date.now()}`,
         name,
-        description,
+        company,
         imageUrl,
         dataAiHint
     };
@@ -101,7 +101,7 @@ export async function updateProject(formData: FormData) {
     const validatedFields = ProjectSchema.safeParse({
         id: formData.get('id'),
         name: formData.get('name'),
-        description: formData.get('description'),
+        company: formData.get('company'),
     });
 
     if (!validatedFields.success || !validatedFields.data.id) {
@@ -109,7 +109,7 @@ export async function updateProject(formData: FormData) {
         throw new Error('Datos del proyecto inválidos para actualizar.');
     }
     
-    const { id, name, description } = validatedFields.data;
+    const { id, name, company } = validatedFields.data;
     const db = await readDb();
     const projectIndex = db.projects.findIndex(p => p.id === id);
 
@@ -131,7 +131,7 @@ export async function updateProject(formData: FormData) {
     db.projects[projectIndex] = {
         ...db.projects[projectIndex],
         name,
-        description,
+        company,
         imageUrl,
         dataAiHint,
     };

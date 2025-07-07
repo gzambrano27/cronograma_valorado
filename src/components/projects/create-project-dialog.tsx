@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { createProject, updateProject } from "@/lib/actions";
 import type { Project } from "@/lib/types";
 import { PlusCircle, UploadCloud } from "lucide-react";
@@ -72,8 +71,8 @@ export function CreateProjectDialog({
             </DialogTitle>
             <DialogDescription>
               {isEditing
-                ? "Edita los detalles de tu proyecto."
-                : "Añade los detalles de tu nuevo proyecto. Haz clic en guardar cuando hayas terminado."}
+                ? "Edita los detalles de tu proyecto, como el nombre y la compañía."
+                : "Añade los detalles de tu nuevo proyecto, incluyendo la compañía a la que pertenece."}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -91,14 +90,14 @@ export function CreateProjectDialog({
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description" className="text-right">
-                Descripción
+              <Label htmlFor="company" className="text-right">
+                Compañía
               </Label>
-              <Textarea
-                id="description"
-                name="description"
-                placeholder="Describe tu proyecto aquí."
-                defaultValue={project?.description || ""}
+              <Input
+                id="company"
+                name="company"
+                placeholder="Nombre de la compañía"
+                defaultValue={project?.company || ""}
                 className="col-span-3"
                 required
               />

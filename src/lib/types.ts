@@ -13,7 +13,7 @@ export type TaskValidation = {
 export type Project = {
   id: string;
   name: string;
-  description: string;
+  company: string;
   totalValue: number;
   consumedValue: number;
   taskCount: number;
