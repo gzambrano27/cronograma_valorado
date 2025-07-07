@@ -1,3 +1,3 @@
 {
-  "endpointUrl": "http://172.168.11.132:8069/api/v1/configs/5/data"
+  "endpointUrl": "http://172.168.11.132:8069/api/v1/project.project/data?token=934bd0b9d20b497d910c65ab3dfefe71"
 }

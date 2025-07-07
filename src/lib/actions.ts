@@ -1,3 +1,4 @@
+
 'use server';
 
 import type { Database, Project, Task, TaskValidation, AppConfig } from './types';
@@ -314,6 +315,22 @@ export async function deleteTask(taskId: string, projectId: string) {
     const db = await readDb();
     db.tasks = db.tasks.filter(t => t.id !== taskId);
     await writeDb(db);
+    revalidatePath(`/projects/${projectId}`);
+    revalidatePath(`/`);
+}
+
+export async function deleteMultipleTasks(taskIds: string[], projectId: string) {
+    if (!taskIds || taskIds.length === 0) {
+        return;
+    }
+    const db = await readDb();
+
+    const taskIdsSet = new Set(taskIds);
+
+    db.tasks = db.tasks.filter(t => !taskIdsSet.has(t.id));
+
+    await writeDb(db);
+
     revalidatePath(`/projects/${projectId}`);
     revalidatePath(`/`);
 }

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -27,7 +28,7 @@ export function TaskActions({ task }: TaskActionsProps) {
   const hasValidations = task.validations && task.validations.length > 0;
 
   return (
-    <>
+    <div onClick={(e) => e.stopPropagation()}>
       <DeleteTaskDialog
         taskId={task.id}
         projectId={task.projectId}
@@ -77,6 +78,6 @@ export function TaskActions({ task }: TaskActionsProps) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </>
+    </div>
   );
 }

@@ -6,6 +6,7 @@ import {
   ArrowUpDown,
   ChevronDown,
   ChevronRight,
+  Trash2,
 } from "lucide-react"
 import {
   ColumnDef,
@@ -19,6 +20,7 @@ import {
   getSortedRowModel,
   getExpandedRowModel,
   useReactTable,
+  RowSelectionState,
 } from "@tanstack/react-table"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
@@ -46,6 +48,9 @@ import { DailyConsumptionTracker } from "./daily-consumption-tracker"
 import { TaskActions } from "./task-actions"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
+import { Checkbox } from "../ui/checkbox"
+import { DeleteMultipleTasksDialog } from "./delete-multiple-tasks-dialog"
+import { cn } from "@/lib/utils"
 
 const statusTranslations: Record<Task['status'], string> = {
     'pendiente': 'Pendiente',
@@ -59,7 +64,32 @@ const adjustDateForTimezone = (date: Date | string): Date => {
     return new Date(d.getTime() + userTimezoneOffset);
 };
 
-const columns: ColumnDef<Task>[] = [
+const getColumns = (): ColumnDef<Task>[] => [
+  {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Seleccionar todo"
+          className="translate-y-[2px]"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          onClick={(e) => e.stopPropagation()}
+          aria-label="Seleccionar fila"
+          className="translate-y-[2px]"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+  },
   {
     id: 'expander',
     header: () => null,
@@ -68,7 +98,10 @@ const columns: ColumnDef<Task>[] = [
         <Button
           variant="ghost"
           size="icon"
-          onClick={row.getToggleExpandedHandler()}
+          onClick={(e) => {
+            e.stopPropagation();
+            row.getToggleExpandedHandler()();
+          }}
           className="w-8 p-0 data-[state=open]:bg-muted"
         >
           {row.getIsExpanded() ? (
@@ -157,11 +190,7 @@ const columns: ColumnDef<Task>[] = [
   {
     id: "actions",
     header: () => <div className="text-right">Acciones</div>,
-    cell: ({ row }) => (
-      <div className="flex justify-end">
-        <TaskActions task={row.original} />
-      </div>
-    ),
+    cell: ({ row }) => <TaskActions task={row.original} />,
   },
 ]
 
@@ -173,7 +202,8 @@ const columnTranslations: Record<string, string> = {
     startDate: "Fecha Inicio",
     endDate: "Fecha Fin",
     expander: "Expandir",
-    actions: "Acciones"
+    actions: "Acciones",
+    select: "Seleccionar"
 };
 
 export function TaskTable({ data }: { data: Task[] }) {
@@ -196,8 +226,10 @@ export function TaskTable({ data }: { data: Task[] }) {
     }
   }, [isMobile]);
 
-  const [rowSelection, setRowSelection] = React.useState({})
+  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
   const [expanded, setExpanded] = React.useState({})
+
+  const columns = React.useMemo(() => getColumns(), []);
 
   const table = useReactTable({
     data,
@@ -212,6 +244,7 @@ export function TaskTable({ data }: { data: Task[] }) {
     onRowSelectionChange: setRowSelection,
     getExpandedRowModel: getExpandedRowModel(),
     onExpandedChange: setExpanded,
+    enableRowSelection: true,
     getRowCanExpand: () => true,
     state: {
       sorting,
@@ -222,9 +255,31 @@ export function TaskTable({ data }: { data: Task[] }) {
     },
   })
 
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+  const selectedTasks = table.getFilteredSelectedRowModel().rows.map(row => row.original);
+
   return (
     <div className="w-full">
-      <div className="flex flex-col sm:flex-row items-center gap-4 py-4">
+      {selectedTasks.length > 0 && (
+          <>
+              <DeleteMultipleTasksDialog
+                  tasks={selectedTasks}
+                  open={isDeleteDialogOpen}
+                  onOpenChange={setIsDeleteDialogOpen}
+                  onSuccess={() => setRowSelection({})}
+              />
+              <div className="flex items-center justify-between gap-4 mb-4">
+                  <div className="text-sm text-muted-foreground">
+                      {`${selectedTasks.length} de ${table.getCoreRowModel().rows.length} fila(s) seleccionadas.`}
+                  </div>
+                  <Button variant="destructive" onClick={() => setIsDeleteDialogOpen(true)}>
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Eliminar Seleccionadas ({selectedTasks.length})
+                  </Button>
+              </div>
+          </>
+      )}
+      <div className={cn("flex flex-col sm:flex-row items-center gap-4", selectedTasks.length === 0 && "py-4")}>
         <Input
           placeholder="Filtrar por nombre..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -303,6 +358,8 @@ export function TaskTable({ data }: { data: Task[] }) {
                 <React.Fragment key={row.id}>
                   <TableRow
                     data-state={row.getIsSelected() && "selected"}
+                    onClick={() => row.toggleSelected(!row.getIsSelected())}
+                    className="cursor-pointer"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
