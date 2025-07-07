@@ -198,7 +198,7 @@ const Sidebar = React.forwardRef<
       data-state={state}
       data-side={side}
       className={cn(
-        "group/sidebar hidden h-full flex-col bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-in-out md:flex",
+        "group/sidebar hidden flex-col bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-in-out md:flex",
         state === "expanded" ? "w-[--sidebar-width]" : "w-[--sidebar-width-icon]",
         side === "left" ? "border-r border-sidebar-border" : "border-l border-sidebar-border",
         className
@@ -215,7 +215,7 @@ const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
 >(({ className, onClick, ...props }, ref) => {
-  const { toggleSidebar } = useSidebar()
+  const { toggleSidebar, isMobile } = useSidebar()
 
   return (
     <Button
@@ -223,7 +223,7 @@ const SidebarTrigger = React.forwardRef<
       data-sidebar="trigger"
       variant="ghost"
       size="icon"
-      className={cn("h-7 w-7", className)}
+      className={cn("h-7 w-7", isMobile && "md:hidden", className)}
       onClick={(event) => {
         onClick?.(event)
         toggleSidebar()
@@ -327,7 +327,6 @@ const SidebarContent = React.forwardRef<
       data-sidebar="content"
       className={cn(
         "flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[state=collapsed]/sidebar:overflow-hidden",
-        "group-data-[state=collapsed]/sidebar:items-center group-data-[state=expanded]/sidebar:p-2",
         className
       )}
       {...props}
@@ -416,7 +415,7 @@ const SidebarMenu = React.forwardRef<
     ref={ref}
     data-sidebar="menu"
     className={cn(
-      "flex min-w-0 flex-col gap-1 group-data-[state=expanded]/sidebar:w-full",
+      "flex min-w-0 flex-col gap-1 group-data-[state=expanded]/sidebar:w-full group-data-[state=collapsed]/sidebar:justify-center",
       className
     )}
     {...props}
@@ -580,7 +579,7 @@ const SidebarMenuSkeleton = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="menu-skeleton"
-      className={cn("flex h-8 items-center gap-2 rounded-md px-2", className)}
+      className={cn("flex h-8 items-center gap-2 rounded-md", className)}
       {...props}
     >
       {showIcon && (
