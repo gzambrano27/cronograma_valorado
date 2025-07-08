@@ -111,7 +111,7 @@ export function generateSCurveData(tasks: Task[], totalProjectValue: number): SC
   let cumulativePlannedValue = 0;
   let cumulativeActualValue = 0;
 
-  const sCurve: SCurveData[] = projectInterval.map((day) => {
+  const sCurve: Omit<SCurveData, 'deviation'>[] = projectInterval.map((day) => {
     let dailyPlannedValue = 0;
     let dailyActualValue = 0;
     
@@ -142,16 +142,22 @@ export function generateSCurveData(tasks: Task[], totalProjectValue: number): SC
     cumulativePlannedValue += dailyPlannedValue;
     cumulativeActualValue += dailyActualValue;
 
+    const plannedPercentage = (cumulativePlannedValue / totalProjectValue) * 100;
+    const actualPercentage = (cumulativeActualValue / totalProjectValue) * 100;
+
     return {
       date: format(day, "d MMM", { locale: es }),
-      planned: Math.round((cumulativePlannedValue / totalProjectValue) * 100),
-      actual: Math.round((cumulativeActualValue / totalProjectValue) * 100),
+      planned: Math.min(100, plannedPercentage),
+      actual: Math.min(100, actualPercentage),
+      cumulativePlannedValue: cumulativePlannedValue,
+      cumulativeActualValue: cumulativeActualValue,
     };
   });
 
   return sCurve.map(d => ({
       ...d,
-      planned: Math.max(0, Math.min(100, d.planned)),
-      actual: Math.max(0, Math.min(100, d.actual)),
+      planned: Math.round(d.planned),
+      actual: Math.round(d.actual),
+      deviation: Math.round(d.actual - d.planned),
   }));
 }

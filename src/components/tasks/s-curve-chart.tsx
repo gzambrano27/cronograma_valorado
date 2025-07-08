@@ -14,7 +14,6 @@ import {
   ChartContainer,
   ChartLegend,
   ChartLegendContent,
-  ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
 import type { SCurveData } from "@/lib/types"
@@ -33,6 +32,48 @@ const chartConfig = {
     color: "hsl(var(--primary))",
   },
 } satisfies ChartConfig
+
+const formatCurrency = (value: number) => new Intl.NumberFormat("es-ES", {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+}).format(value);
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload as SCurveData;
+    
+    return (
+      <div className="p-4 bg-background/95 backdrop-blur-sm border rounded-lg shadow-xl text-sm min-w-[250px]">
+        <p className="font-bold text-base mb-2">{`Fecha: ${label}`}</p>
+        <div className="space-y-1.5">
+            <div className="flex justify-between items-center gap-4">
+                <span className="flex items-center text-muted-foreground">
+                    <div className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: 'var(--color-planned)' }} />
+                    Planificado:
+                </span>
+                <span className="font-mono font-semibold">{`${data.planned}% (${formatCurrency(data.cumulativePlannedValue)})`}</span>
+            </div>
+            <div className="flex justify-between items-center gap-4">
+                <span className="flex items-center text-muted-foreground">
+                    <div className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: 'var(--color-actual)' }} />
+                    Real:
+                </span>
+                <span className="font-mono font-semibold">{`${data.actual}% (${formatCurrency(data.cumulativeActualValue)})`}</span>
+            </div>
+             <div className="flex justify-between items-center gap-4 pt-2 mt-2 border-t">
+                <span className="font-semibold">Desviación:</span>
+                <span className={`font-mono font-bold ${data.deviation < 0 ? 'text-destructive' : 'text-success'}`}>{`${data.deviation}%`}</span>
+            </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+};
+
 
 export function SCurveChart({ data }: SCurveChartProps) {
   return (
@@ -89,31 +130,8 @@ export function SCurveChart({ data }: SCurveChartProps) {
             </linearGradient>
           </defs>
           <Tooltip
-            cursor
-            content={
-              <ChartTooltipContent
-                className="w-56"
-                indicator="dot"
-                formatter={(value, name, item) => (
-                  <>
-                    <div
-                      className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
-                      style={{
-                        backgroundColor: item.color,
-                      }}
-                    />
-                    <div className="flex flex-1 justify-between gap-4">
-                      <p className="text-muted-foreground">
-                        {chartConfig[name as keyof typeof chartConfig]?.label}
-                      </p>
-                      <p className="font-mono font-medium tabular-nums text-foreground">
-                        {`${value}%`}
-                      </p>
-                    </div>
-                  </>
-                )}
-              />
-            }
+            cursor={{ strokeDasharray: '3 3' }}
+            content={<CustomTooltip />}
           />
           <ChartLegend content={<ChartLegendContent />} align="right" verticalAlign="top" wrapperStyle={{paddingBottom: '1rem'}}/>
           <Area
