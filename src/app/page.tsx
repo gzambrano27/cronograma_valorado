@@ -1,13 +1,39 @@
 import { ProjectView } from "@/components/projects/project-view";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getProjects } from "@/lib/data";
-import { DollarSign, ListChecks, Briefcase } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { getProjects, getTasks } from "@/lib/data";
+import { DollarSign, ListChecks, Briefcase, BarChart, PieChart } from "lucide-react";
+import { ProjectValueChart } from "@/components/dashboard/project-value-chart";
+import { TaskStatusChart } from "@/components/dashboard/task-status-chart";
 
 export default async function Home() {
   const projects = await getProjects();
+  const tasks = await getTasks();
+  
   const totalProjects = projects.length;
   const totalValue = projects.reduce((sum, p) => sum + p.totalValue, 0);
-  const completedTasks = projects.reduce((sum, p) => sum + p.completedTasks, 0);
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(t => t.status === 'completado').length;
+
+  // Data for ProjectValueChart
+  const projectValueData = projects
+    .map(p => ({
+      name: p.name.length > 20 ? `${p.name.substring(0, 20)}...` : p.name,
+      value: p.totalValue,
+    }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 7); // Show top 7 projects
+
+  // Data for TaskStatusChart
+  const taskStatusCounts = tasks.reduce((acc, task) => {
+    acc[task.status] = (acc[task.status] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const taskStatusData = [
+    { name: 'Completado', value: taskStatusCounts['completado'] || 0, fill: 'hsl(var(--chart-1))' },
+    { name: 'En Progreso', value: taskStatusCounts['en-progreso'] || 0, fill: 'hsl(var(--chart-2))' },
+    { name: 'Pendiente', value: taskStatusCounts['pendiente'] || 0, fill: 'hsl(var(--chart-3))' },
+  ].filter(item => item.value > 0);
 
   return (
     <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
@@ -31,7 +57,7 @@ export default async function Home() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Proyectos Activos</CardTitle>
+            <CardTitle className="text-sm font-medium">Proyectos Totales</CardTitle>
             <Briefcase className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -43,17 +69,51 @@ export default async function Home() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tareas Completadas</CardTitle>
+            <CardTitle className="text-sm font-medium">Tareas Totales</CardTitle>
             <ListChecks className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold">+{completedTasks}</div>
+            <div className="text-xl font-bold">{totalTasks}</div>
             <p className="text-xs text-muted-foreground">
-              Tareas completadas en todos los proyectos
+              +{completedTasks} completadas
             </p>
           </CardContent>
         </Card>
       </div>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+        <Card className="lg:col-span-3">
+          <CardHeader>
+            <CardTitle className="font-headline flex items-center gap-2">
+              <BarChart className="h-5 w-5" />
+              Valor por Proyecto
+            </CardTitle>
+            <CardDescription>Visualización del valor de los proyectos principales.</CardDescription>
+          </CardHeader>
+          <CardContent className="pl-2">
+            <ProjectValueChart data={projectValueData} />
+          </CardContent>
+        </Card>
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="font-headline flex items-center gap-2">
+              <PieChart className="h-5 w-5" />
+              Distribución de Tareas
+            </CardTitle>
+            <CardDescription>Estado general de las tareas en todos los proyectos.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {tasks.length > 0 ? (
+                <TaskStatusChart data={taskStatusData} />
+            ) : (
+                <div className="flex items-center justify-center h-full min-h-[250px] text-muted-foreground">
+                    No hay datos de tareas para mostrar.
+                </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
       <ProjectView projects={projects} />
     </div>
   );
