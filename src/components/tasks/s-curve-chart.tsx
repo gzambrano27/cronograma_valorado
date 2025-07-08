@@ -1,5 +1,6 @@
 "use client"
 
+import * as React from "react"
 import {
   Area,
   AreaChart,
@@ -9,6 +10,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts"
+import { ArrowUp, ArrowDown } from "lucide-react"
 
 import {
   ChartContainer,
@@ -64,7 +66,11 @@ const CustomTooltip = ({ active, payload, label }: any) => {
             </div>
              <div className="flex justify-between items-center gap-4 pt-2 mt-2 border-t">
                 <span className="font-semibold">Desviación:</span>
-                <span className={`font-mono font-bold ${data.deviation < 0 ? 'text-destructive' : 'text-success'}`}>{`${data.deviation}%`}</span>
+                <span className={`font-mono font-bold flex items-center ${data.deviation < 0 ? 'text-destructive' : 'text-foreground'}`}>
+                  {data.deviation > 0 && <ArrowUp className="h-4 w-4 mr-1" />}
+                  {data.deviation < 0 && <ArrowDown className="h-4 w-4 mr-1" />}
+                  {`${data.deviation}%`}
+                </span>
             </div>
         </div>
       </div>
@@ -76,6 +82,21 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 
 export function SCurveChart({ data }: SCurveChartProps) {
+  const [opacities, setOpacities] = React.useState({
+    planned: 1,
+    actual: 1,
+  });
+
+  const handleLegendClick = (data: any) => {
+    const { dataKey } = data;
+    if (dataKey === 'planned' || dataKey === 'actual') {
+        setOpacities(prev => ({
+            ...prev,
+            [dataKey]: prev[dataKey] === 1 ? 0.2 : 1,
+        }));
+    }
+  };
+
   return (
     <ChartContainer config={chartConfig} className="min-h-[250px] w-full">
       <ResponsiveContainer width="100%" height={300}>
@@ -133,13 +154,16 @@ export function SCurveChart({ data }: SCurveChartProps) {
             cursor={{ strokeDasharray: '3 3' }}
             content={<CustomTooltip />}
           />
-          <ChartLegend content={<ChartLegendContent />} align="right" verticalAlign="top" wrapperStyle={{paddingBottom: '1rem'}}/>
+          <ChartLegend onClick={handleLegendClick} content={<ChartLegendContent />} align="right" verticalAlign="top" wrapperStyle={{paddingBottom: '1rem'}}/>
           <Area
             dataKey="planned"
             type="monotone"
             fill="url(#fillPlanned)"
             stroke="var(--color-planned)"
             strokeWidth={2}
+            strokeOpacity={opacities.planned}
+            fillOpacity={opacities.planned === 1 ? 0.4 : 0.1}
+            activeDot={{ r: 6 }}
             dot={false}
           />
           <Area
@@ -148,6 +172,9 @@ export function SCurveChart({ data }: SCurveChartProps) {
             fill="url(#fillActual)"
             stroke="var(--color-actual)"
             strokeWidth={2}
+            strokeOpacity={opacities.actual}
+            fillOpacity={opacities.actual === 1 ? 0.4 : 0.1}
+            activeDot={{ r: 6 }}
             dot={false}
           />
         </AreaChart>
