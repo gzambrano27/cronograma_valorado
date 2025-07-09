@@ -457,7 +457,11 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
   const parser = new XMLParser({
     ignoreAttributes: true,
     isArray: (tagName, jPath, isLeafNode, isAttribute) => { 
-        if (['Project.Tasks.Task', 'Project.ExtendedAttributes.ExtendedAttribute', 'Project.Tasks.Task.ExtendedAttribute'].includes(jPath)) return true;
+        if ([
+          'Project.Tasks.Task', 
+          'Project.ExtendedAttributes.ExtendedAttribute', 
+          'Project.Tasks.Task.ExtendedAttribute'
+        ].includes(jPath)) return true;
         return false;
      }
   });
@@ -470,32 +474,43 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
   }
 
   // 1. Find the FieldID for 'Cantidades'
-  let cantidadFieldId: string | null = null;
-  for (const attr of projectData.ExtendedAttributes.ExtendedAttribute) {
-    if (attr.Alias === 'Cantidades') {
-      cantidadFieldId = attr.FieldID;
-      break;
-    }
-  }
-
-  if (!cantidadFieldId) {
+  const extendedAttrDefs = projectData.ExtendedAttributes.ExtendedAttribute;
+  const cantidadAttrDef = extendedAttrDefs.find((attr: any) => attr.Alias === 'Cantidades');
+  
+  if (!cantidadAttrDef || !cantidadAttrDef.FieldID) {
     throw new Error('No se pudo encontrar el campo personalizado "Cantidades" en el XML.');
   }
+  const cantidadFieldId = cantidadAttrDef.FieldID;
 
   // 2. Process tasks
   const newTasks: Task[] = [];
-  for (const task of projectData.Tasks.Task) {
+  const tasks = projectData.Tasks.Task;
+
+  for (const task of tasks) {
+    // Only process tasks at level 5
     if (task.OutlineLevel === 5) {
       let quantity = 0;
       if (task.ExtendedAttribute) {
-        const quantityAttr = task.ExtendedAttribute.find((attr: any) => attr.FieldID === cantidadFieldId);
+        // Handle case where ExtendedAttribute might not be an array if only one exists
+        const attributes = Array.isArray(task.ExtendedAttribute) ? task.ExtendedAttribute : [task.ExtendedAttribute];
+        const quantityAttr = attributes.find((attr: any) => attr.FieldID === cantidadFieldId);
         if (quantityAttr && quantityAttr.Value) {
-          quantity = Number(quantityAttr.Value);
+          quantity = parseFloat(quantityAttr.Value) || 0;
         }
       }
 
-      // Cost is stored as an integer and should be divided by 100
-      const value = task.Cost ? Number(task.Cost) / 100 : 0;
+      // Use FixedCost for individual tasks as it holds the direct cost.
+      // The Cost tag seems to be a rollup/summary value. Divide by 100 as instructed.
+      const value = task.FixedCost ? parseFloat(task.FixedCost) / 100 : 0;
+      
+      const startDate = new Date(task.Start);
+      const endDate = new Date(task.Finish);
+
+      // Basic validation to skip invalid tasks
+      if (!task.Name || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+          console.warn('Skipping invalid task data:', task);
+          continue;
+      }
       
       const newTask: Task = {
         id: `task-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
@@ -503,8 +518,8 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
         name: task.Name,
         quantity: quantity,
         value: value,
-        startDate: new Date(task.Start),
-        endDate: new Date(task.Finish),
+        startDate,
+        endDate,
         status: 'pendiente',
         dailyConsumption: [],
         validations: []
