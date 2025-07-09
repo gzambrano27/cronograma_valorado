@@ -1,87 +1,76 @@
 "use client"
 
 import * as React from "react"
-import { Pie, PieChart, ResponsiveContainer, Sector } from "recharts"
-import type { PieSectorDataItem } from "recharts/types/polar/Pie"
+import { Label, Pie, PieChart } from "recharts"
+
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+  type ChartConfig,
+} from "@/components/ui/chart"
 
 interface TaskStatusChartProps {
-  data: { name: string; value: number; fill: string }[]
+  data: any[]
+  config: ChartConfig,
+  totalTasks: number
 }
 
-const renderActiveShape = (props: any) => {
-  const RADIAN = Math.PI / 180;
-  const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent, value } = props;
-  const sin = Math.sin(-RADIAN * midAngle);
-  const cos = Math.cos(-RADIAN * midAngle);
-  const sx = cx + (outerRadius + 10) * cos;
-  const sy = cy + (outerRadius + 10) * sin;
-  const mx = cx + (outerRadius + 30) * cos;
-  const my = cy + (outerRadius + 30) * sin;
-  const ex = mx + (cos >= 0 ? 1 : -1) * 22;
-  const ey = my;
-  const textAnchor = cos >= 0 ? 'start' : 'end';
-
+export function TaskStatusChart({ data, config, totalTasks }: TaskStatusChartProps) {
   return (
-    <g>
-      <text x={cx} y={cy} dy={8} textAnchor="middle" fill="hsl(var(--foreground))" className="text-lg font-bold">
-        {payload.name}
-      </text>
-      <Sector
-        cx={cx}
-        cy={cy}
-        innerRadius={innerRadius}
-        outerRadius={outerRadius}
-        startAngle={startAngle}
-        endAngle={endAngle}
-        fill={fill}
-      />
-      <Sector
-        cx={cx}
-        cy={cy}
-        startAngle={startAngle}
-        endAngle={endAngle}
-        innerRadius={outerRadius + 6}
-        outerRadius={outerRadius + 10}
-        fill={fill}
-      />
-      <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none" />
-      <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
-      <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="hsl(var(--foreground))" className="text-sm">{`Tareas: ${value}`}</text>
-      <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill="hsl(var(--muted-foreground))" className="text-xs">
-        {`(${(percent * 100).toFixed(2)}%)`}
-      </text>
-    </g>
-  );
-};
-
-export function TaskStatusChart({ data }: TaskStatusChartProps) {
-  const [activeIndex, setActiveIndex] = React.useState(0);
-
-  const onPieEnter = React.useCallback(
-    (_: any, index: number) => {
-      setActiveIndex(index);
-    },
-    [setActiveIndex]
-  );
-
-  return (
-    <div className="w-full h-[300px]">
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
-          <Pie
-            activeIndex={activeIndex}
-            activeShape={renderActiveShape}
-            data={data}
-            cx="50%"
-            cy="50%"
-            innerRadius={60}
-            outerRadius={80}
-            fill="hsl(var(--accent))"
-            dataKey="value"
-            onMouseEnter={onPieEnter}
+    <ChartContainer
+      config={config}
+      className="mx-auto aspect-square max-h-[300px]"
+    >
+      <PieChart>
+        <ChartTooltip
+          cursor={false}
+          content={<ChartTooltipContent hideLabel nameKey="tasks" />}
+        />
+        <Pie
+          data={data}
+          dataKey="tasks"
+          nameKey="status"
+          innerRadius={60}
+          strokeWidth={5}
+        >
+           <Label
+            content={({ viewBox }) => {
+              if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                return (
+                  <text
+                    x={viewBox.cx}
+                    y={viewBox.cy}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                  >
+                    <tspan
+                      x={viewBox.cx}
+                      y={viewBox.cy}
+                      className="text-3xl font-bold"
+                    >
+                      {totalTasks.toLocaleString()}
+                    </tspan>
+                    <tspan
+                      x={viewBox.cx}
+                      y={(viewBox.cy || 0) + 20}
+                      className="text-sm text-muted-foreground"
+                    >
+                      Tareas
+                    </tspan>
+                  </text>
+                )
+              }
+            }}
           />
-        </PieChart>
-      </ResponsiveContainer>
-    </div>
+        </Pie>
+        <ChartLegend
+          content={<ChartLegendContent nameKey="status" className="text-xs" />}
+          className="-translate-y-[15px] flex-wrap gap-2 [&>*]:basis-1/3 [&>*]:justify-center"
+        />
+      </PieChart>
+    </ChartContainer>
   )
 }

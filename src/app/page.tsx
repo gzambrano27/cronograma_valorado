@@ -4,6 +4,23 @@ import { getProjects, getTasks } from "@/lib/data";
 import { DollarSign, ListChecks, Briefcase, BarChart, PieChart } from "lucide-react";
 import { ProjectValueChart } from "@/components/dashboard/project-value-chart";
 import { TaskStatusChart } from "@/components/dashboard/task-status-chart";
+import type { ChartConfig } from "@/components/ui/chart";
+
+const taskStatusConfig = {
+  completado: {
+    label: "Completado",
+    color: "hsl(var(--chart-1))",
+  },
+  "en-progreso": {
+    label: "En Progreso",
+    color: "hsl(var(--chart-2))",
+  },
+  pendiente: {
+    label: "Pendiente",
+    color: "hsl(var(--chart-3))",
+  },
+} satisfies ChartConfig;
+
 
 export default async function Home() {
   const projects = await getProjects();
@@ -29,11 +46,10 @@ export default async function Home() {
     return acc;
   }, {} as Record<string, number>);
 
-  const taskStatusData = [
-    { name: 'Completado', value: taskStatusCounts['completado'] || 0, fill: 'hsl(var(--chart-1))' },
-    { name: 'En Progreso', value: taskStatusCounts['en-progreso'] || 0, fill: 'hsl(var(--chart-2))' },
-    { name: 'Pendiente', value: taskStatusCounts['pendiente'] || 0, fill: 'hsl(var(--chart-3))' },
-  ].filter(item => item.value > 0);
+  const taskStatusData = Object.entries(taskStatusCounts).map(([status, count]) => ({
+    status,
+    tasks: count,
+  })).filter(item => item.tasks > 0);
 
   return (
     <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
@@ -104,7 +120,7 @@ export default async function Home() {
           </CardHeader>
           <CardContent>
             {tasks.length > 0 ? (
-                <TaskStatusChart data={taskStatusData} />
+                <TaskStatusChart data={taskStatusData} config={taskStatusConfig} totalTasks={totalTasks} />
             ) : (
                 <div className="flex items-center justify-center h-full min-h-[250px] text-muted-foreground">
                     No hay datos de tareas para mostrar.
