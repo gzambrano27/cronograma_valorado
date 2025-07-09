@@ -473,7 +473,6 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
     throw new Error('El archivo XML no tiene el formato esperado de MS Project.');
   }
 
-  // 1. Find the FieldID for 'Cantidades'
   const extendedAttrDefs = projectData.ExtendedAttributes.ExtendedAttribute;
   const cantidadAttrDef = extendedAttrDefs.find((attr: any) => attr.Alias === 'Cantidades');
   
@@ -482,57 +481,59 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
   }
   const cantidadFieldId = cantidadAttrDef.FieldID;
 
-  // 2. Process tasks
   const newTasks: Task[] = [];
   const tasks = projectData.Tasks.Task;
 
   for (const task of tasks) {
-    // Only process tasks at level 5
-    if (task.OutlineLevel === 5) {
-      
-      let quantity = 0;
-      if (task.ExtendedAttribute) {
-        const attributes = Array.isArray(task.ExtendedAttribute) ? task.ExtendedAttribute : [task.ExtendedAttribute];
-        const quantityAttr = attributes.find((attr: any) => attr.FieldID === cantidadFieldId);
-        if (quantityAttr && quantityAttr.Value) {
-          const parsedQuantity = parseFloat(quantityAttr.Value);
-          quantity = !isNaN(parsedQuantity) ? parsedQuantity : 0;
-        }
-      }
+      try {
+          if (task.OutlineLevel === 5) {
+              let quantity = 0;
+              if (task.ExtendedAttribute) {
+                  const attributes = [].concat(task.ExtendedAttribute).filter(attr => typeof attr === 'object' && attr !== null);
+                  if (attributes.length > 0) {
+                      const quantityAttr = attributes.find((attr: any) => attr.FieldID === cantidadFieldId);
+                      if (quantityAttr && typeof quantityAttr.Value !== 'undefined' && quantityAttr.Value !== null) {
+                          const parsedQuantity = parseFloat(quantityAttr.Value);
+                          quantity = !isNaN(parsedQuantity) ? parsedQuantity : 0;
+                      }
+                  }
+              }
 
-      const parsedCost = parseFloat(task.Cost);
-      const value = !isNaN(parsedCost) ? parsedCost / 100 : 0;
-      
-      const startDate = new Date(task.Start);
-      const endDate = new Date(task.Finish);
+              const costRaw = task.Cost ?? 0;
+              const parsedCost = parseFloat(costRaw);
+              const value = !isNaN(parsedCost) ? parsedCost / 100 : 0;
 
-      // Basic validation to skip invalid tasks
-      if (!task.Name || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-          console.warn('Skipping invalid task data:', task);
-          continue;
+              const startDate = new Date(task.Start);
+              const endDate = new Date(task.Finish);
+
+              if (!task.Name || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                  console.warn('Omitiendo tarea con datos inválidos:', task);
+                  continue;
+              }
+
+              const newTask: Task = {
+                  id: `task-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+                  projectId,
+                  name: task.Name,
+                  quantity,
+                  value,
+                  startDate,
+                  endDate,
+                  status: 'pendiente',
+                  dailyConsumption: [],
+                  validations: []
+              };
+              newTasks.push(newTask);
+          }
+      } catch (e) {
+          console.error("Error procesando una tarea, omitiendo. Datos de la tarea:", task, "Error:", e);
       }
-      
-      const newTask: Task = {
-        id: `task-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-        projectId,
-        name: task.Name,
-        quantity: quantity,
-        value: value,
-        startDate,
-        endDate,
-        status: 'pendiente',
-        dailyConsumption: [],
-        validations: []
-      };
-      newTasks.push(newTask);
-    }
   }
 
   if (newTasks.length === 0) {
-    throw new Error('No se encontraron tareas válidas (nivel 5) en el archivo XML.');
+    throw new Error('No se encontraron tareas válidas (nivel 5) para importar en el archivo XML.');
   }
 
-  // 3. Update database
   const db = await readDb();
   db.tasks.push(...newTasks);
   await writeDb(db);
