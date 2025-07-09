@@ -1,7 +1,7 @@
 import type { Project, Task, SCurveData, AppConfig } from './types';
 import fs from 'fs/promises';
 import path from 'path';
-import { differenceInCalendarDays, eachDayOfInterval, format, startOfDay } from 'date-fns';
+import { eachDayOfInterval, format, startOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 interface Database {
@@ -101,64 +101,67 @@ export async function getTasksByProjectId(id: string): Promise<Task[]> {
 }
 
 export function generateSCurveData(tasks: Task[], totalProjectValue: number): SCurveData[] {
-  if (tasks.length === 0 || totalProjectValue === 0) {
+  // 1. Verificar existencia de tareas
+  if (tasks.length === 0 || totalProjectValue <= 0) {
     return [];
   }
 
-  const projectStartDate = new Date(Math.min(...tasks.map(t => new Date(t.startDate).getTime())));
-  const projectEndDate = new Date(Math.max(...tasks.map(t => new Date(t.endDate).getTime())));
+  const plannedValuesByDate = new Map<string, number>();
+  const actualValuesByDate = new Map<string, number>();
+  const allDateStamps = new Set<number>();
 
-  if (projectStartDate > projectEndDate) {
+  // 2. Calcular valores por fecha y recopilar todas las fechas relevantes
+  tasks.forEach(task => {
+    // Valor Programado: se acumula en la fecha de fin de la tarea
+    if (task.value > 0) {
+      const plannedTimestamp = startOfDay(new Date(task.endDate)).getTime();
+      allDateStamps.add(plannedTimestamp);
+      plannedValuesByDate.set(
+        plannedTimestamp.toString(),
+        (plannedValuesByDate.get(plannedTimestamp.toString()) || 0) + task.value
+      );
+    }
+
+    // Valor Real: se acumula en la fecha de cada reporte de consumo
+    if (task.dailyConsumption) {
+      task.dailyConsumption.forEach(consumption => {
+        const valuePerUnit = task.quantity > 0 ? task.value / task.quantity : 0;
+        const consumptionValue = consumption.consumedQuantity * valuePerUnit;
+        if (consumptionValue > 0) {
+          const actualTimestamp = startOfDay(new Date(consumption.date)).getTime();
+          allDateStamps.add(actualTimestamp);
+          actualValuesByDate.set(
+            actualTimestamp.toString(),
+            (actualValuesByDate.get(actualTimestamp.toString()) || 0) + consumptionValue
+          );
+        }
+      });
+    }
+  });
+
+  // 4. Ordenar el horizonte temporal
+  const sortedTimestamps = Array.from(allDateStamps).sort((a, b) => a - b);
+  
+  if (sortedTimestamps.length === 0) {
     return [];
   }
-
-  const projectInterval = eachDayOfInterval({ start: projectStartDate, end: projectEndDate });
 
   let cumulativePlannedValue = 0;
   let cumulativeActualValue = 0;
+  
+  // 5. Calcular porcentajes acumulados
+  const sCurvePoints = sortedTimestamps.map(timestamp => {
+    const dailyPlanned = plannedValuesByDate.get(timestamp.toString()) || 0;
+    const dailyActual = actualValuesByDate.get(timestamp.toString()) || 0;
 
-  const sCurve: Omit<SCurveData, 'deviation'>[] = projectInterval.map((day) => {
-    let dailyPlannedValue = 0;
-    let dailyActualValue = 0;
-    
-    const currentDay = startOfDay(day);
-
-    tasks.forEach(task => {
-      const taskStartDate = startOfDay(new Date(task.startDate));
-      const taskEndDate = startOfDay(new Date(task.endDate));
-
-      if (currentDay >= taskStartDate && currentDay <= taskEndDate) {
-        const duration = differenceInCalendarDays(taskEndDate, taskStartDate) + 1;
-        if (duration > 0) {
-          dailyPlannedValue += task.value / duration;
-        }
-      }
-
-      if (task.dailyConsumption) {
-        const consumptionToday = task.dailyConsumption.find(c => {
-            const consumptionDate = new Date(c.date);
-            const localConsumptionDate = new Date(
-                consumptionDate.getUTCFullYear(),
-                consumptionDate.getUTCMonth(),
-                consumptionDate.getUTCDate()
-            );
-            return localConsumptionDate.getTime() === currentDay.getTime();
-        });
-        if (consumptionToday && task.quantity > 0) {
-          const valuePerUnit = task.value / task.quantity;
-          dailyActualValue += consumptionToday.consumedQuantity * valuePerUnit;
-        }
-      }
-    });
-
-    cumulativePlannedValue += dailyPlannedValue;
-    cumulativeActualValue += dailyActualValue;
+    cumulativePlannedValue += dailyPlanned;
+    cumulativeActualValue += dailyActual;
 
     const plannedPercentage = (cumulativePlannedValue / totalProjectValue) * 100;
     const actualPercentage = (cumulativeActualValue / totalProjectValue) * 100;
-
+    
     return {
-      date: format(day, "d MMM", { locale: es }),
+      timestamp,
       planned: Math.min(100, plannedPercentage),
       actual: Math.min(100, actualPercentage),
       cumulativePlannedValue: cumulativePlannedValue,
@@ -166,10 +169,51 @@ export function generateSCurveData(tasks: Task[], totalProjectValue: number): SC
     };
   });
 
-  return sCurve.map(d => ({
-      ...d,
-      planned: Math.round(d.planned),
-      actual: Math.round(d.actual),
-      deviation: Math.round(d.actual - d.planned),
-  }));
+  // Crear una serie de datos diaria para una curva suave, interpolando valores
+  const firstDate = new Date(sortedTimestamps[0]);
+  const lastDate = new Date(sortedTimestamps[sortedTimestamps.length - 1]);
+  const projectInterval = eachDayOfInterval({ start: firstDate, end: lastDate });
+
+  const finalCurve: SCurveData[] = [];
+  let lastPoint = {
+    planned: 0,
+    actual: 0,
+    cumulativePlannedValue: 0,
+    cumulativeActualValue: 0,
+  };
+  let pointIndex = 0;
+
+  projectInterval.forEach(day => {
+    const dayTimestamp = day.getTime();
+    
+    // Avanzar y actualizar el punto de datos si la fecha del gráfico alcanza o supera la fecha del siguiente evento
+    while (pointIndex < sCurvePoints.length && sCurvePoints[pointIndex].timestamp <= dayTimestamp) {
+      lastPoint = sCurvePoints[pointIndex];
+      pointIndex++;
+    }
+    
+    finalCurve.push({
+      date: format(day, "d MMM", { locale: es }),
+      planned: Math.round(lastPoint.planned),
+      actual: Math.round(lastPoint.actual),
+      cumulativePlannedValue: lastPoint.cumulativePlannedValue,
+      cumulativeActualValue: lastPoint.cumulativeActualValue,
+      deviation: Math.round(lastPoint.actual - lastPoint.planned),
+    });
+  });
+
+  // Añadir un punto inicial en 0% para anclar la gráfica
+   if (finalCurve.length > 0 && (finalCurve[0].planned > 0 || finalCurve[0].actual > 0)) {
+     const dayBefore = new Date(firstDate.getTime() - 86400000);
+     finalCurve.unshift({
+        date: format(dayBefore, "d MMM", { locale: es }),
+        planned: 0,
+        actual: 0,
+        cumulativePlannedValue: 0,
+        cumulativeActualValue: 0,
+        deviation: 0
+      });
+  }
+
+  return finalCurve;
 }

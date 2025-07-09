@@ -164,7 +164,7 @@ export function SCurveChart({ data }: SCurveChartProps) {
             strokeOpacity={opacities.planned}
             fillOpacity={opacities.planned === 1 ? 0.4 : 0.1}
             activeDot={{ r: 6 }}
-            dot={false}
+            dot={true}
           />
           <Area
             dataKey="actual"
@@ -175,7 +175,7 @@ export function SCurveChart({ data }: SCurveChartProps) {
             strokeOpacity={opacities.actual}
             fillOpacity={opacities.actual === 1 ? 0.4 : 0.1}
             activeDot={{ r: 6 }}
-            dot={false}
+            dot={true}
           />
         </AreaChart>
       </ResponsiveContainer>
