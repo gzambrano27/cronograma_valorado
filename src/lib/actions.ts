@@ -463,7 +463,16 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
           'Project.ExtendedAttributes.ExtendedAttribute', 
           'Project.Tasks.Task.ExtendedAttribute'
         ].includes(jPath);
-     }
+    },
+    stopNodes: [
+        "Project.Views",
+        "Project.Filters",
+        "Project.Groups",
+        "Project.Tables",
+        "Project.Calendars",
+        "Project.Resources",
+        "Project.Assignments"
+    ]
   });
 
   let parsedXml;
@@ -482,7 +491,6 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
 
   const extendedAttrDefs = projectData.ExtendedAttributes?.ExtendedAttribute || [];
   const cantidadAttrDef = extendedAttrDefs.find((attr: any) => attr.Alias === 'Cantidades');
-  
   const cantidadFieldId = cantidadAttrDef?.FieldID;
 
   const newTasks: Task[] = [];
@@ -494,27 +502,21 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
             continue;
         }
 
-        // 1. Validate Name
         const name = task.Name;
-        if (!name || typeof name !== 'string') {
-            console.warn('Omitiendo tarea sin nombre válido.');
-            continue;
-        }
-
-        // 2. Validate Dates
         const startDate = new Date(task.Start);
         const endDate = new Date(task.Finish);
-        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-            console.warn('Omitiendo tarea con fechas inválidas:', name);
+
+        if (!name || typeof name !== 'string' || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            console.warn('Omitiendo tarea con datos básicos inválidos (nombre/fechas):', name);
+            continue;
+        }
+        
+        const costRaw = task.FixedCost ?? task.Cost;
+        if (costRaw === undefined || costRaw === null) {
+             console.warn('Omitiendo tarea sin campo de costo (<FixedCost> o <Cost>):', name);
             continue;
         }
 
-        // 3. Validate and Extract Cost
-        const costRaw = task.FixedCost ?? task.Cost;
-        if (costRaw === undefined || costRaw === null) {
-            console.warn('Omitiendo tarea sin campo de costo <FixedCost> o <Cost>:', name);
-            continue; 
-        }
         const parsedCost = parseFloat(costRaw);
         if (isNaN(parsedCost)) {
             console.warn('Omitiendo tarea con valor de costo no numérico:', name, 'Valor:', costRaw);
@@ -522,7 +524,6 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
         }
         const value = parsedCost / 100;
 
-        // 4. Validate and Extract Quantity
         let quantity = 0;
         if (cantidadFieldId && Array.isArray(task.ExtendedAttribute)) {
             const quantityAttr = task.ExtendedAttribute.find((attr: any) => attr.FieldID === cantidadFieldId);
@@ -534,7 +535,6 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
             }
         }
         
-        // --- Create Task Object ---
         const newTask: Task = {
             id: `task-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
             projectId,
@@ -565,3 +565,5 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/`);
 }
+
+    
