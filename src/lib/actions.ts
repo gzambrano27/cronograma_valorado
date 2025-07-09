@@ -489,18 +489,19 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
   for (const task of tasks) {
     // Only process tasks at level 5
     if (task.OutlineLevel === 5) {
+      
       let quantity = 0;
       if (task.ExtendedAttribute) {
-        // Handle case where ExtendedAttribute might not be an array if only one exists
         const attributes = Array.isArray(task.ExtendedAttribute) ? task.ExtendedAttribute : [task.ExtendedAttribute];
         const quantityAttr = attributes.find((attr: any) => attr.FieldID === cantidadFieldId);
         if (quantityAttr && quantityAttr.Value) {
-          quantity = parseFloat(quantityAttr.Value) || 0;
+          const parsedQuantity = parseFloat(quantityAttr.Value);
+          quantity = !isNaN(parsedQuantity) ? parsedQuantity : 0;
         }
       }
 
-      // Use Cost for individual tasks, as requested. Divide by 100.
-      const value = task.Cost ? parseFloat(task.Cost) / 100 : 0;
+      const parsedCost = parseFloat(task.Cost);
+      const value = !isNaN(parsedCost) ? parsedCost / 100 : 0;
       
       const startDate = new Date(task.Start);
       const endDate = new Date(task.Finish);
