@@ -466,14 +466,21 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
      }
   });
 
-  const parsedXml = parser.parse(fileContent);
+  let parsedXml;
+  try {
+    parsedXml = parser.parse(fileContent);
+  } catch(e) {
+    console.error("Error parsing XML file:", e);
+    throw new Error("El archivo XML está malformado o no es válido.");
+  }
+
 
   const projectData = parsedXml.Project;
-  if (!projectData || !projectData.Tasks?.Task || !projectData.ExtendedAttributes?.ExtendedAttribute) {
+  if (!projectData || !projectData.Tasks?.Task) {
     throw new Error('El archivo XML no tiene el formato esperado de MS Project o no contiene tareas.');
   }
 
-  const extendedAttrDefs = projectData.ExtendedAttributes.ExtendedAttribute;
+  const extendedAttrDefs = projectData.ExtendedAttributes?.ExtendedAttribute || [];
   const cantidadAttrDef = extendedAttrDefs.find((attr: any) => attr.Alias === 'Cantidades');
   
   const cantidadFieldId = cantidadAttrDef?.FieldID;
@@ -483,50 +490,72 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
 
   for (const task of tasks) {
     try {
-        if (task.OutlineLevel === 5) {
-            
-            const costRaw = task.FixedCost ?? 0;
-            const parsedCost = parseFloat(costRaw);
-            const value = !isNaN(parsedCost) ? parsedCost / 100 : 0;
+        if (task.OutlineLevel !== 5) {
+            continue;
+        }
 
-            let quantity = 0;
-            if (cantidadFieldId && Array.isArray(task.ExtendedAttribute)) {
-                const quantityAttr = task.ExtendedAttribute.find((attr: any) => attr.FieldID === cantidadFieldId);
-                if (quantityAttr && quantityAttr.Value != null) {
-                    const parsedQuantity = parseFloat(quantityAttr.Value);
-                    quantity = !isNaN(parsedQuantity) ? parsedQuantity : 0;
+        // 1. Validate Name
+        const name = task.Name;
+        if (!name || typeof name !== 'string') {
+            console.warn('Omitiendo tarea sin nombre válido.');
+            continue;
+        }
+
+        // 2. Validate Dates
+        const startDate = new Date(task.Start);
+        const endDate = new Date(task.Finish);
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            console.warn('Omitiendo tarea con fechas inválidas:', name);
+            continue;
+        }
+
+        // 3. Validate and Extract Cost
+        const costRaw = task.FixedCost ?? task.Cost;
+        if (costRaw === undefined || costRaw === null) {
+            console.warn('Omitiendo tarea sin campo de costo <FixedCost> o <Cost>:', name);
+            continue; 
+        }
+        const parsedCost = parseFloat(costRaw);
+        if (isNaN(parsedCost)) {
+            console.warn('Omitiendo tarea con valor de costo no numérico:', name, 'Valor:', costRaw);
+            continue;
+        }
+        const value = parsedCost / 100;
+
+        // 4. Validate and Extract Quantity
+        let quantity = 0;
+        if (cantidadFieldId && Array.isArray(task.ExtendedAttribute)) {
+            const quantityAttr = task.ExtendedAttribute.find((attr: any) => attr.FieldID === cantidadFieldId);
+            if (quantityAttr && quantityAttr.Value != null) {
+                const parsedQuantity = parseFloat(quantityAttr.Value);
+                if (!isNaN(parsedQuantity)) {
+                    quantity = parsedQuantity;
                 }
             }
-            
-            const startDate = new Date(task.Start);
-            const endDate = new Date(task.Finish);
-
-            if (!task.Name || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-                console.warn('Omitiendo tarea con datos inválidos (nombre/fechas):', task.Name);
-                continue;
-            }
-
-            const newTask: Task = {
-                id: `task-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-                projectId,
-                name: task.Name,
-                quantity,
-                value,
-                startDate,
-                endDate,
-                status: 'pendiente',
-                dailyConsumption: [],
-                validations: []
-            };
-            newTasks.push(newTask);
         }
+        
+        // --- Create Task Object ---
+        const newTask: Task = {
+            id: `task-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+            projectId,
+            name,
+            quantity,
+            value,
+            startDate,
+            endDate,
+            status: 'pendiente',
+            dailyConsumption: [],
+            validations: []
+        };
+        newTasks.push(newTask);
+
     } catch (e) {
-        console.error("Error procesando una tarea del XML, omitiendo. Tarea:", task?.Name, "Error:", e);
+        console.error("Error inesperado procesando una tarea del XML, omitiendo. Tarea:", task?.Name, "Error:", e);
     }
   }
 
   if (newTasks.length === 0) {
-    throw new Error('No se encontraron tareas válidas (nivel 5) para importar en el archivo XML.');
+    throw new Error('No se encontraron tareas válidas (nivel 5) con los datos requeridos para importar en el archivo XML.');
   }
 
   const db = await readDb();
