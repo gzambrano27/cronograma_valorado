@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Label, Pie, PieChart } from "recharts"
+import { Label, Pie, PieChart, Cell } from "recharts"
 
 import {
   ChartContainer,
@@ -19,6 +19,15 @@ interface TaskStatusChartProps {
 }
 
 export function TaskStatusChart({ data, config, totalTasks }: TaskStatusChartProps) {
+  // Memoize chart data to add a fill property for the cells.
+  // This ensures consistent colors defined in the config are used.
+  const chartData = React.useMemo(() => {
+    return data.map(item => ({
+      ...item,
+      fill: `var(--color-${item.status})`,
+    }));
+  }, [data]);
+  
   return (
     <ChartContainer
       config={config}
@@ -27,15 +36,20 @@ export function TaskStatusChart({ data, config, totalTasks }: TaskStatusChartPro
       <PieChart>
         <ChartTooltip
           cursor={false}
-          content={<ChartTooltipContent hideLabel nameKey="tasks" />}
+          // Correctly use "status" as the nameKey to look up the proper label in the config.
+          content={<ChartTooltipContent hideLabel nameKey="status" />}
         />
         <Pie
-          data={data}
+          data={chartData}
           dataKey="tasks"
           nameKey="status"
           innerRadius={60}
           strokeWidth={5}
         >
+           {/* Add explicit Cells to apply the correct colors */}
+           {chartData.map((entry) => (
+            <Cell key={`cell-${entry.status}`} fill={entry.fill} />
+          ))}
            <Label
             content={({ viewBox }) => {
               if (viewBox && "cx" in viewBox && "cy" in viewBox) {
@@ -67,6 +81,7 @@ export function TaskStatusChart({ data, config, totalTasks }: TaskStatusChartPro
           />
         </Pie>
         <ChartLegend
+          // Use nameKey="status" so the legend can look up the label in the config
           content={<ChartLegendContent nameKey="status" className="text-xs" />}
           className="-translate-y-[15px] flex-wrap gap-2 [&>*]:basis-1/3 [&>*]:justify-center"
         />
