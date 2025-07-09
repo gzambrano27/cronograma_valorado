@@ -28,8 +28,8 @@ body {
     --input: 0 0% 20%;
     --ring: 0 0% 80%;
     --radius: 0.5rem;
-    --chart-1: 0 0% 80%;
-    --chart-2: 0 0% 60%;
+    --chart-1: 0 0% 90%;
+    --chart-2: 0 0% 65%;
     --chart-3: 0 0% 40%;
     --chart-4: 0 0% 20%;
     --chart-5: 0 0% 15%;
@@ -65,8 +65,9 @@ body {
     --border: 0 0% 85%;
     --input: 0 0% 85%;
     --ring: 0 0% 10%;
-    --chart-1: 0 0% 10%;
-    --chart-2: 0 0% 40%;
+    --chart-1: 0 0% 20%;
+    --chart-2: 0 0% 50%;
+    --chart-3: 0 0% 80%;
 
     /* Sidebar Variables */
     --sidebar-background: 0 0% 95%;
