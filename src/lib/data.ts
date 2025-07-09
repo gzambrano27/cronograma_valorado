@@ -135,9 +135,15 @@ export function generateSCurveData(tasks: Task[], totalProjectValue: number): SC
       }
 
       if (task.dailyConsumption) {
-        const consumptionToday = task.dailyConsumption.find(
-          c => format(new Date(c.date), 'yyyy-MM-dd') === format(currentDay, 'yyyy-MM-dd')
-        );
+        const consumptionToday = task.dailyConsumption.find(c => {
+            const consumptionDate = new Date(c.date);
+            const localConsumptionDate = new Date(
+                consumptionDate.getUTCFullYear(),
+                consumptionDate.getUTCMonth(),
+                consumptionDate.getUTCDate()
+            );
+            return localConsumptionDate.getTime() === currentDay.getTime();
+        });
         if (consumptionToday && task.quantity > 0) {
           const valuePerUnit = task.value / task.quantity;
           dailyActualValue += consumptionToday.consumedQuantity * valuePerUnit;
