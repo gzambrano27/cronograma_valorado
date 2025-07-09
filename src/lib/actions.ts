@@ -8,6 +8,8 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { getAppConfig } from './data';
+import { XMLParser } from 'fast-xml-parser';
+
 
 const dbPath = path.join(process.cwd(), 'src', 'lib', 'db.json');
 const configPath = path.join(process.cwd(), 'src', 'lib', 'config.json');
@@ -442,4 +444,84 @@ export async function validateTask(formData: FormData) {
 export async function getSettings(): Promise<AppConfig> {
   const config = await getAppConfig();
   return config;
+}
+
+export async function importTasksFromXML(projectId: string, formData: FormData) {
+  const file = formData.get('xmlFile') as File | null;
+  if (!file) {
+    throw new Error('No se ha seleccionado ningún archivo XML.');
+  }
+
+  const fileContent = await file.text();
+  
+  const parser = new XMLParser({
+    ignoreAttributes: true,
+    isArray: (tagName, jPath, isLeafNode, isAttribute) => { 
+        if (['Project.Tasks.Task', 'Project.ExtendedAttributes.ExtendedAttribute', 'Project.Tasks.Task.ExtendedAttribute'].includes(jPath)) return true;
+        return false;
+     }
+  });
+
+  const parsedXml = parser.parse(fileContent);
+  const projectData = parsedXml.Project;
+
+  if (!projectData || !projectData.Tasks || !projectData.Tasks.Task || !projectData.ExtendedAttributes || !projectData.ExtendedAttributes.ExtendedAttribute) {
+    throw new Error('El archivo XML no tiene el formato esperado de MS Project.');
+  }
+
+  // 1. Find the FieldID for 'Cantidades'
+  let cantidadFieldId: string | null = null;
+  for (const attr of projectData.ExtendedAttributes.ExtendedAttribute) {
+    if (attr.Alias === 'Cantidades') {
+      cantidadFieldId = attr.FieldID;
+      break;
+    }
+  }
+
+  if (!cantidadFieldId) {
+    throw new Error('No se pudo encontrar el campo personalizado "Cantidades" en el XML.');
+  }
+
+  // 2. Process tasks
+  const newTasks: Task[] = [];
+  for (const task of projectData.Tasks.Task) {
+    if (task.OutlineLevel === 5) {
+      let quantity = 0;
+      if (task.ExtendedAttribute) {
+        const quantityAttr = task.ExtendedAttribute.find((attr: any) => attr.FieldID === cantidadFieldId);
+        if (quantityAttr && quantityAttr.Value) {
+          quantity = Number(quantityAttr.Value);
+        }
+      }
+
+      // Cost is stored as an integer and should be divided by 100
+      const value = task.Cost ? Number(task.Cost) / 100 : 0;
+      
+      const newTask: Task = {
+        id: `task-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+        projectId,
+        name: task.Name,
+        quantity: quantity,
+        value: value,
+        startDate: new Date(task.Start),
+        endDate: new Date(task.Finish),
+        status: 'pendiente',
+        dailyConsumption: [],
+        validations: []
+      };
+      newTasks.push(newTask);
+    }
+  }
+
+  if (newTasks.length === 0) {
+    throw new Error('No se encontraron tareas válidas (nivel 5) en el archivo XML.');
+  }
+
+  // 3. Update database
+  const db = await readDb();
+  db.tasks.push(...newTasks);
+  await writeDb(db);
+
+  revalidatePath(`/projects/${projectId}`);
+  revalidatePath(`/`);
 }
