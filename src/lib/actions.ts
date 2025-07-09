@@ -447,6 +447,7 @@ export async function getSettings(): Promise<AppConfig> {
 
 export async function importTasksFromXML(projectId: string, formData: FormData) {
   const { XMLParser } = await import('fast-xml-parser');
+  
   const file = formData.get('xmlFile') as File | null;
   if (!file) {
     throw new Error('No se ha seleccionado ningún archivo XML.');
@@ -457,77 +458,71 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
   const parser = new XMLParser({
     ignoreAttributes: true,
     isArray: (tagName, jPath, isLeafNode, isAttribute) => { 
-        if ([
+        return [
           'Project.Tasks.Task', 
           'Project.ExtendedAttributes.ExtendedAttribute', 
           'Project.Tasks.Task.ExtendedAttribute'
-        ].includes(jPath)) return true;
-        return false;
+        ].includes(jPath);
      }
   });
 
   const parsedXml = parser.parse(fileContent);
-  const projectData = parsedXml.Project;
 
-  if (!projectData || !projectData.Tasks || !projectData.Tasks.Task || !projectData.ExtendedAttributes || !projectData.ExtendedAttributes.ExtendedAttribute) {
-    throw new Error('El archivo XML no tiene el formato esperado de MS Project.');
+  const projectData = parsedXml.Project;
+  if (!projectData || !projectData.Tasks?.Task || !projectData.ExtendedAttributes?.ExtendedAttribute) {
+    throw new Error('El archivo XML no tiene el formato esperado de MS Project o no contiene tareas.');
   }
 
   const extendedAttrDefs = projectData.ExtendedAttributes.ExtendedAttribute;
   const cantidadAttrDef = extendedAttrDefs.find((attr: any) => attr.Alias === 'Cantidades');
   
-  if (!cantidadAttrDef || !cantidadAttrDef.FieldID) {
-    throw new Error('No se pudo encontrar el campo personalizado "Cantidades" en el XML.');
-  }
-  const cantidadFieldId = cantidadAttrDef.FieldID;
+  const cantidadFieldId = cantidadAttrDef?.FieldID;
 
   const newTasks: Task[] = [];
   const tasks = projectData.Tasks.Task;
 
   for (const task of tasks) {
-      try {
-          if (task.OutlineLevel === 5) {
-              let quantity = 0;
-              if (task.ExtendedAttribute) {
-                  const attributes = [].concat(task.ExtendedAttribute).filter(attr => typeof attr === 'object' && attr !== null);
-                  if (attributes.length > 0) {
-                      const quantityAttr = attributes.find((attr: any) => attr.FieldID === cantidadFieldId);
-                      if (quantityAttr && typeof quantityAttr.Value !== 'undefined' && quantityAttr.Value !== null) {
-                          const parsedQuantity = parseFloat(quantityAttr.Value);
-                          quantity = !isNaN(parsedQuantity) ? parsedQuantity : 0;
-                      }
-                  }
-              }
+    try {
+        if (task.OutlineLevel === 5) {
+            
+            const costRaw = task.FixedCost ?? 0;
+            const parsedCost = parseFloat(costRaw);
+            const value = !isNaN(parsedCost) ? parsedCost / 100 : 0;
 
-              const costRaw = task.Cost ?? 0;
-              const parsedCost = parseFloat(costRaw);
-              const value = !isNaN(parsedCost) ? parsedCost / 100 : 0;
+            let quantity = 0;
+            if (cantidadFieldId && Array.isArray(task.ExtendedAttribute)) {
+                const quantityAttr = task.ExtendedAttribute.find((attr: any) => attr.FieldID === cantidadFieldId);
+                if (quantityAttr && quantityAttr.Value != null) {
+                    const parsedQuantity = parseFloat(quantityAttr.Value);
+                    quantity = !isNaN(parsedQuantity) ? parsedQuantity : 0;
+                }
+            }
+            
+            const startDate = new Date(task.Start);
+            const endDate = new Date(task.Finish);
 
-              const startDate = new Date(task.Start);
-              const endDate = new Date(task.Finish);
+            if (!task.Name || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                console.warn('Omitiendo tarea con datos inválidos (nombre/fechas):', task.Name);
+                continue;
+            }
 
-              if (!task.Name || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-                  console.warn('Omitiendo tarea con datos inválidos:', task);
-                  continue;
-              }
-
-              const newTask: Task = {
-                  id: `task-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-                  projectId,
-                  name: task.Name,
-                  quantity,
-                  value,
-                  startDate,
-                  endDate,
-                  status: 'pendiente',
-                  dailyConsumption: [],
-                  validations: []
-              };
-              newTasks.push(newTask);
-          }
-      } catch (e) {
-          console.error("Error procesando una tarea, omitiendo. Datos de la tarea:", task, "Error:", e);
-      }
+            const newTask: Task = {
+                id: `task-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+                projectId,
+                name: task.Name,
+                quantity,
+                value,
+                startDate,
+                endDate,
+                status: 'pendiente',
+                dailyConsumption: [],
+                validations: []
+            };
+            newTasks.push(newTask);
+        }
+    } catch (e) {
+        console.error("Error procesando una tarea del XML, omitiendo. Tarea:", task?.Name, "Error:", e);
+    }
   }
 
   if (newTasks.length === 0) {
