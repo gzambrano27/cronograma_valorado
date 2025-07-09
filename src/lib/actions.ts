@@ -499,9 +499,8 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
         }
       }
 
-      // Use FixedCost for individual tasks as it holds the direct cost.
-      // The Cost tag seems to be a rollup/summary value. Divide by 100 as instructed.
-      const value = task.FixedCost ? parseFloat(task.FixedCost) / 100 : 0;
+      // Use Cost for individual tasks, as requested. Divide by 100.
+      const value = task.Cost ? parseFloat(task.Cost) / 100 : 0;
       
       const startDate = new Date(task.Start);
       const endDate = new Date(task.Finish);
