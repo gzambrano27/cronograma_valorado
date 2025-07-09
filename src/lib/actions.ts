@@ -8,7 +8,6 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { getAppConfig } from './data';
-import { XMLParser } from 'fast-xml-parser';
 
 
 const dbPath = path.join(process.cwd(), 'src', 'lib', 'db.json');
@@ -447,6 +446,7 @@ export async function getSettings(): Promise<AppConfig> {
 }
 
 export async function importTasksFromXML(projectId: string, formData: FormData) {
+  const { XMLParser } = await import('fast-xml-parser');
   const file = formData.get('xmlFile') as File | null;
   if (!file) {
     throw new Error('No se ha seleccionado ningún archivo XML.');
