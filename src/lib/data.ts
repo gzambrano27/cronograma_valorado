@@ -81,7 +81,13 @@ export async function getProjects(): Promise<Project[]> {
 
 export async function getTasks(): Promise<Task[]> {
   const db = await readDb();
-  return db.tasks;
+  return db.tasks.map(task => ({
+    ...task,
+    consumedQuantity: (task.dailyConsumption || []).reduce(
+      (sum, consumption) => sum + consumption.consumedQuantity,
+      0
+    ),
+  }));
 }
 
 export async function getProjectById(id: string): Promise<Project | undefined> {

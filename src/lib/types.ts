@@ -29,6 +29,7 @@ export type Task = {
   projectId: string;
   name:string;
   quantity: number;
+  consumedQuantity: number;
   value: number;
   startDate: Date;
   endDate: Date;

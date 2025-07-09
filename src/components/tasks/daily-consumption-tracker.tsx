@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { format, differenceInCalendarDays } from "date-fns";
+import { format, differenceInCalendarDays, eachDayOfInterval } from "date-fns";
 import { updateTaskConsumption } from "@/lib/actions";
 
 interface DailyConsumptionTrackerProps {
@@ -24,15 +24,9 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
 
-  const adjustDateForTimezone = (date: Date | string): Date => {
-    const d = new Date(date);
-    const userTimezoneOffset = d.getTimezoneOffset() * 60000;
-    return new Date(d.getTime() + userTimezoneOffset);
-  };
-
   const [consumptions, setConsumptions] = useState<Record<string, number>>(
     (task.dailyConsumption || []).reduce((acc, curr) => {
-      acc[format(adjustDateForTimezone(curr.date), "yyyy-MM-dd")] = curr.consumedQuantity;
+      acc[format(new Date(curr.date), "yyyy-MM-dd")] = curr.consumedQuantity;
       return acc;
     }, {} as Record<string, number>)
   );
@@ -55,10 +49,15 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
     startTransition(async () => {
       try {
         await updateTaskConsumption(task.id, date, consumedQuantity);
+
+        const displayDate = new Date(date);
+        const userTimezoneOffset = displayDate.getTimezoneOffset() * 60000;
+        const correctedDate = new Date(displayDate.getTime() + userTimezoneOffset);
+
         toast({
           title: "Consumo Guardado",
           description: `El consumo para el ${format(
-            adjustDateForTimezone(date),
+            correctedDate,
             "PPP"
           )} ha sido actualizado.`,
         });
@@ -72,23 +71,12 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
     });
   };
 
-  const getDates = (startDate: Date, endDate: Date) => {
-    const dates = [];
-    let currentDate = adjustDateForTimezone(startDate);
-    const finalDate = adjustDateForTimezone(endDate);
-    
-    while (currentDate <= finalDate) {
-      dates.push(new Date(currentDate));
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-    return dates;
-  };
-
-  const dates = getDates(task.startDate, task.endDate);
+  const dates = eachDayOfInterval({
+    start: new Date(task.startDate),
+    end: new Date(task.endDate),
+  });
   
-  const adjustedStartDate = adjustDateForTimezone(task.startDate);
-  const adjustedEndDate = adjustDateForTimezone(task.endDate);
-  const durationInDays = differenceInCalendarDays(adjustedEndDate, adjustedStartDate) + 1;
+  const durationInDays = differenceInCalendarDays(new Date(task.endDate), new Date(task.startDate)) + 1;
   const dailyPlannedQuantity = durationInDays > 0 ? task.quantity / durationInDays : 0;
 
 

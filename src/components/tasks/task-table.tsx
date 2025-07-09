@@ -159,6 +159,14 @@ const getColumns = (): ColumnDef<Task>[] => [
     },
   },
   {
+    accessorKey: "consumedQuantity",
+    header: () => <div className="text-right">Cant. Consumida</div>,
+    cell: ({ row }) => {
+        const consumed = row.getValue("consumedQuantity") as number;
+        return <div className="text-right font-mono">{consumed.toLocaleString('es-ES')}</div>;
+    }
+  },
+  {
     accessorKey: "value",
     header: () => <div className="text-right">Valor</div>,
     cell: ({ row }) => {
@@ -198,6 +206,7 @@ const columnTranslations: Record<string, string> = {
     name: "Tarea",
     status: "Estado",
     quantity: "Cantidad Total",
+    consumedQuantity: "Cant. Consumida",
     value: "Valor",
     startDate: "Fecha Inicio",
     endDate: "Fecha Fin",
@@ -217,6 +226,7 @@ export function TaskTable({ data }: { data: Task[] }) {
     if (isMobile) {
       setColumnVisibility({
         quantity: false,
+        consumedQuantity: false,
         value: false,
         startDate: false,
         endDate: false,
