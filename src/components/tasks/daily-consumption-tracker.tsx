@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import { updateTaskConsumption } from "@/lib/actions";
 
 interface DailyConsumptionTrackerProps {
@@ -44,7 +45,12 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
 
     setConsumptions(prevConsumptions => 
         prevConsumptions.map(c => {
-            if (format(new Date(c.date), 'yyyy-MM-dd') === dateString) {
+            // Adjust date for comparison to avoid timezone issues
+            const d = new Date(c.date);
+            const userTimezoneOffset = d.getTimezoneOffset() * 60000;
+            const adjustedDate = new Date(d.getTime() + userTimezoneOffset);
+
+            if (format(adjustedDate, 'yyyy-MM-dd') === dateString) {
                 return { ...c, consumedQuantity: numericValue };
             }
             return c;
@@ -53,7 +59,13 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
   };
   
   const handleSave = (date: string) => {
-    const consumptionEntry = consumptions.find(c => format(new Date(c.date), 'yyyy-MM-dd') === date);
+    const consumptionEntry = consumptions.find(c => {
+        const d = new Date(c.date);
+        const userTimezoneOffset = d.getTimezoneOffset() * 60000;
+        const adjustedDate = new Date(d.getTime() + userTimezoneOffset);
+        return format(adjustedDate, 'yyyy-MM-dd') === date;
+    });
+
     const consumedQuantity = consumptionEntry?.consumedQuantity ?? 0;
 
     startTransition(async () => {
@@ -68,7 +80,7 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
           title: "Consumo Guardado",
           description: `El consumo para el ${format(
             correctedDate,
-            "PPP"
+            "PPP", { locale: es }
           )} ha sido actualizado.`,
         });
       } catch (error) {
@@ -80,6 +92,12 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
       }
     });
   };
+  
+  const adjustDateForDisplay = (date: Date): Date => {
+      const d = new Date(date);
+      const userTimezoneOffset = d.getTimezoneOffset() * 60000;
+      return new Date(d.getTime() + userTimezoneOffset);
+  }
 
   return (
     <div className="p-4 bg-muted/50 rounded-md">
@@ -98,13 +116,14 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
             </TableHeader>
             <TableBody>
             {consumptions.map((consumptionDay) => {
-                const dateString = format(new Date(consumptionDay.date), "yyyy-MM-dd");
+                const displayDate = adjustDateForDisplay(consumptionDay.date);
+                const dateString = format(displayDate, "yyyy-MM-dd");
                 const consumedValue = consumptionDay.consumedQuantity * task.value;
                 const difference = consumptionDay.consumedQuantity - consumptionDay.plannedQuantity;
                 
                 return (
                 <TableRow key={dateString}>
-                    <TableCell>{format(new Date(consumptionDay.date), "PPP")}</TableCell>
+                    <TableCell>{format(displayDate, "PPP", { locale: es })}</TableCell>
                     <TableCell className="font-mono">{consumptionDay.plannedQuantity.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                     <TableCell>
                       <Input

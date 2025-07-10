@@ -60,6 +60,11 @@ const statusTranslations: Record<Task['status'], string> = {
 
 const adjustDateForTimezone = (date: Date | string): Date => {
     const d = new Date(date);
+    // When a date string like "2025-06-02T00:00:00.000Z" is parsed,
+    // new Date() converts it to the browser's local timezone.
+    // If the timezone is west of UTC (e.g., in the Americas), the local date becomes June 1st.
+    // getTimezoneOffset() returns the difference in minutes between UTC and local time.
+    // For UTC-5, it's 300. We add this offset back to correct the date.
     const userTimezoneOffset = d.getTimezoneOffset() * 60000;
     return new Date(d.getTime() + userTimezoneOffset);
 };
