@@ -349,18 +349,22 @@ export async function updateTaskConsumption(taskId: string, date: string, consum
         task.dailyConsumption = [];
     }
     
+    // The incoming date is already in 'yyyy-MM-dd' format, representing a specific day.
+    // To avoid timezone issues, parse it as a UTC date.
     const [year, month, day] = date.split('-').map(Number);
-    const consumptionDate = new Date(Date.UTC(year, month - 1, day));
+    const consumptionDateUTC = new Date(Date.UTC(year, month - 1, day));
+    const consumptionTimestamp = consumptionDateUTC.getTime();
+
 
     const consumptionIndex = task.dailyConsumption.findIndex(
-        c => new Date(c.date).getTime() === consumptionDate.getTime()
+        c => new Date(c.date).getTime() === consumptionTimestamp
     );
     
     if (consumedQuantity > 0) {
         if (consumptionIndex > -1) {
             task.dailyConsumption[consumptionIndex].consumedQuantity = consumedQuantity;
         } else {
-            task.dailyConsumption.push({ date: consumptionDate, consumedQuantity });
+            task.dailyConsumption.push({ date: consumptionDateUTC, consumedQuantity });
         }
     } else {
         if (consumptionIndex > -1) {
@@ -565,5 +569,3 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/`);
 }
-
-    

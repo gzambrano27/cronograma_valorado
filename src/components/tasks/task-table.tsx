@@ -64,6 +64,12 @@ const adjustDateForTimezone = (date: Date | string): Date => {
     return new Date(d.getTime() + userTimezoneOffset);
 };
 
+const formatCurrency = (value: number) => new Intl.NumberFormat("es-ES", {
+  style: "currency",
+  currency: "USD",
+}).format(value);
+
+
 const getColumns = (): ColumnDef<Task>[] => [
   {
       id: "select",
@@ -167,17 +173,36 @@ const getColumns = (): ColumnDef<Task>[] => [
     }
   },
   {
+    id: "difference",
+    header: () => <div className="text-right">Diferencia de Consumo</div>,
+    cell: ({ row }) => {
+        const difference = row.original.quantity - row.original.consumedQuantity;
+        return <div className="text-right font-mono">{difference.toLocaleString('es-ES')}</div>;
+    }
+  },
+  {
     accessorKey: "value",
-    header: () => <div className="text-right">Precio Unitario</div>,
+    header: () => <div className="text-right">PVP</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("value"))
-      const formatted = new Intl.NumberFormat("es-ES", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount)
-
-      return <div className="text-right font-mono">{formatted}</div>
+      return <div className="text-right font-mono">{formatCurrency(amount)}</div>
     },
+  },
+  {
+    id: "subtotalValued",
+    header: () => <div className="text-right">Subtotal Valorado</div>,
+    cell: ({ row }) => {
+        const subtotal = row.original.quantity * row.original.value;
+        return <div className="text-right font-mono">{formatCurrency(subtotal)}</div>;
+    }
+  },
+  {
+    id: "subtotalActual",
+    header: () => <div className="text-right">Subtotal Avance Real</div>,
+    cell: ({ row }) => {
+        const subtotal = row.original.consumedQuantity * row.original.value;
+        return <div className="text-right font-mono">{formatCurrency(subtotal)}</div>;
+    }
   },
   {
     accessorKey: "startDate",
@@ -207,7 +232,10 @@ const columnTranslations: Record<string, string> = {
     status: "Estado",
     quantity: "Cant. Planificada",
     consumedQuantity: "Cant. Consumida",
-    value: "Precio Unitario",
+    difference: "Diferencia de Consumo",
+    value: "PVP",
+    subtotalValued: "Subtotal Valorado",
+    subtotalActual: "Subtotal Avance Real",
     startDate: "Fecha Inicio",
     endDate: "Fecha Fin",
     expander: "Expandir",
@@ -227,7 +255,10 @@ export function TaskTable({ data }: { data: Task[] }) {
       setColumnVisibility({
         quantity: false,
         consumedQuantity: false,
+        difference: false,
         value: false,
+        subtotalValued: false,
+        subtotalActual: false,
         startDate: false,
         endDate: false,
       });
