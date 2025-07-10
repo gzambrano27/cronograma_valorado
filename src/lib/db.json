@@ -8,5 +8,241 @@
       "dataAiHint": "project building"
     }
   ],
-  "tasks": []
+  "tasks": [
+    {
+      "id": "task-1752161981528-te7yygk",
+      "projectId": "proj-1751568818238",
+      "name": "POSTE DE HORMIGÓN CIRCULAR DE 12M 500KGF PARA MT",
+      "quantity": 987654,
+      "value": 456789,
+      "startDate": "2025-06-02T09:00:00.000Z",
+      "endDate": "2025-06-13T19:00:00.000Z",
+      "status": "completado",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-02T00:00:00.000Z",
+          "plannedQuantity": 82304.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-03T00:00:00.000Z",
+          "plannedQuantity": 82304.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-04T00:00:00.000Z",
+          "plannedQuantity": 82304.5,
+          "consumedQuantity": 200000
+        },
+        {
+          "date": "2025-06-05T00:00:00.000Z",
+          "plannedQuantity": 82304.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-06T00:00:00.000Z",
+          "plannedQuantity": 82304.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-07T00:00:00.000Z",
+          "plannedQuantity": 82304.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-08T00:00:00.000Z",
+          "plannedQuantity": 82304.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-09T00:00:00.000Z",
+          "plannedQuantity": 82304.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-10T00:00:00.000Z",
+          "plannedQuantity": 82304.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-11T00:00:00.000Z",
+          "plannedQuantity": 82304.5,
+          "consumedQuantity": 600000
+        },
+        {
+          "date": "2025-06-12T00:00:00.000Z",
+          "plannedQuantity": 82304.5,
+          "consumedQuantity": 187654
+        },
+        {
+          "date": "2025-06-13T00:00:00.000Z",
+          "plannedQuantity": 82304.5,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 987654,
+      "validations": []
+    },
+    {
+      "id": "task-1752161981528-zv6eggy",
+      "projectId": "proj-1751568818238",
+      "name": "POSTE DE HORMIGÓN CIRCULAR DE 12M 2000KGF PARA MT",
+      "quantity": 5,
+      "value": 50,
+      "startDate": "2025-06-02T09:00:00.000Z",
+      "endDate": "2025-06-03T19:00:00.000Z",
+      "status": "completado",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-02T00:00:00.000Z",
+          "plannedQuantity": 2.5,
+          "consumedQuantity": 5
+        },
+        {
+          "date": "2025-06-03T00:00:00.000Z",
+          "plannedQuantity": 2.5,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 5,
+      "validations": []
+    },
+    {
+      "id": "task-1752161981528-3jnj1d8",
+      "projectId": "proj-1751568818238",
+      "name": "POSTE DE HORMIGÓN CIRCULAR DE 14M 700KGF PARA MT",
+      "quantity": 22,
+      "value": 75,
+      "startDate": "2025-06-02T09:00:00.000Z",
+      "endDate": "2025-06-04T19:00:00.000Z",
+      "status": "completado",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-02T00:00:00.000Z",
+          "plannedQuantity": 7.33333333333333,
+          "consumedQuantity": 22
+        },
+        {
+          "date": "2025-06-03T00:00:00.000Z",
+          "plannedQuantity": 7.33333333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-04T00:00:00.000Z",
+          "plannedQuantity": 7.333333333333339,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 22,
+      "validations": []
+    },
+    {
+      "id": "task-1752161981528-u4u7z86",
+      "projectId": "proj-1751568818238",
+      "name": "POSTE DE HORMIGÓN CIRCULAR DE 14M 2000KGF PARA MT",
+      "quantity": 5,
+      "value": 46,
+      "startDate": "2025-06-02T09:00:00.000Z",
+      "endDate": "2025-06-02T19:00:00.000Z",
+      "status": "completado",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-02T00:00:00.000Z",
+          "plannedQuantity": 5,
+          "consumedQuantity": 5
+        }
+      ],
+      "consumedQuantity": 5,
+      "validations": []
+    },
+    {
+      "id": "task-1752161981528-vqlp7m3",
+      "projectId": "proj-1751568818238",
+      "name": "Fin de instalacion de postes",
+      "quantity": 0,
+      "value": 0,
+      "startDate": "2025-06-13T19:00:00.000Z",
+      "endDate": "2025-06-13T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752161981528-hjy2zr8",
+      "projectId": "proj-1751568818238",
+      "name": "TENSOR FAROL SIMPLE MT TAT-0FS",
+      "quantity": 403,
+      "value": 0,
+      "startDate": "2025-06-16T09:00:00.000Z",
+      "endDate": "2025-06-17T19:00:00.000Z",
+      "status": "en-progreso",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-16T00:00:00.000Z",
+          "plannedQuantity": 201.5,
+          "consumedQuantity": 153
+        },
+        {
+          "date": "2025-06-17T00:00:00.000Z",
+          "plannedQuantity": 201.5,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 153,
+      "validations": []
+    },
+    {
+      "id": "task-1752161981528-kz80jbr",
+      "projectId": "proj-1751568818238",
+      "name": "TENSOR TIERRA SIMPLE MT TAT-0TS",
+      "quantity": 279,
+      "value": 0,
+      "startDate": "2025-06-16T09:00:00.000Z",
+      "endDate": "2025-06-20T19:00:00.000Z",
+      "status": "en-progreso",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-16T00:00:00.000Z",
+          "plannedQuantity": 55.8,
+          "consumedQuantity": 50
+        },
+        {
+          "date": "2025-06-17T00:00:00.000Z",
+          "plannedQuantity": 55.8,
+          "consumedQuantity": 179
+        },
+        {
+          "date": "2025-06-18T00:00:00.000Z",
+          "plannedQuantity": 55.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-19T00:00:00.000Z",
+          "plannedQuantity": 55.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-20T00:00:00.000Z",
+          "plannedQuantity": 55.80000000000001,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 229,
+      "validations": []
+    },
+    {
+      "id": "task-1752161981528-zx4lf32",
+      "projectId": "proj-1751568818238",
+      "name": "Fin de instalacion de tensores",
+      "quantity": 0,
+      "value": 0,
+      "startDate": "2025-06-20T19:00:00.000Z",
+      "endDate": "2025-06-20T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [],
+      "consumedQuantity": 0,
+      "validations": []
+    }
+  ]
 }
