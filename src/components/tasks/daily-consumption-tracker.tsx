@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { Task } from "@/lib/types";
@@ -13,12 +14,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { format, differenceInCalendarDays, eachDayOfInterval } from "date-fns";
+import { format, eachDayOfInterval } from "date-fns";
 import { updateTaskConsumption } from "@/lib/actions";
 
 interface DailyConsumptionTrackerProps {
   task: Task;
 }
+
+const formatCurrency = (value: number) => new Intl.NumberFormat("es-ES", {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+}).format(value);
+
 
 export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) {
   const { toast } = useToast();
@@ -75,10 +84,6 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
     start: new Date(task.startDate),
     end: new Date(task.endDate),
   });
-  
-  const durationInDays = differenceInCalendarDays(new Date(task.endDate), new Date(task.startDate)) + 1;
-  const dailyPlannedQuantity = durationInDays > 0 ? task.quantity / durationInDays : 0;
-
 
   return (
     <div className="p-4 bg-muted/50 rounded-md">
@@ -88,29 +93,33 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
             <TableHeader className="sticky top-0 bg-muted">
             <TableRow>
                 <TableHead>Fecha</TableHead>
-                <TableHead>Cant. Planificada</TableHead>
-                <TableHead className="w-[180px]">Consumo Registrado</TableHead>
+                <TableHead>Cant. Registrada</TableHead>
+                <TableHead>Valor Consumido</TableHead>
                 <TableHead className="w-[100px] text-right">Acción</TableHead>
             </TableRow>
             </TableHeader>
             <TableBody>
             {dates.map((date) => {
                 const dateString = format(date, "yyyy-MM-dd");
+                const consumedQuantity = consumptions[dateString] ?? 0;
+                const consumedValue = consumedQuantity * task.value;
                 return (
                 <TableRow key={dateString}>
                     <TableCell>{format(date, "PPP")}</TableCell>
-                    <TableCell>{dailyPlannedQuantity.toFixed(2)}</TableCell>
                     <TableCell>
-                    <Input
-                        type="number"
-                        value={consumptions[dateString] ?? ""}
-                        onChange={(e) =>
-                        handleConsumptionChange(dateString, e.target.value)
-                        }
-                        placeholder="0"
-                        className="h-8"
-                        disabled={isPending}
-                    />
+                      <Input
+                          type="number"
+                          value={consumedQuantity}
+                          onChange={(e) =>
+                            handleConsumptionChange(dateString, e.target.value)
+                          }
+                          placeholder="0"
+                          className="h-8"
+                          disabled={isPending}
+                      />
+                    </TableCell>
+                    <TableCell className="font-mono">
+                      {formatCurrency(consumedValue)}
                     </TableCell>
                     <TableCell className="text-right">
                     <Button 
@@ -118,7 +127,7 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
                         onClick={() => handleSave(dateString)}
                         disabled={isPending}
                     >
-                        {isPending ? "Guardando..." : "Guardar"}
+                        {isPending ? "..." : "Guardar"}
                     </Button>
                     </TableCell>
                 </TableRow>

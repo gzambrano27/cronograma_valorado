@@ -55,18 +55,20 @@ export async function getProjects(): Promise<Project[]> {
     const projectTasks = tasks.filter(task => task.projectId === project.id);
     const completedTasks = projectTasks.filter(task => task.status === 'completado').length;
     const taskCount = projectTasks.length;
-    const totalValue = projectTasks.reduce((sum, task) => sum + task.value, 0);
+    
+    // Calculate totalValue based on quantity * value (unit price)
+    const totalValue = projectTasks.reduce((sum, task) => sum + (task.quantity * task.value), 0);
     
     const consumedValue = projectTasks.reduce((projectSum, task) => {
-      if (!task.dailyConsumption || !task.quantity) {
+      if (!task.dailyConsumption) {
         return projectSum;
       }
-      const valuePerUnit = task.value / task.quantity;
       const totalConsumedQuantity = task.dailyConsumption.reduce(
         (taskSum, consumption) => taskSum + consumption.consumedQuantity,
         0
       );
-      return projectSum + totalConsumedQuantity * valuePerUnit;
+      // Consumed value is consumed quantity * unit price
+      return projectSum + (totalConsumedQuantity * task.value);
     }, 0);
 
     return {
@@ -113,20 +115,20 @@ export function generateSCurveData(tasks: Task[], totalProjectValue: number): SC
   // 2. Calcular valores por fecha y recopilar todas las fechas relevantes
   tasks.forEach(task => {
     // Valor Programado: se acumula en la fecha de fin de la tarea
-    if (task.value > 0) {
+    const plannedValue = task.quantity * task.value;
+    if (plannedValue > 0) {
       const plannedTimestamp = startOfDay(new Date(task.endDate)).getTime();
       allDateStamps.add(plannedTimestamp);
       plannedValuesByDate.set(
         plannedTimestamp.toString(),
-        (plannedValuesByDate.get(plannedTimestamp.toString()) || 0) + task.value
+        (plannedValuesByDate.get(plannedTimestamp.toString()) || 0) + plannedValue
       );
     }
 
     // Valor Real: se acumula en la fecha de cada reporte de consumo
     if (task.dailyConsumption) {
       task.dailyConsumption.forEach(consumption => {
-        const valuePerUnit = task.quantity > 0 ? task.value / task.quantity : 0;
-        const consumptionValue = consumption.consumedQuantity * valuePerUnit;
+        const consumptionValue = consumption.consumedQuantity * task.value;
         if (consumptionValue > 0) {
           const actualTimestamp = startOfDay(new Date(consumption.date)).getTime();
           allDateStamps.add(actualTimestamp);

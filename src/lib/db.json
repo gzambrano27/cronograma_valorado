@@ -62,12 +62,8 @@
       "status": "completado",
       "dailyConsumption": [
         {
-          "date": "2025-06-04T00:00:00.000Z",
-          "consumedQuantity": 11
-        },
-        {
-          "date": "2025-06-02T00:00:00.000Z",
-          "consumedQuantity": 11
+          "date": "2025-06-03T00:00:00.000Z",
+          "consumedQuantity": 22
         }
       ],
       "validations": []

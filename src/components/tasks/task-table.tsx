@@ -152,7 +152,7 @@ const getColumns = (): ColumnDef<Task>[] => [
   },
   {
     accessorKey: "quantity",
-    header: () => <div className="text-right">Cantidad Total</div>,
+    header: () => <div className="text-right">Cant. Planificada</div>,
     cell: ({ row }) => {
       const quantity = parseFloat(row.getValue("quantity"))
       return <div className="text-right font-mono">{quantity.toLocaleString('es-ES')}</div>
@@ -168,7 +168,7 @@ const getColumns = (): ColumnDef<Task>[] => [
   },
   {
     accessorKey: "value",
-    header: () => <div className="text-right">Valor</div>,
+    header: () => <div className="text-right">Precio Unitario</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("value"))
       const formatted = new Intl.NumberFormat("es-ES", {
@@ -205,9 +205,9 @@ const getColumns = (): ColumnDef<Task>[] => [
 const columnTranslations: Record<string, string> = {
     name: "Tarea",
     status: "Estado",
-    quantity: "Cantidad Total",
+    quantity: "Cant. Planificada",
     consumedQuantity: "Cant. Consumida",
-    value: "Valor",
+    value: "Precio Unitario",
     startDate: "Fecha Inicio",
     endDate: "Fecha Fin",
     expander: "Expandir",
@@ -372,7 +372,16 @@ export function TaskTable({ data }: { data: Task[] }) {
                     className="cursor-pointer"
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
+                      <TableCell key={cell.id} onClick={(e) => {
+                          if (cell.column.id === 'expander') {
+                            e.stopPropagation();
+                            row.getToggleExpandedHandler()();
+                          } else if (cell.column.id !== 'select') {
+                              // Allow row selection by clicking on cells
+                          } else {
+                            e.stopPropagation();
+                          }
+                      }}>
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
