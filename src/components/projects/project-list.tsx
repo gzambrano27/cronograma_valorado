@@ -26,6 +26,7 @@ import {
   useReactTable,
   RowSelectionState
 } from "@tanstack/react-table";
+import { formatCurrency } from "@/lib/utils";
 
 interface ProjectListProps {
   projects: Project[];
@@ -96,7 +97,7 @@ export default function ProjectList({ projects, view }: ProjectListProps) {
             header: () => <div className="text-right hidden sm:table-cell">Valor Consumido</div>,
             cell: ({ row }) => (
                 <div className="text-right font-mono hidden sm:table-cell">
-                    ${row.original.consumedValue.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {formatCurrency(row.original.consumedValue)}
                 </div>
             )
         },
@@ -105,7 +106,7 @@ export default function ProjectList({ projects, view }: ProjectListProps) {
             header: () => <div className="text-right hidden sm:table-cell">Valor Total</div>,
             cell: ({ row }) => (
                 <div className="text-right font-mono hidden sm:table-cell">
-                    ${row.original.totalValue.toLocaleString('es-ES')}
+                    {formatCurrency(row.original.totalValue, 0)}
                 </div>
             )
         },
@@ -178,11 +179,11 @@ export default function ProjectList({ projects, view }: ProjectListProps) {
             <CardFooter className="flex flex-col gap-2 bg-muted/40 p-4 border-t">
               <div className="flex justify-between items-baseline w-full">
                 <p className="text-xs text-muted-foreground">Valor Consumido</p>
-                <p className="font-bold text-base">${project.consumedValue.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                <p className="font-bold text-base">{formatCurrency(project.consumedValue)}</p>
               </div>
               <div className="flex justify-between items-baseline w-full">
                 <p className="text-xs text-muted-foreground">Valor Total</p>
-                <p className="font-bold text-base">${project.totalValue.toLocaleString('es-ES')}</p>
+                <p className="font-bold text-base">{formatCurrency(project.totalValue, 0)}</p>
               </div>
             </CardFooter>
           </Card>

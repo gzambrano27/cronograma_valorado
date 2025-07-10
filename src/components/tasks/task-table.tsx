@@ -50,7 +50,7 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { Checkbox } from "../ui/checkbox"
 import { DeleteMultipleTasksDialog } from "./delete-multiple-tasks-dialog"
-import { cn } from "@/lib/utils"
+import { cn, formatCurrency } from "@/lib/utils"
 
 const statusTranslations: Record<Task['status'], string> = {
     'pendiente': 'Pendiente',
@@ -68,11 +68,6 @@ const adjustDateForTimezone = (date: Date | string): Date => {
     const userTimezoneOffset = d.getTimezoneOffset() * 60000;
     return new Date(d.getTime() + userTimezoneOffset);
 };
-
-const formatCurrency = (value: number) => new Intl.NumberFormat("es-ES", {
-  style: "currency",
-  currency: "USD",
-}).format(value);
 
 
 const getColumns = (): ColumnDef<Task>[] => [

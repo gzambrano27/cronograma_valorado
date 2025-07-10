@@ -7,6 +7,7 @@ import { DollarSign, CheckCircle, ListTodo } from "lucide-react";
 import { AddTaskSheet } from "@/components/tasks/add-task-sheet";
 import { Progress } from "@/components/ui/progress";
 import { SCurveCard } from "@/components/tasks/s-curve-card";
+import { formatCurrency } from "@/lib/utils";
 
 export default async function ProjectPage({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -17,7 +18,7 @@ export default async function ProjectPage({ params }: { params: { id: string } }
   }
 
   const projectTasks = await getTasksByProjectId(id);
-  const sCurve = generateSCurveData(projectTasks, project.totalValue);
+  const sCurve = await generateSCurveData(projectTasks, project.totalValue);
 
   const progressPercentage = project.taskCount > 0 ? (project.completedTasks / project.taskCount) * 100 : 0;
   const tasksInProgress = projectTasks.filter(t => t.status === 'en-progreso').length;
@@ -43,7 +44,7 @@ export default async function ProjectPage({ params }: { params: { id: string } }
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold">${project.totalValue.toLocaleString('es-ES')}</div>
+            <div className="text-xl font-bold">{formatCurrency(project.totalValue, 0)}</div>
             <p className="text-xs text-muted-foreground">Valor estimado del proyecto</p>
           </CardContent>
         </Card>

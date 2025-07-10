@@ -13,17 +13,11 @@ import {
   ChartContainer,
   ChartTooltipContent,
 } from "@/components/ui/chart"
+import { formatCurrency } from "@/lib/utils"
 
 interface ProjectValueChartProps {
   data: { name: string; value: number }[]
 }
-
-const formatCurrency = (value: number) => new Intl.NumberFormat("es-ES", {
-  style: "currency",
-  currency: "USD",
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 0,
-}).format(value);
 
 export function ProjectValueChart({ data }: ProjectValueChartProps) {
   return (

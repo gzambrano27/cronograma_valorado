@@ -17,17 +17,12 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { updateTaskConsumption } from "@/lib/actions";
+import { formatCurrency } from "@/lib/utils";
+
 
 interface DailyConsumptionTrackerProps {
   task: Task;
 }
-
-const formatCurrency = (value: number) => new Intl.NumberFormat("es-ES", {
-  style: "currency",
-  currency: "USD",
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-}).format(value);
 
 
 export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) {

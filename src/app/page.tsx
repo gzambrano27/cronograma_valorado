@@ -5,6 +5,7 @@ import { DollarSign, ListChecks, Briefcase, BarChart, PieChart } from "lucide-re
 import { ProjectValueChart } from "@/components/dashboard/project-value-chart";
 import { TaskStatusChart } from "@/components/dashboard/task-status-chart";
 import type { ChartConfig } from "@/components/ui/chart";
+import { formatCurrency } from "@/lib/utils";
 
 const taskStatusConfig = {
   completado: {
@@ -65,7 +66,7 @@ export default async function Home() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold">${totalValue.toLocaleString('es-ES')}</div>
+            <div className="text-xl font-bold">{formatCurrency(totalValue, 0)}</div>
             <p className="text-xs text-muted-foreground">
               Valor combinado de todos los proyectos
             </p>
