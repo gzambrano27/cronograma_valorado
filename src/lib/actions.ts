@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { getAppConfig } from './data';
-import { eachDayOfInterval, differenceInDays } from 'date-fns';
+import { eachDayOfInterval } from 'date-fns';
 
 
 const dbPath = path.join(process.cwd(), 'src', 'lib', 'db.json');
@@ -150,7 +150,7 @@ const ProjectSchema = z.object({
 const TaskSchema = z.object({
     name: z.string().min(3, { message: 'El nombre debe tener al menos 3 caracteres.' }),
     quantity: z.coerce.number().min(0, { message: 'La cantidad no puede ser negativa.' }),
-    value: z.coerce.number().min(0, { message: 'El valor no puede ser negativo.' }),
+    value: z.coerce.number().min(0, { message: 'El valor no puede ser negativa.' }),
     startDate: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: 'Fecha de inicio inválida.' }),
     endDate: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: 'Fecha de fin inválida.' }),
 });
@@ -158,7 +158,11 @@ const TaskSchema = z.object({
 function createDailyConsumption(startDate: Date, endDate: Date, totalQuantity: number): DailyConsumption[] {
     if (totalQuantity === 0) return [];
     
-    const dates = eachDayOfInterval({ start: startDate, end: endDate });
+    // Correct for timezone issues by ensuring we use the UTC date parts
+    const startUTC = new Date(Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()));
+    const endUTC = new Date(Date.UTC(endDate.getFullYear(), endDate.getMonth(), endDate.getDate()));
+    
+    const dates = eachDayOfInterval({ start: startUTC, end: endUTC });
     const totalDays = dates.length;
 
     if (totalDays <= 0) return [];
@@ -405,6 +409,7 @@ export async function updateTaskConsumption(taskId: string, date: string, consum
     }
 
     const totalConsumed = task.dailyConsumption.reduce((sum, c) => sum + c.consumedQuantity, 0);
+    task.consumedQuantity = totalConsumed;
 
     if (totalConsumed >= task.quantity) {
         task.status = 'completado';
@@ -603,3 +608,5 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/`);
 }
+
+    
