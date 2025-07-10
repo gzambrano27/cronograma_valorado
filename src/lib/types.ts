@@ -45,6 +45,8 @@ export type SCurveData = {
   cumulativePlannedValue: number;
   cumulativeActualValue: number;
   deviation: number;
+  dotPlanned?: number;
+  dotActual?: number;
 };
 
 export type AppConfig = {

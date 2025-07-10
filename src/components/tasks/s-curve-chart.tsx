@@ -9,6 +9,7 @@ import {
   Tooltip,
   XAxis,
   YAxis,
+  Dot,
 } from "recharts"
 import { ArrowUp, ArrowDown } from "lucide-react"
 
@@ -77,6 +78,17 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     );
   }
 
+  return null;
+};
+
+// Custom dot renderer to only show dots when data is available
+const CustomDot = (props: any) => {
+  const { cx, cy, payload, dataKey } = props;
+  const dotKey = dataKey === 'planned' ? 'dotPlanned' : 'dotActual';
+
+  if (payload[dotKey] !== undefined) {
+    return <Dot cx={cx} cy={cy} r={5} fill={props.fill} stroke={props.stroke} />;
+  }
   return null;
 };
 
@@ -164,7 +176,7 @@ export function SCurveChart({ data }: SCurveChartProps) {
             strokeOpacity={opacities.planned}
             fillOpacity={opacities.planned === 1 ? 0.4 : 0.1}
             activeDot={{ r: 6 }}
-            dot={true}
+            dot={<CustomDot />}
           />
           <Area
             dataKey="actual"
@@ -175,7 +187,7 @@ export function SCurveChart({ data }: SCurveChartProps) {
             strokeOpacity={opacities.actual}
             fillOpacity={opacities.actual === 1 ? 0.4 : 0.1}
             activeDot={{ r: 6 }}
-            dot={true}
+            dot={<CustomDot />}
           />
         </AreaChart>
       </ResponsiveContainer>
