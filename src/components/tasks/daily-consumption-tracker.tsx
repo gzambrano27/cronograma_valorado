@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { format, eachDayOfInterval } from "date-fns";
+import { format, eachDayOfInterval, differenceInDays } from "date-fns";
 import { updateTaskConsumption } from "@/lib/actions";
 
 interface DailyConsumptionTrackerProps {
@@ -84,6 +84,10 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
     start: new Date(task.startDate),
     end: new Date(task.endDate),
   });
+  
+  const totalDays = differenceInDays(new Date(task.endDate), new Date(task.startDate)) + 1;
+  const dailyPlannedQuantity = totalDays > 0 ? (task.quantity / totalDays) : 0;
+
 
   return (
     <div className="p-4 bg-muted/50 rounded-md">
@@ -93,19 +97,31 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
             <TableHeader className="sticky top-0 bg-muted">
             <TableRow>
                 <TableHead>Fecha</TableHead>
+                <TableHead>Cant. Planificada</TableHead>
                 <TableHead>Cant. Registrada</TableHead>
+                <TableHead>Diferencia</TableHead>
                 <TableHead>Valor Consumido</TableHead>
                 <TableHead className="w-[100px] text-right">Acción</TableHead>
             </TableRow>
             </TableHeader>
             <TableBody>
-            {dates.map((date) => {
+            {dates.map((date, index) => {
                 const dateString = format(date, "yyyy-MM-dd");
                 const consumedQuantity = consumptions[dateString] ?? 0;
                 const consumedValue = consumedQuantity * task.value;
+                const isLastDay = index === dates.length - 1;
+
+                // Adjust the last day's planned quantity to account for rounding differences
+                const plannedQtyForDay = isLastDay 
+                    ? task.quantity - (dailyPlannedQuantity * (totalDays - 1))
+                    : dailyPlannedQuantity;
+
+                const difference = consumedQuantity - plannedQtyForDay;
+                
                 return (
                 <TableRow key={dateString}>
                     <TableCell>{format(date, "PPP")}</TableCell>
+                    <TableCell className="font-mono">{plannedQtyForDay.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                     <TableCell>
                       <Input
                           type="number"
@@ -114,10 +130,11 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
                             handleConsumptionChange(dateString, e.target.value)
                           }
                           placeholder="0"
-                          className="h-8"
+                          className="h-8 w-32"
                           disabled={isPending}
                       />
                     </TableCell>
+                    <TableCell className="font-mono">{difference.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                     <TableCell className="font-mono">
                       {formatCurrency(consumedValue)}
                     </TableCell>
