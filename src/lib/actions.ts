@@ -1,13 +1,14 @@
 
 'use server';
 
-import type { Database, Project, Task, TaskValidation, AppConfig } from './types';
+import type { Database, Project, Task, TaskValidation, AppConfig, DailyConsumption } from './types';
 import fs from 'fs/promises';
 import path from 'path';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { getAppConfig } from './data';
+import { eachDayOfInterval, differenceInDays } from 'date-fns';
 
 
 const dbPath = path.join(process.cwd(), 'src', 'lib', 'db.json');
@@ -154,6 +155,38 @@ const TaskSchema = z.object({
     endDate: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: 'Fecha de fin inválida.' }),
 });
 
+function createDailyConsumption(startDate: Date, endDate: Date, totalQuantity: number): DailyConsumption[] {
+    if (totalQuantity === 0) return [];
+    
+    const dates = eachDayOfInterval({ start: startDate, end: endDate });
+    const totalDays = dates.length;
+
+    if (totalDays <= 0) return [];
+
+    const dailyPlannedQuantity = totalQuantity / totalDays;
+    
+    let distributedQuantity = 0;
+
+    const consumptionBreakdown = dates.map((date, index) => {
+        let plannedQtyForDay: number;
+        if (index === totalDays - 1) {
+             // Assign remaining quantity to the last day to avoid rounding issues
+            plannedQtyForDay = totalQuantity - distributedQuantity;
+        } else {
+            plannedQtyForDay = parseFloat(dailyPlannedQuantity.toPrecision(15));
+            distributedQuantity += plannedQtyForDay;
+        }
+        
+        return {
+            date: date,
+            plannedQuantity: plannedQtyForDay,
+            consumedQuantity: 0,
+        };
+    });
+
+    return consumptionBreakdown;
+}
+
 
 export async function createProject(formData: FormData) {
     const validatedFields = ProjectSchema.safeParse({
@@ -287,11 +320,16 @@ export async function createTask(projectId: string, formData: FormData) {
 
   const { name, quantity, value, startDate, endDate } = validatedFields.data;
   
-  if (new Date(startDate) > new Date(endDate)) {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  
+  if (start > end) {
       throw new Error('La fecha de inicio no puede ser posterior a la fecha de fin.');
   }
 
   const db = await readDb();
+  
+  const dailyConsumption = createDailyConsumption(start, end, quantity);
 
   const newTask: Task = {
     id: `task-${Date.now()}`,
@@ -299,10 +337,11 @@ export async function createTask(projectId: string, formData: FormData) {
     name,
     quantity,
     value,
-    startDate: new Date(startDate),
-    endDate: new Date(endDate),
+    startDate: start,
+    endDate: end,
     status: 'pendiente',
-    dailyConsumption: []
+    dailyConsumption: dailyConsumption,
+    consumedQuantity: 0,
   };
 
   db.tasks.push(newTask);
@@ -349,8 +388,6 @@ export async function updateTaskConsumption(taskId: string, date: string, consum
         task.dailyConsumption = [];
     }
     
-    // The incoming date is already in 'yyyy-MM-dd' format, representing a specific day.
-    // To avoid timezone issues, parse it as a UTC date.
     const [year, month, day] = date.split('-').map(Number);
     const consumptionDateUTC = new Date(Date.UTC(year, month - 1, day));
     const consumptionTimestamp = consumptionDateUTC.getTime();
@@ -360,18 +397,12 @@ export async function updateTaskConsumption(taskId: string, date: string, consum
         c => new Date(c.date).getTime() === consumptionTimestamp
     );
     
-    if (consumedQuantity > 0) {
-        if (consumptionIndex > -1) {
-            task.dailyConsumption[consumptionIndex].consumedQuantity = consumedQuantity;
-        } else {
-            task.dailyConsumption.push({ date: consumptionDateUTC, consumedQuantity });
-        }
+    if (consumptionIndex > -1) {
+        task.dailyConsumption[consumptionIndex].consumedQuantity = consumedQuantity;
     } else {
-        if (consumptionIndex > -1) {
-            task.dailyConsumption.splice(consumptionIndex, 1);
-        }
+        // This case should not happen with pre-generation, but as a fallback:
+        task.dailyConsumption.push({ date: consumptionDateUTC, consumedQuantity, plannedQuantity: 0 });
     }
-
 
     const totalConsumed = task.dailyConsumption.reduce((sum, c) => sum + c.consumedQuantity, 0);
 
@@ -538,6 +569,8 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
                 }
             }
         }
+
+        const dailyConsumption = createDailyConsumption(startDate, endDate, quantity);
         
         const newTask: Task = {
             id: `task-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
@@ -548,7 +581,8 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
             startDate,
             endDate,
             status: 'pendiente',
-            dailyConsumption: [],
+            dailyConsumption: dailyConsumption,
+            consumedQuantity: 0,
             validations: []
         };
         newTasks.push(newTask);

@@ -1,7 +1,7 @@
 
 "use client";
 
-import type { Task } from "@/lib/types";
+import type { DailyConsumption, Task } from "@/lib/types";
 import { useState, useTransition } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { format, eachDayOfInterval, differenceInDays } from "date-fns";
+import { format } from "date-fns";
 import { updateTaskConsumption } from "@/lib/actions";
 
 interface DailyConsumptionTrackerProps {
@@ -33,28 +33,29 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
 
-  const [consumptions, setConsumptions] = useState<Record<string, number>>(
-    (task.dailyConsumption || []).reduce((acc, curr) => {
-      acc[format(new Date(curr.date), "yyyy-MM-dd")] = curr.consumedQuantity;
-      return acc;
-    }, {} as Record<string, number>)
+  // Initialize local state from the pre-generated dailyConsumption array
+  const [consumptions, setConsumptions] = useState<DailyConsumption[]>(
+    task.dailyConsumption || []
   );
 
-  const handleConsumptionChange = (date: string, value: string) => {
-    const newConsumptions = { ...consumptions };
-    if (value === "") {
-        delete newConsumptions[date];
-    } else {
-        const numericValue = Number(value);
-        if (!isNaN(numericValue) && numericValue >= 0) {
-            newConsumptions[date] = numericValue;
-        }
-    }
-    setConsumptions(newConsumptions);
-  };
+  const handleConsumptionChange = (dateString: string, value: string) => {
+    const numericValue = value === "" ? 0 : Number(value);
+    if (isNaN(numericValue)) return; // Ignore non-numeric input
 
+    setConsumptions(prevConsumptions => 
+        prevConsumptions.map(c => {
+            if (format(new Date(c.date), 'yyyy-MM-dd') === dateString) {
+                return { ...c, consumedQuantity: numericValue };
+            }
+            return c;
+        })
+    );
+  };
+  
   const handleSave = (date: string) => {
-    const consumedQuantity = consumptions[date] || 0;
+    const consumptionEntry = consumptions.find(c => format(new Date(c.date), 'yyyy-MM-dd') === date);
+    const consumedQuantity = consumptionEntry?.consumedQuantity ?? 0;
+
     startTransition(async () => {
       try {
         await updateTaskConsumption(task.id, date, consumedQuantity);
@@ -80,15 +81,6 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
     });
   };
 
-  const dates = eachDayOfInterval({
-    start: new Date(task.startDate),
-    end: new Date(task.endDate),
-  });
-  
-  const totalDays = differenceInDays(new Date(task.endDate), new Date(task.startDate)) + 1;
-  const dailyPlannedQuantity = totalDays > 0 ? (task.quantity / totalDays) : 0;
-
-
   return (
     <div className="p-4 bg-muted/50 rounded-md">
       <h4 className="font-semibold mb-2 text-base">Desglose de Consumo Diario</h4>
@@ -105,27 +97,19 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
             </TableRow>
             </TableHeader>
             <TableBody>
-            {dates.map((date, index) => {
-                const dateString = format(date, "yyyy-MM-dd");
-                const consumedQuantity = consumptions[dateString] ?? 0;
-                const consumedValue = consumedQuantity * task.value;
-                const isLastDay = index === dates.length - 1;
-
-                // Adjust the last day's planned quantity to account for rounding differences
-                const plannedQtyForDay = isLastDay 
-                    ? task.quantity - (dailyPlannedQuantity * (totalDays - 1))
-                    : dailyPlannedQuantity;
-
-                const difference = consumedQuantity - plannedQtyForDay;
+            {consumptions.map((consumptionDay) => {
+                const dateString = format(new Date(consumptionDay.date), "yyyy-MM-dd");
+                const consumedValue = consumptionDay.consumedQuantity * task.value;
+                const difference = consumptionDay.consumedQuantity - consumptionDay.plannedQuantity;
                 
                 return (
                 <TableRow key={dateString}>
-                    <TableCell>{format(date, "PPP")}</TableCell>
-                    <TableCell className="font-mono">{plannedQtyForDay.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
+                    <TableCell>{format(new Date(consumptionDay.date), "PPP")}</TableCell>
+                    <TableCell className="font-mono">{consumptionDay.plannedQuantity.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                     <TableCell>
                       <Input
                           type="number"
-                          value={consumedQuantity}
+                          value={consumptionDay.consumedQuantity}
                           onChange={(e) =>
                             handleConsumptionChange(dateString, e.target.value)
                           }

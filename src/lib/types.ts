@@ -1,5 +1,6 @@
 export type DailyConsumption = {
   date: Date;
+  plannedQuantity: number;
   consumedQuantity: number;
 };
 
@@ -30,7 +31,7 @@ export type Task = {
   name:string;
   quantity: number;
   consumedQuantity: number;
-  value: number;
+  value: number; // This is PVP (Precio de Venta al Público) or Unit Price
   startDate: Date;
   endDate: Date;
   validations?: TaskValidation[];
