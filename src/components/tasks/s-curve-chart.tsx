@@ -97,6 +97,8 @@ export function SCurveChart({ data }: SCurveChartProps) {
         }));
     }
   };
+  
+  const yAxisTicks = Array.from({ length: 21 }, (_, i) => i * 5); // 0, 5, ..., 100
 
   return (
     <ChartContainer config={chartConfig} className="min-h-[250px] w-full">
@@ -125,6 +127,7 @@ export function SCurveChart({ data }: SCurveChartProps) {
             tickMargin={8}
             tickFormatter={(value) => `${value}%`}
             domain={[0, 100]}
+            ticks={yAxisTicks}
             className="text-xs"
           />
           <defs>
