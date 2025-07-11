@@ -18,7 +18,6 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart"
 import type { SCurveData } from "@/lib/types"
-import { formatCurrency } from "@/lib/utils"
 
 interface SCurveChartProps {
   data: SCurveData[]
@@ -34,6 +33,13 @@ const chartConfig = {
     color: "hsl(var(--primary))",
   },
 } satisfies ChartConfig
+
+const formatCurrency = (value: number) => new Intl.NumberFormat("es-ES", {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+}).format(value);
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -51,14 +57,14 @@ const CustomTooltip = ({ active, payload, label }: any) => {
                     <div className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: 'var(--color-planned)' }} />
                     Planificado:
                 </span>
-                <span className="font-mono font-semibold">{`${plannedPercent}% (${formatCurrency(data.cumulativePlannedValue, 0)})`}</span>
+                <span className="font-mono font-semibold">{`${plannedPercent}% (${formatCurrency(data.cumulativePlannedValue)})`}</span>
             </div>
             <div className="flex justify-between items-center gap-4">
                 <span className="flex items-center">
                     <div className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: 'var(--color-actual)' }} />
                     Real:
                 </span>
-                <span className="font-mono font-semibold">{`${actualPercent}% (${formatCurrency(data.cumulativeActualValue, 0)})`}</span>
+                <span className="font-mono font-semibold">{`${actualPercent}% (${formatCurrency(data.cumulativeActualValue)})`}</span>
             </div>
              <div className="flex justify-between items-center gap-4 pt-2 mt-2 border-t">
                 <span className="font-semibold">Desviación:</span>
