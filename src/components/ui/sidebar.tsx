@@ -190,7 +190,7 @@ const Sidebar = React.forwardRef<
       data-state={state}
       data-side={side}
       className={cn(
-        "group/sidebar hidden flex-col bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-in-out md:flex",
+        "group/sidebar hidden h-screen flex-col bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-in-out md:flex sticky top-0",
         state === "expanded" ? "w-[--sidebar-width]" : "w-[--sidebar-width-icon]",
         side === "left" ? "border-r border-sidebar-border" : "border-l border-sidebar-border",
         className
@@ -324,7 +324,7 @@ const SidebarContent = React.forwardRef<
       )}
       {...props}
     >
-        <ScrollArea className="h-full">
+        <ScrollArea className="h-full" variant="sidebar">
             <div className="flex flex-col gap-2">
                 {children}
             </div>
