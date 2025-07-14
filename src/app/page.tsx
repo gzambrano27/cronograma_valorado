@@ -48,16 +48,14 @@ export default function Home() {
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(t => t.status === 'completado').length;
 
-  // Data for ProjectValueChart
   const projectValueData = projects
     .map(p => ({
       name: p.name.length > 20 ? `${p.name.substring(0, 20)}...` : p.name,
       value: p.totalValue,
     }))
     .sort((a, b) => b.value - a.value)
-    .slice(0, 7); // Show top 7 projects
+    .slice(0, 7); 
 
-  // Data for TaskStatusChart
   const taskStatusCounts = tasks.reduce((acc, task) => {
     acc[task.status] = (acc[task.status] || 0) + 1;
     return acc;
