@@ -23,22 +23,28 @@ import { Button } from "../ui/button";
 import { Breadcrumb } from "./breadcrumb";
 import { ThemeToggle } from "./theme-toggle";
 
+const SIDEBAR_COOKIE_NAME = "sidebar_state";
+
 export default function AppShell({ 
   children,
   projects,
-  title,
-  sidebarOpen
+  title
 }: { 
   children: React.ReactNode,
   projects: Project[],
-  title: string,
-  sidebarOpen?: boolean
+  title: string
 }) {
   const pathname = usePathname();
   const [isClient, setIsClient] = React.useState(false);
+  const [sidebarOpen, setSidebarOpen] = React.useState(true);
 
   React.useEffect(() => {
     setIsClient(true);
+    const sidebarCookie = document.cookie
+        .split('; ')
+        .find(row => row.startsWith(`${SIDEBAR_COOKIE_NAME}=`))
+        ?.split('=')[1];
+    setSidebarOpen(sidebarCookie ? sidebarCookie === 'true' : true);
   }, []);
   
   return (

@@ -1,6 +1,5 @@
 
 'use client'
-import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import AppShell from '@/components/layout/app-shell';
@@ -10,26 +9,17 @@ import React, { useState, useEffect } from 'react';
 import type { Project } from '@/lib/types';
 
 
-const SIDEBAR_COOKIE_NAME = "sidebar_state";
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-
+  
   useEffect(() => {
     async function fetchData() {
       const fetchedProjects = await getProjects();
       setProjects(fetchedProjects);
-      
-      const sidebarCookie = document.cookie
-        .split('; ')
-        .find(row => row.startsWith(`${SIDEBAR_COOKIE_NAME}=`))
-        ?.split('=')[1];
-      setSidebarOpen(sidebarCookie ? sidebarCookie === 'true' : true);
     }
     fetchData();
   }, []);
@@ -54,7 +44,7 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <AppShell projects={projects} title={title} sidebarOpen={sidebarOpen}>
+          <AppShell projects={projects} title={title}>
             {children}
           </AppShell>
           <Toaster />
