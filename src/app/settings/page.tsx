@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useTransition } from "react";
@@ -38,7 +39,7 @@ export default function SettingsPage() {
                     title: "Sincronización Exitosa",
                     description: "Los proyectos se han actualizado correctamente.",
                 });
-                router.push('/');
+                router.push('/dashboard');
             } catch (error) {
                 toast({
                     variant: "destructive",

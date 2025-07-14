@@ -137,7 +137,7 @@ export async function syncProjectsFromEndpoint() {
   
   await writeDb(db);
 
-  revalidatePath('/');
+  revalidatePath('/dashboard');
   revalidatePath('/settings');
 }
 
@@ -230,8 +230,8 @@ export async function createProject(formData: FormData) {
     db.projects.unshift(newProject as Project);
     await writeDb(db);
 
-    revalidatePath('/');
-    redirect('/');
+    revalidatePath('/dashboard');
+    redirect('/dashboard');
 }
 
 export async function updateProject(formData: FormData) {
@@ -275,7 +275,7 @@ export async function updateProject(formData: FormData) {
 
     await writeDb(db);
 
-    revalidatePath('/');
+    revalidatePath('/dashboard');
     revalidatePath(`/projects/${id}`);
 }
 
@@ -287,9 +287,9 @@ export async function deleteProject(projectId: string) {
 
     await writeDb(db);
 
-    revalidatePath('/');
+    revalidatePath('/dashboard');
     revalidatePath(`/projects`);
-    redirect('/');
+    redirect('/dashboard');
 }
 
 export async function deleteMultipleProjects(projectIds: string[]) {
@@ -305,7 +305,7 @@ export async function deleteMultipleProjects(projectIds: string[]) {
 
     await writeDb(db);
 
-    revalidatePath('/');
+    revalidatePath('/dashboard');
     revalidatePath(`/projects`);
 }
 
@@ -353,7 +353,7 @@ export async function createTask(projectId: string, formData: FormData) {
   await writeDb(db);
 
   revalidatePath(`/projects/${projectId}`);
-  revalidatePath(`/`);
+  revalidatePath(`/dashboard`);
 }
 
 export async function deleteTask(taskId: string, projectId: string) {
@@ -361,7 +361,7 @@ export async function deleteTask(taskId: string, projectId: string) {
     db.tasks = db.tasks.filter(t => t.id !== taskId);
     await writeDb(db);
     revalidatePath(`/projects/${projectId}`);
-    revalidatePath(`/`);
+    revalidatePath(`/dashboard`);
 }
 
 export async function deleteMultipleTasks(taskIds: string[], projectId: string) {
@@ -377,7 +377,7 @@ export async function deleteMultipleTasks(taskIds: string[], projectId: string) 
     await writeDb(db);
 
     revalidatePath(`/projects/${projectId}`);
-    revalidatePath(`/`);
+    revalidatePath(`/dashboard`);
 }
 
 export async function updateTaskConsumption(taskId: string, date: string, consumedQuantity: number) {
@@ -424,7 +424,7 @@ export async function updateTaskConsumption(taskId: string, date: string, consum
     await writeDb(db);
 
     revalidatePath(`/projects/${task.projectId}`);
-    revalidatePath(`/`);
+    revalidatePath(`/dashboard`);
 }
 
 const ValidateTaskSchema = z.object({
@@ -607,5 +607,5 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
   await writeDb(db);
 
   revalidatePath(`/projects/${projectId}`);
-  revalidatePath(`/`);
+  revalidatePath(`/dashboard`);
 }

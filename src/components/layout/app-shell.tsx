@@ -104,7 +104,7 @@ export default function AppShell({
                   <Cog className="h-5 w-5" />
               </Button>
           </Link>
-          <Link href="/" passHref>
+          <Link href="/dashboard" passHref>
              <Button variant="outline">Panel Principal</Button>
           </Link>
         </header>

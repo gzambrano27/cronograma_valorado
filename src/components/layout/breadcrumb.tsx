@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -16,8 +17,7 @@ const translations: Record<string, string> = {
 export function Breadcrumb({ projects }: BreadcrumbProps) {
   const pathname = usePathname();
   
-  // Return null on the root path to hide breadcrumbs on the dashboard
-  if (pathname === '/') {
+  if (pathname === '/' || pathname === '/dashboard') {
     return null;
   }
 
@@ -34,13 +34,10 @@ export function Breadcrumb({ projects }: BreadcrumbProps) {
     
     let name = segment;
     if (segments[0] === 'projects' && index === 0) {
-      // First segment after root is 'projects'
       name = translations['projects'] || 'Proyectos';
     } else if (segments[0] === 'projects' && index === 1) {
-      // Second segment is the project ID
       name = getProjectName(segment);
     } else {
-      // General case for other paths
       name = translations[segment] || (segment.charAt(0).toUpperCase() + segment.slice(1));
     }
 
@@ -53,7 +50,7 @@ export function Breadcrumb({ projects }: BreadcrumbProps) {
         <li>
           <Link href="/" className="transition-colors hover:text-foreground">
             <Home className="h-4 w-4" />
-            <span className="sr-only">Panel Principal</span>
+            <span className="sr-only">Menú Principal</span>
           </Link>
         </li>
         {breadcrumbs.map((crumb) => (
