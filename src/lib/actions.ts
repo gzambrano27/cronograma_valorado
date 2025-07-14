@@ -117,22 +117,45 @@ export async function syncProjectsFromEndpoint() {
   const externalProjects = parsedData.data.data['project.project'];
   const db = await readDb();
 
-  const newApiProjects = externalProjects.map(extProj => {
-    const existingProject = db.projects.find(p => p.id === `ext-${extProj.id}`);
-    return {
-      id: `ext-${extProj.id}`,
-      externalId: extProj.id,
-      name: extProj.name,
-      company: extProj.company_id[1],
-      externalCompanyId: extProj.company_id[0],
-      client: extProj.partner_id ? extProj.partner_id[1] : undefined,
-      clientId: extProj.partner_id ? extProj.partner_id[0] : undefined,
-    };
-  });
-  
-  const localProjects = db.projects.filter(p => !p.id.startsWith('ext-'));
-  db.projects = [...localProjects, ...newApiProjects as Project[]];
+  const externalProjectIds = new Set<string>();
 
+  externalProjects.forEach(extProj => {
+    const projectId = `ext-${extProj.id}`;
+    externalProjectIds.add(projectId);
+
+    const existingProjectIndex = db.projects.findIndex(p => p.id === projectId);
+
+    const projectData = {
+        name: extProj.name,
+        company: extProj.company_id[1],
+        externalCompanyId: extProj.company_id[0],
+        client: extProj.partner_id ? extProj.partner_id[1] : undefined,
+        clientId: extProj.partner_id ? extProj.partner_id[0] : undefined,
+    };
+
+    if (existingProjectIndex > -1) {
+        // Update existing project
+        db.projects[existingProjectIndex] = {
+            ...db.projects[existingProjectIndex],
+            ...projectData
+        };
+    } else {
+        // Add new project
+        const newProject = {
+            id: projectId,
+            externalId: extProj.id,
+            ...projectData
+        };
+        db.projects.push(newProject as Project);
+    }
+  });
+
+  // Filter out old external projects that are no longer in the API response
+  const localProjects = db.projects.filter(p => !p.id.startsWith('ext-'));
+  const currentExternalProjects = db.projects.filter(p => p.id.startsWith('ext-') && externalProjectIds.has(p.id));
+
+  db.projects = [...localProjects, ...currentExternalProjects];
+  
   const allValidProjectIds = new Set(db.projects.map(p => p.id));
   db.tasks = db.tasks.filter(task => allValidProjectIds.has(task.projectId));
   
@@ -209,7 +232,7 @@ export async function createProject(formData: FormData) {
     
     const db = await readDb();
 
-    const newProject: Omit<Project, 'totalValue' | 'taskCount' | 'completedTasks' | 'consumedValue' | 'externalId' | 'externalCompanyId'> = {
+    const newProject: Omit<Project, 'totalValue' | 'taskCount' | 'completedTasks' | 'consumedValue' | 'externalId' | 'externalCompanyId' | 'client' | 'clientId'> = {
         id: `proj-${Date.now()}`,
         name,
         company,
@@ -284,7 +307,7 @@ export async function deleteMultipleProjects(projectIds: string[]) {
     revalidatePath(`/projects`);
 }
 
-export async function createTask(projectId: string, formData: FormData) {
+export async function createTask(projectId: string, onSuccess: () => void, formData: FormData) {
   const validatedFields = TaskSchema.safeParse({
     name: formData.get('name'),
     quantity: formData.get('quantity'),
@@ -329,6 +352,7 @@ export async function createTask(projectId: string, formData: FormData) {
 
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/dashboard`);
+  onSuccess();
 }
 
 export async function deleteTask(taskId: string, projectId: string) {
@@ -461,7 +485,7 @@ export async function getSettings(): Promise<AppConfig> {
   return config;
 }
 
-export async function importTasksFromXML(projectId: string, formData: FormData) {
+export async function importTasksFromXML(projectId: string, onSuccess: () => void, formData: FormData) {
   const { XMLParser } = await import('fast-xml-parser');
   
   const file = formData.get('xmlFile') as File | null;
@@ -583,4 +607,5 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
 
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/dashboard`);
+  onSuccess();
 }

@@ -41,7 +41,7 @@ export function AddTaskSheet({ projectId, onSuccess }: { projectId: string, onSu
   const [startDate, setStartDate] = React.useState<Date>()
   const [endDate, setEndDate] = React.useState<Date>()
 
-  const createTaskWithProjectId = createTask.bind(null, projectId);
+  const createTaskWithProps = createTask.bind(null, projectId, onSuccess);
 
   const [state, formAction] = useActionState(async (_prevState: any, formData: FormData) => {
     // Add dates to formData
@@ -53,13 +53,12 @@ export function AddTaskSheet({ projectId, onSuccess }: { projectId: string, onSu
     }
 
     try {
-      await createTaskWithProjectId(formData);
+      await createTaskWithProps(formData);
       toast({
         title: "Tarea Creada",
         description: "La nueva tarea ha sido añadida al cronograma.",
       });
       setOpen(false);
-      onSuccess(); // Call the success callback to reload data
       return { success: true, message: "Tarea creada." };
     } catch (error: any) {
       return { success: false, message: error.message || "No se pudo crear la tarea." };
