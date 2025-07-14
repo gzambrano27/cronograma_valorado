@@ -20,27 +20,23 @@ export default function Home() {
                     Seleccione una herramienta para comenzar. Su panel de control central para la gestión y valoración de proyectos.
                 </p>
 
-                <Card 
-                    className="group hover:bg-muted/40 transition-colors cursor-pointer"
-                    onClick={() => router.push('/dashboard')}
-                >
-                    <CardHeader>
-                        <div className="flex items-center gap-4">
-                            <GanttChartSquare className="w-8 h-8 text-primary" />
-                            <div className="text-left">
-                                <CardTitle className="font-headline text-xl">Cronograma Valorado</CardTitle>
-                                <CardDescription className="mt-1">
-                                    Visualice, gestione y valore sus proyectos y tareas con herramientas de planificación avanzadas.
-                                </CardDescription>
-                            </div>
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <Button className="w-full" asChild>
-                            <Link href="/dashboard">Acceder al Cronograma</Link>
-                        </Button>
-                    </CardContent>
-                </Card>
+                <div className="flex justify-center">
+                    <Card 
+                        className="group hover:bg-muted/40 transition-colors cursor-pointer w-72"
+                        onClick={() => router.push('/dashboard')}
+                    >
+                        <CardContent className="flex flex-col items-center text-center p-6">
+                            <GanttChartSquare className="w-16 h-16 text-primary mb-4" />
+                            <CardTitle className="font-headline text-xl mb-2">Cronograma Valorado</CardTitle>
+                            <CardDescription>
+                                Visualice, gestione y valore sus proyectos y tareas.
+                            </CardDescription>
+                            <Button className="mt-6 w-full" asChild>
+                                <Link href="/dashboard">Acceder</Link>
+                            </Button>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </div>
     );
