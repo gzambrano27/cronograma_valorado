@@ -19,6 +19,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { ScrollArea } from "./scroll-area"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -311,18 +312,24 @@ SidebarSeparator.displayName = "SidebarSeparator"
 
 const SidebarContent = React.forwardRef<
   HTMLDivElement,
-  React.ComponentProps<"div">
->(({ className, ...props }, ref) => {
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, children, ...props }, ref) => {
   return (
     <div
       ref={ref}
       data-sidebar="content"
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto",
+        "flex min-h-0 flex-1 flex-col gap-2",
         className
       )}
       {...props}
-    />
+    >
+        <ScrollArea className="h-full">
+            <div className="flex flex-col gap-2">
+                {children}
+            </div>
+        </ScrollArea>
+    </div>
   )
 })
 SidebarContent.displayName = "SidebarContent"

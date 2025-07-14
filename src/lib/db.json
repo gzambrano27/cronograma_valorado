@@ -1,248 +1,761 @@
 {
   "projects": [
     {
-      "id": "proj-1751568818238",
-      "name": "Proyecto 1",
-      "company": "Compañía de Ejemplo S.A.",
+      "id": "ext-58",
+      "externalId": 58,
+      "name": "399.1 AIREACIÓN NUEVA MARAGRO",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-139",
+      "externalId": 139,
+      "name": "565-001-Aireación Pañamao",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-127",
+      "externalId": 127,
+      "name": "AGROBALAO",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-65",
+      "externalId": 65,
+      "name": "ALIMENTADOR INPESCA",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-120",
+      "externalId": 120,
+      "name": "ALIMENTADOR INPESCA (copia)",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-97",
+      "externalId": 97,
+      "name": "ASISERVY",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-144",
+      "externalId": 144,
+      "name": "AUDITORIA",
+      "company": "SALZAM GROUP HOLDING S.A.S.",
+      "externalCompanyId": 9,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-106",
+      "externalId": 106,
+      "name": "BANCO DE REGULADORES LANCONOR",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-100",
+      "externalId": 100,
+      "name": "Banco de Reguladores Granmar",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-98",
+      "externalId": 98,
+      "name": "CALIFICACIÓN GEN EMERGENTE ASISERVY (copia)",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-96",
+      "externalId": 96,
+      "name": "CALIFICACIÓN GEN EMERGENTE CALADEMAR",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-90",
+      "externalId": 90,
+      "name": "CALIFICACIÓN GEN EMERGENTE CARGILL GYE",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-94",
+      "externalId": 94,
+      "name": "CALIFICACIÓN GEN EMERGENTE CRIMASA DURÁN",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-92",
+      "externalId": 92,
+      "name": "CALIFICACIÓN GEN EMERGENTE LUKMAR",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-46",
+      "externalId": 46,
+      "name": "CALIFICACIÓN GEN EMERGENTE MEXICO",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-89",
+      "externalId": 89,
+      "name": "CALIFICACIÓN GEN EMERGENTE MEXICO (copia)",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-91",
+      "externalId": 91,
+      "name": "CALIFICACIÓN GEN EMERGENTE PREVISORA",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-93",
+      "externalId": 93,
+      "name": "CALIFICACIÓN GEN EMERGENTE RC+Q",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-95",
+      "externalId": 95,
+      "name": "CALIFICACIÓN GEN EMERGENTE TENGUEL",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-137",
+      "externalId": 137,
+      "name": "CHANDUY - AIREACIÓN",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-136",
+      "externalId": 136,
+      "name": "CHANDUY - GENERACIÓN",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-135",
+      "externalId": 135,
+      "name": "CHANDUY AIREACIÓN",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-134",
+      "externalId": 134,
+      "name": "CHANDUY FOTOVOLTAICO",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-99",
+      "externalId": 99,
+      "name": "CHANDUY SGDA",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-142",
+      "externalId": 142,
+      "name": "CIERRE JUNIO 2025",
+      "company": "CAMELEC S.A.S",
+      "externalCompanyId": 10,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-132",
+      "externalId": 132,
+      "name": "CRIMASA",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-21",
+      "externalId": 21,
+      "name": "Cimentación Bomebeo Taura C",
+      "company": "IMPORT GREEN POWER TECHNOLOGY, EQUIPMENT & MACHINERY ITEM S.A",
+      "externalCompanyId": 2,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-129",
+      "externalId": 129,
+      "name": "Construcción de LST Tap Montero 2 - Puerto Inca - Naranjal",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-145",
+      "externalId": 145,
+      "name": "Contabilidad",
+      "company": "SALZAM GROUP HOLDING S.A.S.",
+      "externalCompanyId": 9,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-123",
+      "externalId": 123,
+      "name": "Control Actividades Críticas",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-148",
+      "externalId": 148,
+      "name": "Credito y Cobranzas",
+      "company": "SALZAM GROUP HOLDING S.A.S.",
+      "externalCompanyId": 9,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-125",
+      "externalId": 125,
+      "name": "EQUIPO XYZ",
+      "company": "IMPORT GREEN POWER TECHNOLOGY, EQUIPMENT & MACHINERY ITEM S.A",
+      "externalCompanyId": 2,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-9",
+      "externalId": 9,
+      "name": "EST. DE BOMBEO EXORGÁNICA",
+      "company": "IMPORT GREEN POWER TECHNOLOGY, EQUIPMENT & MACHINERY ITEM S.A",
+      "externalCompanyId": 2,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-143",
+      "externalId": 143,
+      "name": "EXCELENCIA OPERACIONAL",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-130",
+      "externalId": 130,
+      "name": "GENERACION EXPALSA",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-62",
+      "externalId": 62,
+      "name": "GENERACIÓN CENTRALIZADA FARESA",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-140",
+      "externalId": 140,
+      "name": "Inventario de Activos Fijos",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-63",
+      "externalId": 63,
+      "name": "LANCONOR",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-146",
+      "externalId": 146,
+      "name": "LEGAL",
+      "company": "SALZAM GROUP HOLDING S.A.S.",
+      "externalCompanyId": 9,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-112",
+      "externalId": 112,
+      "name": "LMT NIRSA Y BRV",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-105",
+      "externalId": 105,
+      "name": "LST CNEL 7-DURAN-TAURA-POCOS PALOS",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-113",
+      "externalId": 113,
+      "name": "LST Chongon-Sabana Grande 138 KV",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-104",
+      "externalId": 104,
+      "name": "LST DERIVACION PLAYAS HACIA PLUMONT Y CABALA 2",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-111",
+      "externalId": 111,
+      "name": "LST KOREA Y COMPENSACION DE REACTIVOS A 69KV",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-101",
+      "externalId": 101,
+      "name": "LST Naranjal Puerto Baquerizo",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-118",
+      "externalId": 118,
+      "name": "LST Naturisa",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-102",
+      "externalId": 102,
+      "name": "LST PECHICHE - TUGADUAJA",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-108",
+      "externalId": 108,
+      "name": "LST Pocos Palos-La zanja",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-103",
+      "externalId": 103,
+      "name": "LST SANTA ELENA - CHANDUY - PECHICHE",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-119",
+      "externalId": 119,
+      "name": "LST Y MVAR KOREA",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-64",
+      "externalId": 64,
+      "name": "LUTHOCORP",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-124",
+      "externalId": 124,
+      "name": "Línea de media tensión Expreso balao",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-66",
+      "externalId": 66,
+      "name": "MEDIDOR SAIBABA",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-128",
+      "externalId": 128,
+      "name": "MODELO CONVENIO",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-55",
+      "externalId": 55,
+      "name": "OPERACIONES",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-42",
+      "externalId": 42,
+      "name": "OPERACIONES IPSP",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-54",
+      "externalId": 54,
+      "name": "PENDIENTES - RJA",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-53",
+      "externalId": 53,
+      "name": "PLANIFICACIÓN GPS",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-121",
+      "externalId": 121,
+      "name": "POCOS PALOS",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-122",
+      "externalId": 122,
+      "name": "POROYECTO PRIVADO",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-67",
+      "externalId": 67,
+      "name": "PRESTAMO DE BOTE A CNEL MLG",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-141",
+      "externalId": 141,
+      "name": "PROCESO DE CIERRE CONTABLE",
+      "company": "ASESORIA Y GESTIONES ESTRATEGICAS MAXSILPAT S.A.",
+      "externalCompanyId": 14,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-47",
+      "externalId": 47,
+      "name": "PROY VIABILIDAD 2",
+      "company": "IMPORT BLUE POWER TECHNOLOGY AND MACHINERY S.A.",
+      "externalCompanyId": 1,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-52",
+      "externalId": 52,
+      "name": "PROYECTO TERMO",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-48",
+      "externalId": 48,
+      "name": "PRUEBA",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-56",
+      "externalId": 56,
+      "name": "Prueba",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-116",
+      "externalId": 116,
+      "name": "REACTIVOS 69KV CALIFORNIA Y LST 69KV MONTERO-PUERTO INCA",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-117",
+      "externalId": 117,
+      "name": "RIO BONITO 138/69KV",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-109",
+      "externalId": 109,
+      "name": "Repotenciación Montero doble terna",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-107",
+      "externalId": 107,
+      "name": "Repotenciación SE Posorja",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-150",
+      "externalId": 150,
+      "name": "Revision de Compliance - Retenciones",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-115",
+      "externalId": 115,
+      "name": "S/E TUGADUAJA 138/69KV",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-114",
+      "externalId": 114,
+      "name": "SE SABANA GRANDE 138/69KV",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-49",
+      "externalId": 49,
+      "name": "SOSTENIBILIDAD",
+      "company": "IMPORT BLUE POWER TECHNOLOGY AND MACHINERY S.A.",
+      "externalCompanyId": 1,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-35",
+      "externalId": 35,
+      "name": "Sistemas (Apps - Infraestructura)",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-10",
+      "externalId": 10,
+      "name": "TAI. CRIMASA",
+      "company": "IMPORT GREEN POWER TECHNOLOGY, EQUIPMENT & MACHINERY ITEM S.A",
+      "externalCompanyId": 2,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-138",
+      "externalId": 138,
+      "name": "TAURA / LA LUZ - AIREACIÓN - CUARTO DE MANIOBRAS",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-51",
+      "externalId": 51,
+      "name": "TERMOELECTRICA POSORJA",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-147",
+      "externalId": 147,
+      "name": "TESORERIA",
+      "company": "SALZAM GROUP HOLDING S.A.S.",
+      "externalCompanyId": 9,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-28",
+      "externalId": 28,
+      "name": "mantenimiento de generador c27 songa",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-59",
+      "externalId": 59,
+      "name": "399.2 HABILITACIÓN MARAGRO",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-60",
+      "externalId": 60,
+      "name": "400. BOMBEO MARAGRO",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-57",
+      "externalId": 57,
+      "name": "534. EMERGENTE MARAGRO",
+      "company": "GREEN ENERGY CONSTRUCTIONS & INTEGRATION C&I SA",
+      "externalCompanyId": 3,
+      "imageUrl": "https://placehold.co/600x400.png",
+      "dataAiHint": "project building"
+    },
+    {
+      "id": "ext-37",
+      "externalId": 37,
+      "name": "ORGANIZACIÓN GDRIVE",
+      "company": "CONSTRUCCIONES CIVILES Y ELECTRIFICACION S A S",
+      "externalCompanyId": 5,
       "imageUrl": "https://placehold.co/600x400.png",
       "dataAiHint": "project building"
     }
   ],
-  "tasks": [
-    {
-      "id": "task-1752161981528-te7yygk",
-      "projectId": "proj-1751568818238",
-      "name": "POSTE DE HORMIGÓN CIRCULAR DE 12M 500KGF PARA MT",
-      "quantity": 987654,
-      "value": 456789,
-      "startDate": "2025-06-02T09:00:00.000Z",
-      "endDate": "2025-06-13T19:00:00.000Z",
-      "status": "completado",
-      "dailyConsumption": [
-        {
-          "date": "2025-06-02T00:00:00.000Z",
-          "plannedQuantity": 82304.5,
-          "consumedQuantity": 0
-        },
-        {
-          "date": "2025-06-03T00:00:00.000Z",
-          "plannedQuantity": 82304.5,
-          "consumedQuantity": 0
-        },
-        {
-          "date": "2025-06-04T00:00:00.000Z",
-          "plannedQuantity": 82304.5,
-          "consumedQuantity": 200000
-        },
-        {
-          "date": "2025-06-05T00:00:00.000Z",
-          "plannedQuantity": 82304.5,
-          "consumedQuantity": 0
-        },
-        {
-          "date": "2025-06-06T00:00:00.000Z",
-          "plannedQuantity": 82304.5,
-          "consumedQuantity": 0
-        },
-        {
-          "date": "2025-06-07T00:00:00.000Z",
-          "plannedQuantity": 82304.5,
-          "consumedQuantity": 0
-        },
-        {
-          "date": "2025-06-08T00:00:00.000Z",
-          "plannedQuantity": 82304.5,
-          "consumedQuantity": 0
-        },
-        {
-          "date": "2025-06-09T00:00:00.000Z",
-          "plannedQuantity": 82304.5,
-          "consumedQuantity": 0
-        },
-        {
-          "date": "2025-06-10T00:00:00.000Z",
-          "plannedQuantity": 82304.5,
-          "consumedQuantity": 0
-        },
-        {
-          "date": "2025-06-11T00:00:00.000Z",
-          "plannedQuantity": 82304.5,
-          "consumedQuantity": 600000
-        },
-        {
-          "date": "2025-06-12T00:00:00.000Z",
-          "plannedQuantity": 82304.5,
-          "consumedQuantity": 187654
-        },
-        {
-          "date": "2025-06-13T00:00:00.000Z",
-          "plannedQuantity": 82304.5,
-          "consumedQuantity": 0
-        }
-      ],
-      "consumedQuantity": 987654,
-      "validations": []
-    },
-    {
-      "id": "task-1752161981528-zv6eggy",
-      "projectId": "proj-1751568818238",
-      "name": "POSTE DE HORMIGÓN CIRCULAR DE 12M 2000KGF PARA MT",
-      "quantity": 5,
-      "value": 50,
-      "startDate": "2025-06-02T09:00:00.000Z",
-      "endDate": "2025-06-03T19:00:00.000Z",
-      "status": "completado",
-      "dailyConsumption": [
-        {
-          "date": "2025-06-02T00:00:00.000Z",
-          "plannedQuantity": 2.5,
-          "consumedQuantity": 5
-        },
-        {
-          "date": "2025-06-03T00:00:00.000Z",
-          "plannedQuantity": 2.5,
-          "consumedQuantity": 0
-        }
-      ],
-      "consumedQuantity": 5,
-      "validations": []
-    },
-    {
-      "id": "task-1752161981528-3jnj1d8",
-      "projectId": "proj-1751568818238",
-      "name": "POSTE DE HORMIGÓN CIRCULAR DE 14M 700KGF PARA MT",
-      "quantity": 22,
-      "value": 75,
-      "startDate": "2025-06-02T09:00:00.000Z",
-      "endDate": "2025-06-04T19:00:00.000Z",
-      "status": "completado",
-      "dailyConsumption": [
-        {
-          "date": "2025-06-02T00:00:00.000Z",
-          "plannedQuantity": 7.33333333333333,
-          "consumedQuantity": 22
-        },
-        {
-          "date": "2025-06-03T00:00:00.000Z",
-          "plannedQuantity": 7.33333333333333,
-          "consumedQuantity": 0
-        },
-        {
-          "date": "2025-06-04T00:00:00.000Z",
-          "plannedQuantity": 7.333333333333339,
-          "consumedQuantity": 0
-        }
-      ],
-      "consumedQuantity": 22,
-      "validations": []
-    },
-    {
-      "id": "task-1752161981528-u4u7z86",
-      "projectId": "proj-1751568818238",
-      "name": "POSTE DE HORMIGÓN CIRCULAR DE 14M 2000KGF PARA MT",
-      "quantity": 5,
-      "value": 46,
-      "startDate": "2025-06-02T09:00:00.000Z",
-      "endDate": "2025-06-02T19:00:00.000Z",
-      "status": "completado",
-      "dailyConsumption": [
-        {
-          "date": "2025-06-02T00:00:00.000Z",
-          "plannedQuantity": 5,
-          "consumedQuantity": 5
-        }
-      ],
-      "consumedQuantity": 5,
-      "validations": []
-    },
-    {
-      "id": "task-1752161981528-vqlp7m3",
-      "projectId": "proj-1751568818238",
-      "name": "Fin de instalacion de postes",
-      "quantity": 0,
-      "value": 0,
-      "startDate": "2025-06-13T19:00:00.000Z",
-      "endDate": "2025-06-13T19:00:00.000Z",
-      "status": "pendiente",
-      "dailyConsumption": [],
-      "consumedQuantity": 0,
-      "validations": []
-    },
-    {
-      "id": "task-1752161981528-hjy2zr8",
-      "projectId": "proj-1751568818238",
-      "name": "TENSOR FAROL SIMPLE MT TAT-0FS",
-      "quantity": 403,
-      "value": 0,
-      "startDate": "2025-06-16T09:00:00.000Z",
-      "endDate": "2025-06-17T19:00:00.000Z",
-      "status": "en-progreso",
-      "dailyConsumption": [
-        {
-          "date": "2025-06-16T00:00:00.000Z",
-          "plannedQuantity": 201.5,
-          "consumedQuantity": 153
-        },
-        {
-          "date": "2025-06-17T00:00:00.000Z",
-          "plannedQuantity": 201.5,
-          "consumedQuantity": 0
-        }
-      ],
-      "consumedQuantity": 153,
-      "validations": []
-    },
-    {
-      "id": "task-1752161981528-kz80jbr",
-      "projectId": "proj-1751568818238",
-      "name": "TENSOR TIERRA SIMPLE MT TAT-0TS",
-      "quantity": 279,
-      "value": 0,
-      "startDate": "2025-06-16T09:00:00.000Z",
-      "endDate": "2025-06-20T19:00:00.000Z",
-      "status": "en-progreso",
-      "dailyConsumption": [
-        {
-          "date": "2025-06-16T00:00:00.000Z",
-          "plannedQuantity": 55.8,
-          "consumedQuantity": 50
-        },
-        {
-          "date": "2025-06-17T00:00:00.000Z",
-          "plannedQuantity": 55.8,
-          "consumedQuantity": 179
-        },
-        {
-          "date": "2025-06-18T00:00:00.000Z",
-          "plannedQuantity": 55.8,
-          "consumedQuantity": 0
-        },
-        {
-          "date": "2025-06-19T00:00:00.000Z",
-          "plannedQuantity": 55.8,
-          "consumedQuantity": 0
-        },
-        {
-          "date": "2025-06-20T00:00:00.000Z",
-          "plannedQuantity": 55.80000000000001,
-          "consumedQuantity": 0
-        }
-      ],
-      "consumedQuantity": 229,
-      "validations": []
-    },
-    {
-      "id": "task-1752161981528-zx4lf32",
-      "projectId": "proj-1751568818238",
-      "name": "Fin de instalacion de tensores",
-      "quantity": 0,
-      "value": 0,
-      "startDate": "2025-06-20T19:00:00.000Z",
-      "endDate": "2025-06-20T19:00:00.000Z",
-      "status": "pendiente",
-      "dailyConsumption": [],
-      "consumedQuantity": 0,
-      "validations": []
-    }
-  ]
+  "tasks": []
 }
