@@ -22,6 +22,7 @@ import {
 import { Button } from "../ui/button";
 import { Breadcrumb } from "./breadcrumb";
 import { ThemeToggle } from "./theme-toggle";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 
@@ -83,23 +84,30 @@ export default function AppShell({
               <>
                 {projects.map((project, index) => (
                   <SidebarMenuItem key={project.id}>
-                    <SidebarMenuButton
-                      asChild
-                      size="sm"
-                      isActive={pathname === `/projects/${project.id}`}
-                      tooltip={{ children: project.name }}
-                      className="text-xs"
-                    >
-                      <Link href={`/projects/${project.id}`}>
-                        <div className="relative">
-                          <Briefcase className="h-4 w-4 shrink-0" />
-                          <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
-                            {index + 1}
-                          </span>
-                        </div>
-                        <span className="truncate group-data-[state=collapsed]/sidebar:hidden">{project.name}</span>
-                      </Link>
-                    </SidebarMenuButton>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                         <SidebarMenuButton
+                            asChild
+                            size="sm"
+                            isActive={pathname === `/projects/${project.id}`}
+                            tooltip={{ children: project.name }}
+                            className="text-xs"
+                          >
+                            <Link href={`/projects/${project.id}`}>
+                              <div className="relative">
+                                <Briefcase className="h-4 w-4 shrink-0" />
+                                <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
+                                  {index + 1}
+                                </span>
+                              </div>
+                              <span className="truncate group-data-[state=collapsed]/sidebar:hidden">{project.name}</span>
+                            </Link>
+                          </SidebarMenuButton>
+                      </TooltipTrigger>
+                       <TooltipContent side="right" align="start" className="group-data-[state=expanded]/sidebar:block hidden">
+                          {project.name}
+                        </TooltipContent>
+                    </Tooltip>
                   </SidebarMenuItem>
                 ))}
                 {projects.length === 0 && (
