@@ -24,7 +24,7 @@ export default function RootLayout({
     fetchData();
   }, []);
 
-  const title = "Centro de Aplicaciones";
+  const title = "Menú";
 
   return (
     <html lang="en" suppressHydrationWarning>
