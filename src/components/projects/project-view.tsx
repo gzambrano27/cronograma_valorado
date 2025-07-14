@@ -15,7 +15,7 @@ import { LayoutGrid, List } from "lucide-react";
 import ProjectList from "./project-list";
 import { CreateProjectDialog } from "./create-project-dialog";
 
-export function ProjectView({ projects }: { projects: Project[] }) {
+export function ProjectView({ projects, onSuccess }: { projects: Project[], onSuccess: () => void }) {
   const [view, setView] = useState<"grid" | "list">("grid");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCompany, setSelectedCompany] = useState("all");
@@ -113,7 +113,7 @@ export function ProjectView({ projects }: { projects: Project[] }) {
         </Select>
       </div>
 
-      <ProjectList projects={paginatedProjects} view={view} />
+      <ProjectList projects={paginatedProjects} view={view} onSuccess={onSuccess} />
 
       {totalPages > 1 && (
         <div className="flex items-center justify-end py-4 space-x-4">

@@ -8,7 +8,7 @@ import { ProjectValueChart } from "@/components/dashboard/project-value-chart";
 import { TaskStatusChart } from "@/components/dashboard/task-status-chart";
 import type { ChartConfig } from "@/components/ui/chart";
 import { formatCurrency } from "@/lib/utils";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import type { Project, Task } from '@/lib/types';
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -33,15 +33,17 @@ export default function DashboardPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function loadData() {
-      const [fetchedProjects, fetchedTasks] = await Promise.all([getProjects(), getTasks()]);
-      setProjects(fetchedProjects);
-      setTasks(fetchedTasks);
-      setLoading(false);
-    }
-    loadData();
+  const reloadData = useCallback(async () => {
+    setLoading(true);
+    const [fetchedProjects, fetchedTasks] = await Promise.all([getProjects(), getTasks()]);
+    setProjects(fetchedProjects);
+    setTasks(fetchedTasks);
+    setLoading(false);
   }, []);
+
+  useEffect(() => {
+    reloadData();
+  }, [reloadData]);
   
   const totalProjects = projects.length;
   const totalValue = projects.reduce((sum, p) => sum + p.totalValue, 0);
@@ -163,7 +165,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <ProjectView projects={projects} />
+      <ProjectView projects={projects} onSuccess={reloadData} />
     </div>
   );
 }

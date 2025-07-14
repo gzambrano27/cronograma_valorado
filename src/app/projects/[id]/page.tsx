@@ -25,6 +25,7 @@ export default function ProjectPage() {
 
   const reloadData = useCallback(async () => {
     try {
+        setLoading(true);
         const fetchedProject = await getProjectById(id);
         if (!fetchedProject) {
             notFound();
@@ -48,7 +49,6 @@ export default function ProjectPage() {
 
   useEffect(() => {
     if (id) {
-        setLoading(true);
         reloadData();
     }
   }, [id, reloadData]);

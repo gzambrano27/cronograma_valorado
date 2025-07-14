@@ -30,9 +30,10 @@ import { formatCurrency } from "@/lib/utils";
 interface ProjectListProps {
   projects: Project[];
   view: "grid" | "list";
+  onSuccess: () => void;
 }
 
-export default function ProjectList({ projects, view }: ProjectListProps) {
+export default function ProjectList({ projects, view, onSuccess }: ProjectListProps) {
     const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
 
@@ -202,7 +203,10 @@ export default function ProjectList({ projects, view }: ProjectListProps) {
                     projects={selectedProjects}
                     open={isDeleteDialogOpen}
                     onOpenChange={setIsDeleteDialogOpen}
-                    onSuccess={() => setRowSelection({})}
+                    onSuccess={() => {
+                        setRowSelection({});
+                        onSuccess();
+                    }}
                 />
                 <div className="flex items-center justify-between gap-4 mb-4">
                     <div className="text-sm text-muted-foreground">

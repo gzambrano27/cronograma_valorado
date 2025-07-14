@@ -43,7 +43,7 @@ export function DeleteMultipleProjectsDialog({
           description: "Los proyectos seleccionados han sido eliminados.",
         });
         onOpenChange(false);
-        onSuccess();
+        onSuccess(); // Call onSuccess to trigger data reload
       } catch (error) {
         toast({
           variant: "destructive",
