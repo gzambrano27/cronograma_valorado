@@ -67,6 +67,7 @@ export default function AppShell({
               <SidebarMenuItem key={project.id}>
                 <SidebarMenuButton
                   asChild
+                  size="sm"
                   isActive={pathname === `/projects/${project.id}`}
                   tooltip={{ children: project.name }}
                 >
