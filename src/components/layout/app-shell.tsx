@@ -91,7 +91,6 @@ export default function AppShell({
                             size="sm"
                             isActive={pathname === `/projects/${project.id}`}
                             tooltip={{ children: project.name }}
-                            className="text-xs"
                           >
                             <Link href={`/projects/${project.id}`}>
                               <div className="relative">
@@ -100,7 +99,7 @@ export default function AppShell({
                                   {index + 1}
                                 </span>
                               </div>
-                              <span className="truncate group-data-[state=collapsed]/sidebar:hidden">{project.name}</span>
+                              <span className="group-data-[state=collapsed]/sidebar:hidden">{project.name}</span>
                             </Link>
                           </SidebarMenuButton>
                       </TooltipTrigger>
