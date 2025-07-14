@@ -19,7 +19,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { ScrollArea } from "./scroll-area"
+import { ScrollArea, scrollBarVariants } from "./scroll-area"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -190,7 +190,7 @@ const Sidebar = React.forwardRef<
       data-state={state}
       data-side={side}
       className={cn(
-        "group/sidebar hidden h-screen flex-col bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-in-out md:flex sticky top-0",
+        "group/sidebar sticky top-0 hidden h-screen flex-col bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-in-out md:flex",
         state === "expanded" ? "w-[--sidebar-width]" : "w-[--sidebar-width-icon]",
         side === "left" ? "border-r border-sidebar-border" : "border-l border-sidebar-border",
         className
