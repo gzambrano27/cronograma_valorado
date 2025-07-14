@@ -1,4 +1,5 @@
 
+
 'use server';
 
 import type { Database, Project, Task, TaskValidation, AppConfig, DailyConsumption } from './types';
@@ -608,5 +609,3 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/`);
 }
-
-    

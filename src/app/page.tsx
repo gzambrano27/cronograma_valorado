@@ -1,3 +1,5 @@
+
+'use client'
 import { ProjectView } from "@/components/projects/project-view";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { getProjects, getTasks } from "@/lib/data";
@@ -6,6 +8,9 @@ import { ProjectValueChart } from "@/components/dashboard/project-value-chart";
 import { TaskStatusChart } from "@/components/dashboard/task-status-chart";
 import type { ChartConfig } from "@/components/ui/chart";
 import { formatCurrency } from "@/lib/utils";
+import React, { useState, useEffect } from 'react';
+import type { Project, Task } from '@/lib/types';
+import { Skeleton } from "@/components/ui/skeleton";
 
 const taskStatusConfig = {
   completado: {
@@ -23,9 +28,20 @@ const taskStatusConfig = {
 } satisfies ChartConfig;
 
 
-export default async function Home() {
-  const projects = await getProjects();
-  const tasks = await getTasks();
+export default function Home() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      const [fetchedProjects, fetchedTasks] = await Promise.all([getProjects(), getTasks()]);
+      setProjects(fetchedProjects);
+      setTasks(fetchedTasks);
+      setLoading(false);
+    }
+    loadData();
+  }, []);
   
   const totalProjects = projects.length;
   const totalValue = projects.reduce((sum, p) => sum + p.totalValue, 0);
@@ -51,6 +67,24 @@ export default async function Home() {
     status,
     tasks: count,
   })).filter(item => item.tasks > 0);
+
+  if (loading) {
+     return (
+        <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
+            <Skeleton className="h-9 w-48 mb-4" />
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <Skeleton className="h-32" />
+                <Skeleton className="h-32" />
+                <Skeleton className="h-32" />
+            </div>
+             <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+                <Skeleton className="lg:col-span-3 h-[400px]" />
+                <Skeleton className="lg:col-span-2 h-[400px]" />
+             </div>
+             <Skeleton className="h-96" />
+        </div>
+     )
+  }
 
   return (
     <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">

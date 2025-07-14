@@ -1,3 +1,5 @@
+
+'use client'
 import { notFound } from "next/navigation";
 import { getProjectById, getTasksByProjectId, generateSCurveData } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,22 +10,69 @@ import { AddTaskSheet } from "@/components/tasks/add-task-sheet";
 import { Progress } from "@/components/ui/progress";
 import { SCurveCard } from "@/components/tasks/s-curve-card";
 import { formatCurrency } from "@/lib/utils";
+import React, { useState, useEffect } from 'react';
+import type { Project, Task, SCurveData } from '@/lib/types';
+import { Skeleton } from "@/components/ui/skeleton";
 
-export default async function ProjectPage({ params }: { params: { id: string } }) {
+
+export default function ProjectPage({ params }: { params: { id: string } }) {
   const { id } = params;
-  const project = await getProjectById(id);
+  const [project, setProject] = useState<Project | null>(null);
+  const [projectTasks, setProjectTasks] = useState<Task[]>([]);
+  const [sCurve, setSCurve] = useState<SCurveData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+        try {
+            const fetchedProject = await getProjectById(id);
+            if (!fetchedProject) {
+                notFound();
+                return;
+            }
+            setProject(fetchedProject);
+            
+            const fetchedTasks = await getTasksByProjectId(id);
+            setProjectTasks(fetchedTasks);
+            
+            const sCurveData = await generateSCurveData(fetchedTasks, fetchedProject.totalValue);
+            setSCurve(sCurveData);
+
+        } catch(error) {
+            console.error("Failed to load project data", error);
+            // Optionally redirect to an error page or show a message
+        } finally {
+            setLoading(false);
+        }
+    }
+    loadData();
+  }, [id]);
+
+  if (loading) {
+     return (
+        <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
+            <Skeleton className="h-9 w-1/3 mb-4" />
+             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <Skeleton className="h-28" />
+                <Skeleton className="h-28" />
+                <Skeleton className="h-28" />
+            </div>
+             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <Skeleton className="lg:col-span-2 h-[450px]" />
+                <Skeleton className="lg:col-span-1 h-[450px]" />
+            </div>
+            <Skeleton className="h-96 w-full" />
+        </div>
+     );
+  }
   
   if (!project) {
-    notFound();
+    return notFound();
   }
-
-  const projectTasks = await getTasksByProjectId(id);
-  const sCurve = await generateSCurveData(projectTasks, project.totalValue);
 
   const progressPercentage = project.taskCount > 0 ? (project.completedTasks / project.taskCount) * 100 : 0;
   const tasksInProgress = projectTasks.filter(t => t.status === 'en-progreso').length;
   const tasksPending = projectTasks.filter(t => t.status === 'pendiente').length;
-
 
   return (
     <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
