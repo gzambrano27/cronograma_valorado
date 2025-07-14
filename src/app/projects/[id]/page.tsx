@@ -10,7 +10,7 @@ import { AddTaskSheet } from "@/components/tasks/add-task-sheet";
 import { Progress } from "@/components/ui/progress";
 import { SCurveCard } from "@/components/tasks/s-curve-card";
 import { formatCurrency } from "@/lib/utils";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import type { Project, Task, SCurveData } from '@/lib/types';
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -23,33 +23,35 @@ export default function ProjectPage() {
   const [sCurve, setSCurve] = useState<SCurveData[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function loadData() {
-        try {
-            const fetchedProject = await getProjectById(id);
-            if (!fetchedProject) {
-                notFound();
-                return;
-            }
-            setProject(fetchedProject);
-            
-            const fetchedTasks = await getTasksByProjectId(id);
-            setProjectTasks(fetchedTasks);
-            
-            const sCurveData = await generateSCurveData(fetchedTasks, fetchedProject.totalValue);
-            setSCurve(sCurveData);
-
-        } catch(error) {
-            console.error("Failed to load project data", error);
-            // Optionally redirect to an error page or show a message
-        } finally {
-            setLoading(false);
+  const reloadData = useCallback(async () => {
+    try {
+        const fetchedProject = await getProjectById(id);
+        if (!fetchedProject) {
+            notFound();
+            return;
         }
-    }
-    if (id) {
-        loadData();
+        setProject(fetchedProject);
+        
+        const fetchedTasks = await getTasksByProjectId(id);
+        setProjectTasks(fetchedTasks);
+        
+        const sCurveData = await generateSCurveData(fetchedTasks, fetchedProject.totalValue);
+        setSCurve(sCurveData);
+
+    } catch(error) {
+        console.error("Failed to load project data", error);
+        // Optionally redirect to an error page or show a message
+    } finally {
+        setLoading(false);
     }
   }, [id]);
+
+  useEffect(() => {
+    if (id) {
+        setLoading(true);
+        reloadData();
+    }
+  }, [id, reloadData]);
 
   if (loading) {
      return (
@@ -84,8 +86,8 @@ export default function ProjectPage() {
           {project.name}
         </h1>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          <XmlImport projectId={id} />
-          <AddTaskSheet projectId={project.id} />
+          <XmlImport projectId={id} onSuccess={reloadData} />
+          <AddTaskSheet projectId={project.id} onSuccess={reloadData} />
         </div>
       </div>
 
@@ -171,7 +173,7 @@ export default function ProjectPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <TaskTable data={projectTasks} />
+          <TaskTable data={projectTasks} onSuccess={reloadData} />
         </CardContent>
       </Card>
     </div>

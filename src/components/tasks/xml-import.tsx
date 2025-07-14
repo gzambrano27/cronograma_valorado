@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useRef, useTransition } from 'react';
@@ -6,7 +7,7 @@ import { Upload, Loader2 } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
 import { importTasksFromXML } from '@/lib/actions';
 
-export function XmlImport({ projectId }: { projectId: string }) {
+export function XmlImport({ projectId, onSuccess }: { projectId: string, onSuccess: () => void }) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
     const { toast } = useToast();
@@ -23,6 +24,7 @@ export function XmlImport({ projectId }: { projectId: string }) {
                         title: "Importación Exitosa",
                         description: "Las tareas del archivo XML han sido importadas.",
                     });
+                    onSuccess();
                 } catch (error: any) {
                     toast({
                         variant: "destructive",

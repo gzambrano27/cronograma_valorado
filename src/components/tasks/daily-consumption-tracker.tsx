@@ -22,10 +22,11 @@ import { formatCurrency } from "@/lib/utils";
 
 interface DailyConsumptionTrackerProps {
   task: Task;
+  onSuccess: () => void;
 }
 
 
-export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) {
+export function DailyConsumptionTracker({ task, onSuccess }: DailyConsumptionTrackerProps) {
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
 
@@ -78,6 +79,7 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
             "PPP", { locale: es }
           )} ha sido actualizado.`,
         });
+        onSuccess();
       } catch (error) {
         toast({
           variant: "destructive",

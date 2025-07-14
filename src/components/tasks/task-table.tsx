@@ -70,7 +70,7 @@ const adjustDateForTimezone = (date: Date | string): Date => {
 };
 
 
-const getColumns = (): ColumnDef<Task>[] => [
+const getColumns = (onSuccess: () => void): ColumnDef<Task>[] => [
   {
       id: "select",
       header: ({ table }) => (
@@ -243,7 +243,7 @@ const columnTranslations: Record<string, string> = {
     select: "Seleccionar"
 };
 
-export function TaskTable({ data }: { data: Task[] }) {
+export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => void }) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   
@@ -270,7 +270,7 @@ export function TaskTable({ data }: { data: Task[] }) {
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
   const [expanded, setExpanded] = React.useState({})
 
-  const columns = React.useMemo(() => getColumns(), []);
+  const columns = React.useMemo(() => getColumns(onSuccess), [onSuccess]);
 
   const table = useReactTable({
     data,
@@ -307,7 +307,10 @@ export function TaskTable({ data }: { data: Task[] }) {
                   tasks={selectedTasks}
                   open={isDeleteDialogOpen}
                   onOpenChange={setIsDeleteDialogOpen}
-                  onSuccess={() => setRowSelection({})}
+                  onSuccess={() => {
+                    setRowSelection({});
+                    onSuccess();
+                  }}
               />
               <div className="flex items-center justify-between gap-4 mb-4">
                   <div className="text-sm text-muted-foreground">
@@ -423,7 +426,7 @@ export function TaskTable({ data }: { data: Task[] }) {
                   {row.getIsExpanded() && (
                      <TableRow>
                         <TableCell colSpan={row.getVisibleCells().length}>
-                           <DailyConsumptionTracker task={row.original} />
+                           <DailyConsumptionTracker task={row.original} onSuccess={onSuccess} />
                         </TableCell>
                      </TableRow>
                   )}

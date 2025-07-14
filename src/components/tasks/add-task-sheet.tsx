@@ -1,3 +1,4 @@
+
 "use client"
 
 import { Button } from "@/components/ui/button"
@@ -32,7 +33,7 @@ function SubmitButton() {
     );
 }
 
-export function AddTaskSheet({ projectId }: { projectId: string }) {
+export function AddTaskSheet({ projectId, onSuccess }: { projectId: string, onSuccess: () => void }) {
   const [open, setOpen] = React.useState(false)
   const { toast } = useToast()
   const formRef = useRef<HTMLFormElement>(null);
@@ -58,6 +59,7 @@ export function AddTaskSheet({ projectId }: { projectId: string }) {
         description: "La nueva tarea ha sido añadida al cronograma.",
       });
       setOpen(false);
+      onSuccess(); // Call the success callback to reload data
       return { success: true, message: "Tarea creada." };
     } catch (error: any) {
       return { success: false, message: error.message || "No se pudo crear la tarea." };
