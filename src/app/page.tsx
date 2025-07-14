@@ -14,7 +14,7 @@ export default function Home() {
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4 sm:p-6 md:p-8">
             <div className="max-w-2xl text-center">
                  <h1 className="text-4xl sm:text-5xl font-bold tracking-tight font-headline mb-4">
-                    Bienvenido a ProjectValuator
+                    Bienvenido al Centro de Aplicaciones
                 </h1>
                 <p className="text-lg text-muted-foreground mb-8">
                     Seleccione una herramienta para comenzar. Su panel de control central para la gestión y valoración de proyectos.
