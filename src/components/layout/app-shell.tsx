@@ -4,7 +4,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Building2, Cog, Briefcase } from "lucide-react";
+import { Building2, Cog, Briefcase, GanttChartSquare } from "lucide-react";
 import React from "react";
 
 import type { Project } from "@/lib/types";
@@ -47,6 +47,8 @@ export default function AppShell({
     setSidebarOpen(sidebarCookie ? sidebarCookie === 'true' : true);
   }, []);
   
+  const isHomePage = pathname === '/';
+
   return (
     <SidebarProvider title={title} defaultOpen={sidebarOpen}>
       <Sidebar>
@@ -63,32 +65,51 @@ export default function AppShell({
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
-            {projects.map((project, index) => (
-              <SidebarMenuItem key={project.id}>
-                <SidebarMenuButton
-                  asChild
-                  size="sm"
-                  isActive={pathname === `/projects/${project.id}`}
-                  tooltip={{ children: project.name }}
-                >
-                  <Link href={`/projects/${project.id}`}>
-                    <div className="relative">
-                      <Briefcase className="h-4 w-4 shrink-0" />
-                      <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
-                        {index + 1}
-                      </span>
-                    </div>
-                    <span className="truncate group-data-[state=collapsed]/sidebar:hidden">{project.name}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-            {projects.length === 0 && (
+            {isHomePage ? (
                 <SidebarMenuItem>
-                    <span className="flex items-center gap-2 p-2 text-sm text-sidebar-foreground/70 group-data-[state=collapsed]/sidebar:hidden">
-                        No hay proyectos.
-                    </span>
+                  <SidebarMenuButton
+                    asChild
+                    size="sm"
+                    isActive={pathname === `/dashboard`}
+                    tooltip={{ children: "Cronograma Valorado" }}
+                  >
+                    <Link href={`/dashboard`}>
+                      <GanttChartSquare className="h-4 w-4 shrink-0" />
+                      <span className="truncate group-data-[state=collapsed]/sidebar:hidden">Cronograma Valorado</span>
+                    </Link>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
+            ) : (
+              <>
+                {projects.map((project, index) => (
+                  <SidebarMenuItem key={project.id}>
+                    <SidebarMenuButton
+                      asChild
+                      size="sm"
+                      isActive={pathname === `/projects/${project.id}`}
+                      tooltip={{ children: project.name }}
+                      className="text-xs"
+                    >
+                      <Link href={`/projects/${project.id}`}>
+                        <div className="relative">
+                          <Briefcase className="h-4 w-4 shrink-0" />
+                          <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
+                            {index + 1}
+                          </span>
+                        </div>
+                        <span className="truncate group-data-[state=collapsed]/sidebar:hidden">{project.name}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+                {projects.length === 0 && (
+                    <SidebarMenuItem>
+                        <span className="flex items-center gap-2 p-2 text-sm text-sidebar-foreground/70 group-data-[state=collapsed]/sidebar:hidden">
+                            No hay proyectos.
+                        </span>
+                    </SidebarMenuItem>
+                )}
+              </>
             )}
           </SidebarMenu>
         </SidebarContent>

@@ -11,13 +11,14 @@ interface BreadcrumbProps {
 }
 
 const translations: Record<string, string> = {
-  projects: 'Proyectos',
+  dashboard: 'Cronograma Valorado',
+  settings: 'Configuración',
 };
 
 export function Breadcrumb({ projects }: BreadcrumbProps) {
   const pathname = usePathname();
   
-  if (pathname === '/' || pathname === '/dashboard') {
+  if (pathname === '/') {
     return null;
   }
 
@@ -27,22 +28,40 @@ export function Breadcrumb({ projects }: BreadcrumbProps) {
     const project = projects.find((p) => p.id === id);
     return project?.name || id;
   };
+  
+  const buildBreadcrumbs = () => {
+    const crumbs = [];
 
-  const breadcrumbs = segments.map((segment, index) => {
-    const href = '/' + segments.slice(0, index + 1).join('/');
-    const isLast = index === segments.length - 1;
-    
-    let name = segment;
-    if (segments[0] === 'projects' && index === 0) {
-      name = translations['projects'] || 'Proyectos';
-    } else if (segments[0] === 'projects' && index === 1) {
-      name = getProjectName(segment);
-    } else {
-      name = translations[segment] || (segment.charAt(0).toUpperCase() + segment.slice(1));
+    if (pathname.startsWith('/dashboard') || pathname.startsWith('/projects')) {
+        crumbs.push({
+            name: 'Cronograma Valorado',
+            href: '/dashboard',
+            isLast: pathname === '/dashboard',
+        });
     }
 
-    return { name, href, isLast };
-  });
+    if (pathname.startsWith('/projects/')) {
+        const projectId = segments[1];
+        crumbs.push({
+            name: getProjectName(projectId),
+            href: `/projects/${projectId}`,
+            isLast: true
+        });
+    }
+    
+    if (pathname.startsWith('/settings')) {
+        crumbs.push({
+            name: translations['settings'],
+            href: '/settings',
+            isLast: true
+        });
+    }
+
+    return crumbs;
+  }
+
+  const breadcrumbs = buildBreadcrumbs();
+
 
   return (
     <nav aria-label="Breadcrumb">
@@ -53,11 +72,11 @@ export function Breadcrumb({ projects }: BreadcrumbProps) {
             <span className="sr-only">Menú Principal</span>
           </Link>
         </li>
-        {breadcrumbs.map((crumb) => (
-          <li key={crumb.href} className="flex items-center gap-1.5">
+        {breadcrumbs.map((crumb, index) => (
+          <li key={index} className="flex items-center gap-1.5">
             <ChevronRight className="h-4 w-4" />
-            {crumb.isLast || crumb.href === '/projects' ? (
-              <span className={crumb.isLast ? "font-medium text-foreground" : ""}>{crumb.name}</span>
+            {crumb.isLast ? (
+              <span className="font-medium text-foreground">{crumb.name}</span>
             ) : (
               <Link href={crumb.href} className="transition-colors hover:text-foreground">
                 {crumb.name}
