@@ -7,8 +7,9 @@ import { ThemeProvider } from '@/components/layout/theme-provider';
 import { cookies } from 'next/headers';
 
 export const metadata: Metadata = {
-  title: 'Cronograma',
+  title: 'ProjectValuator',
   description: 'Evalúa tus proyectos con precisión.',
+  manifest: '/manifest.json',
 };
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
@@ -19,7 +20,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const projects = await getProjects();
-  const title = "Cronograma";
+  const title = "ProjectValuator";
   const cookieStore = cookies();
   const sidebarStateValue = cookieStore.get(SIDEBAR_COOKIE_NAME)?.value;
   const defaultOpen = sidebarStateValue ? sidebarStateValue === 'true' : true;
@@ -30,6 +31,7 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+        <meta name="theme-color" content="#3F51B5" />
       </head>
       <body className="font-body antialiased">
         <ThemeProvider
