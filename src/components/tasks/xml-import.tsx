@@ -5,15 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Upload, Loader2 } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
 import { importTasksFromXML } from '@/lib/actions';
-import { useParams } from 'next/navigation';
 
-export function XmlImport() {
+export function XmlImport({ projectId }: { projectId: string }) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
     const { toast } = useToast();
     const [isPending, startTransition] = useTransition();
-    const params = useParams();
-    const projectId = params.id as string;
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -57,7 +54,7 @@ export function XmlImport() {
                 className="hidden"
                 disabled={isPending}
             />
-            <Button variant="outline" type="button" onClick={handleButtonClick} disabled={isPending}>
+            <Button variant="outline" type="button" onClick={handleButtonClick} disabled={isPending || !projectId}>
                 {isPending ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (

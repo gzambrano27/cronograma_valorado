@@ -1,6 +1,6 @@
 
 'use client'
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import { getProjectById, getTasksByProjectId, generateSCurveData } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TaskTable } from "@/components/tasks/task-table";
@@ -15,8 +15,9 @@ import type { Project, Task, SCurveData } from '@/lib/types';
 import { Skeleton } from "@/components/ui/skeleton";
 
 
-export default function ProjectPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default function ProjectPage() {
+  const params = useParams();
+  const id = params.id as string;
   const [project, setProject] = useState<Project | null>(null);
   const [projectTasks, setProjectTasks] = useState<Task[]>([]);
   const [sCurve, setSCurve] = useState<SCurveData[]>([]);
@@ -45,7 +46,9 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
             setLoading(false);
         }
     }
-    loadData();
+    if (id) {
+        loadData();
+    }
   }, [id]);
 
   if (loading) {
@@ -81,7 +84,7 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
           {project.name}
         </h1>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          <XmlImport />
+          <XmlImport projectId={id} />
           <AddTaskSheet projectId={project.id} />
         </div>
       </div>
