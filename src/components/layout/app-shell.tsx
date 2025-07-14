@@ -56,7 +56,7 @@ export default function AppShell({
           <div className="flex items-center group-data-[state=expanded]/sidebar:justify-between group-data-[state=collapsed]/sidebar:justify-center p-2">
             <div className="flex items-center gap-2">
               <Building2 className="w-8 h-8 text-primary" />
-              <h2 className="text-xl font-bold font-headline tracking-tight h-7 group-data-[state=collapsed]/sidebar:hidden">
+              <h2 className="text-lg font-bold font-headline tracking-tight h-7 group-data-[state=collapsed]/sidebar:hidden">
                 {title}
               </h2>
             </div>
