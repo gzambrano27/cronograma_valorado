@@ -4,7 +4,6 @@ import * as React from "react";
 import type { Project } from "@/lib/types";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import Image from "next/image";
 import Link from "next/link";
 import { ProjectActions } from "./project-actions";
 import {
@@ -18,7 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DeleteMultipleProjectsDialog } from "./delete-multiple-projects-dialog";
-import { Building2, Trash2 } from "lucide-react";
+import { Building2, Trash2, User } from "lucide-react";
 import {
   ColumnDef,
   flexRender,
@@ -73,6 +72,12 @@ export default function ProjectList({ projects, view }: ProjectListProps) {
                       <Building2 className="h-4 w-4 flex-shrink-0" />
                       <p className="line-clamp-1">{row.original.company}</p>
                     </div>
+                     {row.original.client && (
+                        <div className="flex items-center text-sm text-muted-foreground gap-1.5 mt-1">
+                            <User className="h-4 w-4 flex-shrink-0" />
+                            <p className="line-clamp-1">{row.original.client}</p>
+                        </div>
+                     )}
                 </div>
             )
         },
@@ -138,30 +143,26 @@ export default function ProjectList({ projects, view }: ProjectListProps) {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {projects.map((project) => (
           <Card key={project.id} className="flex flex-col overflow-hidden transition-all duration-300 group hover:shadow-xl border">
-            <CardHeader className="relative p-0">
-              <Link href={`/projects/${project.id}`} aria-label={`Ver detalles de ${project.name}`} className="block aspect-video overflow-hidden">
-                  <Image
-                    src={project.imageUrl}
-                    alt={project.name}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    data-ai-hint={project.dataAiHint}
-                  />
-              </Link>
-              <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <ProjectActions project={project} />
-              </div>
+            <CardHeader className="p-4 relative">
+                 <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <ProjectActions project={project} />
+                </div>
+                <Link href={`/projects/${project.id}`} className="focus:outline-none focus:underline">
+                    <CardTitle className="font-headline mb-1 group-hover:text-primary transition-colors text-lg line-clamp-2 h-14">{project.name}</CardTitle>
+                </Link>
+                <div className="flex items-center text-sm text-muted-foreground gap-2">
+                    <Building2 className="h-4 w-4 flex-shrink-0" />
+                    <p className="truncate">{project.company}</p>
+                </div>
+                {project.client && (
+                    <div className="flex items-center text-sm text-muted-foreground gap-2">
+                        <User className="h-4 w-4 flex-shrink-0" />
+                        <p className="truncate">{project.client}</p>
+                    </div>
+                )}
             </CardHeader>
 
-            <CardContent className="flex flex-1 flex-col p-4">
-              <Link href={`/projects/${project.id}`} className="focus:outline-none focus:underline">
-                <CardTitle className="font-headline mb-1 group-hover:text-primary transition-colors text-lg">{project.name}</CardTitle>
-              </Link>
-              <div className="flex items-center text-sm text-muted-foreground mb-4 gap-2">
-                <Building2 className="h-4 w-4 flex-shrink-0" />
-                <p className="truncate">{project.company}</p>
-              </div>
-              
+            <CardContent className="flex flex-1 flex-col p-4 pt-0">
               <div className="mt-auto space-y-3">
                  <div>
                     <div className="flex justify-between items-center mb-1 text-sm text-muted-foreground">

@@ -70,6 +70,7 @@ const ExternalProjectSchema = z.object({
     id: z.number(),
     name: z.string(),
     company_id: z.tuple([z.number(), z.string()]),
+    partner_id: z.tuple([z.number(), z.string()]).optional(),
 });
 
 const ApiResponseSchema = z.object({
@@ -124,8 +125,8 @@ export async function syncProjectsFromEndpoint() {
       name: extProj.name,
       company: extProj.company_id[1],
       externalCompanyId: extProj.company_id[0],
-      imageUrl: existingProject?.imageUrl || 'https://placehold.co/600x400.png',
-      dataAiHint: existingProject?.dataAiHint || 'project building'
+      client: extProj.partner_id ? extProj.partner_id[1] : undefined,
+      clientId: extProj.partner_id ? extProj.partner_id[0] : undefined,
     };
   });
   
@@ -206,25 +207,12 @@ export async function createProject(formData: FormData) {
 
     const { name, company } = validatedFields.data;
     
-    const imageFile = formData.get('image') as File | null;
-    let imageUrl = 'https://placehold.co/600x400.png';
-    let dataAiHint = 'project building';
-
-    if (imageFile && imageFile.size > 0) {
-        const bytes = await imageFile.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        imageUrl = `data:${imageFile.type};base64,${buffer.toString('base64')}`;
-        dataAiHint = 'custom project image';
-    }
-
     const db = await readDb();
 
     const newProject: Omit<Project, 'totalValue' | 'taskCount' | 'completedTasks' | 'consumedValue' | 'externalId' | 'externalCompanyId'> = {
         id: `proj-${Date.now()}`,
         name,
         company,
-        imageUrl,
-        dataAiHint
     };
 
     db.projects.unshift(newProject as Project);
@@ -254,23 +242,10 @@ export async function updateProject(formData: FormData) {
         throw new Error('Proyecto no encontrado.');
     }
 
-    const imageFile = formData.get('image') as File | null;
-    let imageUrl = db.projects[projectIndex].imageUrl;
-    let dataAiHint = db.projects[projectIndex].dataAiHint;
-
-    if (imageFile && imageFile.size > 0) {
-        const bytes = await imageFile.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        imageUrl = `data:${imageFile.type};base64,${buffer.toString('base64')}`;
-        dataAiHint = 'custom project image';
-    }
-
     db.projects[projectIndex] = {
         ...db.projects[projectIndex],
         name,
         company,
-        imageUrl,
-        dataAiHint,
     };
 
     await writeDb(db);

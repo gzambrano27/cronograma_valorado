@@ -17,12 +17,12 @@ export type Project = {
   name: string;
   company: string;
   externalCompanyId?: number;
+  client?: string;
+  clientId?: number;
   totalValue: number;
   consumedValue: number;
   taskCount: number;
   completedTasks: number;
-  imageUrl: string;
-  dataAiHint: string;
 };
 
 export type Task = {
