@@ -70,7 +70,7 @@ const ExternalProjectSchema = z.object({
     id: z.number(),
     name: z.string(),
     company_id: z.tuple([z.number(), z.string()]),
-    partner_id: z.union([z.tuple([z.number(), z.string()]), z.literal(false)]).optional(),
+    partner_id: z.union([z.tuple([z.number(), z.string()]), z.literal(false)]),
 });
 
 const ApiResponseSchema = z.object({
@@ -620,6 +620,7 @@ export async function importTasksFromXML(projectId: string, onSuccess: () => voi
   revalidatePath(`/dashboard`);
   onSuccess();
 }
+
 
 
 
