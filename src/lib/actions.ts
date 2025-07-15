@@ -110,8 +110,6 @@ export async function fetchEndpointData() {
 }
 
 export async function syncProjectsFromEndpoint(jsonData: any) {
-  console.log('Datos recibidos del endpoint:', JSON.stringify(jsonData, null, 2));
-
   const parsedData = ApiResponseSchema.safeParse(jsonData);
 
   if (!parsedData.success) {
@@ -119,8 +117,6 @@ export async function syncProjectsFromEndpoint(jsonData: any) {
     throw new Error('Sincronización cancelada: no cumple con el formato solicitado.');
   }
 
-  console.log('Datos validados por Zod:', JSON.stringify(parsedData.data, null, 2));
-  
   const externalProjects = parsedData.data?.['project.project'];
   
   if (!Array.isArray(externalProjects)) {
@@ -317,7 +313,7 @@ export async function deleteMultipleProjects(projectIds: string[]) {
     revalidatePath(`/projects`);
 }
 
-export async function createTask(projectId: string, onSuccess: () => void, formData: FormData) {
+export async function createTask(projectId: string, formData: FormData) {
   const validatedFields = TaskSchema.safeParse({
     name: formData.get('name'),
     quantity: formData.get('quantity'),
@@ -362,7 +358,6 @@ export async function createTask(projectId: string, onSuccess: () => void, formD
 
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/dashboard`);
-  onSuccess();
 }
 
 export async function deleteTask(taskId: string, projectId: string) {
@@ -572,7 +567,7 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
             console.warn('Omitiendo tarea con valor de costo no numérico:', name, 'Valor:', costRaw);
             continue;
         }
-        const value = parsedCost / 100;
+        const totalTaskValue = parsedCost / 100;
 
         let quantity = 0;
         if (cantidadFieldId && Array.isArray(task.ExtendedAttribute)) {
@@ -584,6 +579,9 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
                 }
             }
         }
+        
+        // Calculate PVP (value) by dividing total cost by quantity
+        const value = quantity > 0 ? totalTaskValue / quantity : 0;
 
         const dailyConsumption = createDailyConsumption(startDate, endDate, quantity);
         
@@ -618,15 +616,3 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/dashboard`);
 }
-
-
-
-
-
-
-
-
-
-
-
-    
