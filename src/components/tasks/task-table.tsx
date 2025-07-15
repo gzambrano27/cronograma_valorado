@@ -248,7 +248,11 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   
   const isMobile = useIsMobile();
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
+    value: false,
+    subtotalValued: false,
+    subtotalActual: false,
+  });
   
   React.useEffect(() => {
     if (isMobile) {
@@ -263,7 +267,13 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
         endDate: false,
       });
     } else {
-      setColumnVisibility({});
+      // For desktop, set the default visibility here if it's different from the initial state
+      // This will run once when the component mounts on the client
+      setColumnVisibility({
+        value: false,
+        subtotalValued: false,
+        subtotalActual: false,
+      });
     }
   }, [isMobile]);
 
