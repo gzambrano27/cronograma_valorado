@@ -70,7 +70,7 @@ const ExternalProjectSchema = z.object({
     id: z.number(),
     name: z.string(),
     company_id: z.tuple([z.number(), z.string()]),
-    partner_id: z.tuple([z.number(), z.string()]).optional(),
+    partner_id: z.union([z.tuple([z.number(), z.string()]), z.literal(false)]).optional(),
 });
 
 const ApiResponseSchema = z.array(ExternalProjectSchema);
@@ -120,13 +120,15 @@ export async function syncProjectsFromEndpoint() {
     externalProjectIds.add(projectId);
 
     const existingProjectIndex = db.projects.findIndex(p => p.id === projectId);
+    
+    const isPartnerValid = extProj.partner_id && typeof extProj.partner_id !== 'boolean';
 
     const projectData = {
         name: extProj.name,
         company: extProj.company_id[1],
         externalCompanyId: extProj.company_id[0],
-        client: extProj.partner_id ? extProj.partner_id[1] : undefined,
-        clientId: extProj.partner_id ? extProj.partner_id[0] : undefined,
+        client: isPartnerValid ? extProj.partner_id[1] : undefined,
+        clientId: isPartnerValid ? extProj.partner_id[0] : undefined,
     };
 
     if (existingProjectIndex > -1) {
@@ -605,3 +607,4 @@ export async function importTasksFromXML(projectId: string, onSuccess: () => voi
   revalidatePath(`/dashboard`);
   onSuccess();
 }
+
