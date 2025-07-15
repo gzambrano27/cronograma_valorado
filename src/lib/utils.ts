@@ -9,7 +9,7 @@ export function formatCurrency(amount: number, minimumFractionDigits = 2) {
     if (typeof amount !== 'number') {
         return '$0.00';
     }
-  return new Intl.NumberFormat("es-ES", {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
     currencyDisplay: "symbol",

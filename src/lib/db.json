@@ -1,4 +1,4711 @@
 {
-  "projects": [],
-  "tasks": []
+  "projects": [
+    {
+      "id": "proj-1752598261837",
+      "name": "Prueba 1",
+      "company": "GPS GROUP"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task-1752598437342-k415wtu",
+      "projectId": "proj-1752598261837",
+      "name": "POSTE DE HORMIGÓN CIRCULAR DE 12M 500KGF PARA MT",
+      "quantity": 954,
+      "value": 802.77,
+      "startDate": "2025-06-02T09:00:00.000Z",
+      "endDate": "2025-06-13T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-02T00:00:00.000Z",
+          "plannedQuantity": 79.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-03T00:00:00.000Z",
+          "plannedQuantity": 79.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-04T00:00:00.000Z",
+          "plannedQuantity": 79.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-05T00:00:00.000Z",
+          "plannedQuantity": 79.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-06T00:00:00.000Z",
+          "plannedQuantity": 79.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-07T00:00:00.000Z",
+          "plannedQuantity": 79.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-08T00:00:00.000Z",
+          "plannedQuantity": 79.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-09T00:00:00.000Z",
+          "plannedQuantity": 79.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-10T00:00:00.000Z",
+          "plannedQuantity": 79.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-11T00:00:00.000Z",
+          "plannedQuantity": 79.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-12T00:00:00.000Z",
+          "plannedQuantity": 79.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-13T00:00:00.000Z",
+          "plannedQuantity": 79.5,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437342-083c7fn",
+      "projectId": "proj-1752598261837",
+      "name": "POSTE DE HORMIGÓN CIRCULAR DE 12M 2000KGF PARA MT",
+      "quantity": 5,
+      "value": 1335.49,
+      "startDate": "2025-06-02T09:00:00.000Z",
+      "endDate": "2025-06-03T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-02T00:00:00.000Z",
+          "plannedQuantity": 2.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-03T00:00:00.000Z",
+          "plannedQuantity": 2.5,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437345-kx9a2u7",
+      "projectId": "proj-1752598261837",
+      "name": "POSTE DE HORMIGÓN CIRCULAR DE 14M 700KGF PARA MT",
+      "quantity": 22,
+      "value": 1079.75,
+      "startDate": "2025-06-02T09:00:00.000Z",
+      "endDate": "2025-06-04T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-02T00:00:00.000Z",
+          "plannedQuantity": 7.33333333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-03T00:00:00.000Z",
+          "plannedQuantity": 7.33333333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-04T00:00:00.000Z",
+          "plannedQuantity": 7.333333333333339,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437346-pdan7s6",
+      "projectId": "proj-1752598261837",
+      "name": "POSTE DE HORMIGÓN CIRCULAR DE 14M 2000KGF PARA MT",
+      "quantity": 5,
+      "value": 1667.75,
+      "startDate": "2025-06-02T09:00:00.000Z",
+      "endDate": "2025-06-02T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-02T00:00:00.000Z",
+          "plannedQuantity": 5,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437346-py9cybd",
+      "projectId": "proj-1752598261837",
+      "name": "Fin de instalacion de postes",
+      "quantity": 0,
+      "value": 0,
+      "startDate": "2025-06-13T19:00:00.000Z",
+      "endDate": "2025-06-13T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437346-rrax9mw",
+      "projectId": "proj-1752598261837",
+      "name": "TENSOR FAROL SIMPLE MT TAT-0FS",
+      "quantity": 403,
+      "value": 141.16,
+      "startDate": "2025-06-16T09:00:00.000Z",
+      "endDate": "2025-06-17T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-16T00:00:00.000Z",
+          "plannedQuantity": 201.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-17T00:00:00.000Z",
+          "plannedQuantity": 201.5,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437346-w55k5ye",
+      "projectId": "proj-1752598261837",
+      "name": "TENSOR TIERRA SIMPLE MT TAT-0TS",
+      "quantity": 279,
+      "value": 109.11,
+      "startDate": "2025-06-16T09:00:00.000Z",
+      "endDate": "2025-06-20T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-16T00:00:00.000Z",
+          "plannedQuantity": 55.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-17T00:00:00.000Z",
+          "plannedQuantity": 55.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-18T00:00:00.000Z",
+          "plannedQuantity": 55.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-19T00:00:00.000Z",
+          "plannedQuantity": 55.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-20T00:00:00.000Z",
+          "plannedQuantity": 55.80000000000001,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437346-f6pwevh",
+      "projectId": "proj-1752598261837",
+      "name": "Fin de instalacion de tensores",
+      "quantity": 0,
+      "value": 0,
+      "startDate": "2025-06-20T19:00:00.000Z",
+      "endDate": "2025-06-20T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437346-ddd6e0i",
+      "projectId": "proj-1752598261837",
+      "name": "ESTRUCTURA TRIFÁSICA - SEMICENTRADA - ANGULAR EST-3SA DE POSTE MT",
+      "quantity": 7,
+      "value": 391.5,
+      "startDate": "2025-06-16T09:00:00.000Z",
+      "endDate": "2025-06-18T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-16T00:00:00.000Z",
+          "plannedQuantity": 2.33333333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-17T00:00:00.000Z",
+          "plannedQuantity": 2.33333333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-18T00:00:00.000Z",
+          "plannedQuantity": 2.33333333333334,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437346-br4yzs1",
+      "projectId": "proj-1752598261837",
+      "name": "ESTRUCTURA TRIFÁSICA - SEMICENTRADA - DOBLE RETENCIÓN O DOBLE TERMINAL EST-3SD DE POSTE MT",
+      "quantity": 94,
+      "value": 441.94,
+      "startDate": "2025-06-16T09:00:00.000Z",
+      "endDate": "2025-06-20T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-16T00:00:00.000Z",
+          "plannedQuantity": 18.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-17T00:00:00.000Z",
+          "plannedQuantity": 18.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-18T00:00:00.000Z",
+          "plannedQuantity": 18.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-19T00:00:00.000Z",
+          "plannedQuantity": 18.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-20T00:00:00.000Z",
+          "plannedQuantity": 18.799999999999997,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437346-kcscnpb",
+      "projectId": "proj-1752598261837",
+      "name": "ESTRUCTURA TRIFÁSICA - SEMICENTRADA - PASANTE O TANGENTE EST-3SP DE POSTE MT",
+      "quantity": 32,
+      "value": 218.93,
+      "startDate": "2025-06-16T09:00:00.000Z",
+      "endDate": "2025-07-04T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-16T00:00:00.000Z",
+          "plannedQuantity": 1.68421052631579,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-17T00:00:00.000Z",
+          "plannedQuantity": 1.68421052631579,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-18T00:00:00.000Z",
+          "plannedQuantity": 1.68421052631579,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-19T00:00:00.000Z",
+          "plannedQuantity": 1.68421052631579,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-20T00:00:00.000Z",
+          "plannedQuantity": 1.68421052631579,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-21T00:00:00.000Z",
+          "plannedQuantity": 1.68421052631579,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-22T00:00:00.000Z",
+          "plannedQuantity": 1.68421052631579,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-23T00:00:00.000Z",
+          "plannedQuantity": 1.68421052631579,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-24T00:00:00.000Z",
+          "plannedQuantity": 1.68421052631579,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-25T00:00:00.000Z",
+          "plannedQuantity": 1.68421052631579,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-26T00:00:00.000Z",
+          "plannedQuantity": 1.68421052631579,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-27T00:00:00.000Z",
+          "plannedQuantity": 1.68421052631579,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-28T00:00:00.000Z",
+          "plannedQuantity": 1.68421052631579,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-29T00:00:00.000Z",
+          "plannedQuantity": 1.68421052631579,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-30T00:00:00.000Z",
+          "plannedQuantity": 1.68421052631579,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-01T00:00:00.000Z",
+          "plannedQuantity": 1.68421052631579,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-02T00:00:00.000Z",
+          "plannedQuantity": 1.68421052631579,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-03T00:00:00.000Z",
+          "plannedQuantity": 1.68421052631579,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-04T00:00:00.000Z",
+          "plannedQuantity": 1.6842105263157734,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437346-nfgmzpq",
+      "projectId": "proj-1752598261837",
+      "name": "ESTRUCTURA TRIFÁSICA - SEMICENTRADA - RETENCIÓN O TERMINAL EST-3SR DE POSTE MT",
+      "quantity": 412,
+      "value": 313.39,
+      "startDate": "2025-06-16T09:00:00.000Z",
+      "endDate": "2025-06-17T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-16T00:00:00.000Z",
+          "plannedQuantity": 206,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-17T00:00:00.000Z",
+          "plannedQuantity": 206,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437346-po7kn80",
+      "projectId": "proj-1752598261837",
+      "name": "ESTRUCTURA MONOFÁSICA UNA VÍA - VERTICAL RETENCIÓN O TERMINAL PARA NEUTRO CORRIDO ESE-1ER",
+      "quantity": 481,
+      "value": 30.21,
+      "startDate": "2025-06-16T09:00:00.000Z",
+      "endDate": "2025-06-17T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-16T00:00:00.000Z",
+          "plannedQuantity": 240.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-17T00:00:00.000Z",
+          "plannedQuantity": 240.5,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437346-kj21lny",
+      "projectId": "proj-1752598261837",
+      "name": "ESTRUCTURA MONOFÁSICA UNA VÍA VERTICAL - PASANTE O TANGENTE, ANGULAR PARA NEUTRO CORRIDO ESE-1EP",
+      "quantity": 758,
+      "value": 34.58,
+      "startDate": "2025-06-16T09:00:00.000Z",
+      "endDate": "2025-06-27T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-16T00:00:00.000Z",
+          "plannedQuantity": 63.1666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-17T00:00:00.000Z",
+          "plannedQuantity": 63.1666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-18T00:00:00.000Z",
+          "plannedQuantity": 63.1666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-19T00:00:00.000Z",
+          "plannedQuantity": 63.1666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-20T00:00:00.000Z",
+          "plannedQuantity": 63.1666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-21T00:00:00.000Z",
+          "plannedQuantity": 63.1666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-22T00:00:00.000Z",
+          "plannedQuantity": 63.1666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-23T00:00:00.000Z",
+          "plannedQuantity": 63.1666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-24T00:00:00.000Z",
+          "plannedQuantity": 63.1666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-25T00:00:00.000Z",
+          "plannedQuantity": 63.1666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-26T00:00:00.000Z",
+          "plannedQuantity": 63.1666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-27T00:00:00.000Z",
+          "plannedQuantity": 63.16666666666629,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437346-aom8owa",
+      "projectId": "proj-1752598261837",
+      "name": "ESTRUCTURA MONOFÁSICA UNA VÍA - VERTICAL  DOBLE RETENCIÓN O TERMINAL PARA NEUTRO CORRIDO ESE-1ED",
+      "quantity": 64,
+      "value": 41.13,
+      "startDate": "2025-06-16T09:00:00.000Z",
+      "endDate": "2025-06-18T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-16T00:00:00.000Z",
+          "plannedQuantity": 21.3333333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-17T00:00:00.000Z",
+          "plannedQuantity": 21.3333333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-18T00:00:00.000Z",
+          "plannedQuantity": 21.3333333333334,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437346-8871qe7",
+      "projectId": "proj-1752598261837",
+      "name": "ESTRUCTURA TRIFÁSICA - CENTRADA - TIPO H",
+      "quantity": 150,
+      "value": 205.74,
+      "startDate": "2025-06-16T09:00:00.000Z",
+      "endDate": "2025-06-20T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-16T00:00:00.000Z",
+          "plannedQuantity": 30,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-17T00:00:00.000Z",
+          "plannedQuantity": 30,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-18T00:00:00.000Z",
+          "plannedQuantity": 30,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-19T00:00:00.000Z",
+          "plannedQuantity": 30,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-20T00:00:00.000Z",
+          "plannedQuantity": 30,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437346-4iqsjuo",
+      "projectId": "proj-1752598261837",
+      "name": "ESTRUCTURA TRIFÁSICA - CENTRADA - EST-3CA DE POSTE MT",
+      "quantity": 158,
+      "value": 400.63,
+      "startDate": "2025-06-16T09:00:00.000Z",
+      "endDate": "2025-06-20T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-16T00:00:00.000Z",
+          "plannedQuantity": 31.6,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-17T00:00:00.000Z",
+          "plannedQuantity": 31.6,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-18T00:00:00.000Z",
+          "plannedQuantity": 31.6,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-19T00:00:00.000Z",
+          "plannedQuantity": 31.6,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-20T00:00:00.000Z",
+          "plannedQuantity": 31.599999999999994,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437347-4heoqle",
+      "projectId": "proj-1752598261837",
+      "name": "ESTRUCTURA TRIFÁSICA - CENTRADA- PASANTE O TANGENTE EST-3CP DE POSTE MT",
+      "quantity": 516,
+      "value": 224.94,
+      "startDate": "2025-06-16T09:00:00.000Z",
+      "endDate": "2025-06-20T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-16T00:00:00.000Z",
+          "plannedQuantity": 103.2,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-17T00:00:00.000Z",
+          "plannedQuantity": 103.2,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-18T00:00:00.000Z",
+          "plannedQuantity": 103.2,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-19T00:00:00.000Z",
+          "plannedQuantity": 103.2,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-20T00:00:00.000Z",
+          "plannedQuantity": 103.19999999999999,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437347-j3mcgia",
+      "projectId": "proj-1752598261837",
+      "name": "ESTRUCTURA TRIFÁSICA  - CENTRADA - DOBLE RETENCIÓN O DOBLE TERMINAL EST-3CD DE POSTE MT",
+      "quantity": 2,
+      "value": 512.61,
+      "startDate": "2025-06-16T09:00:00.000Z",
+      "endDate": "2025-06-16T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-16T00:00:00.000Z",
+          "plannedQuantity": 2,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437347-v8odml0",
+      "projectId": "proj-1752598261837",
+      "name": "Fin de instalacion de estructuras de media tension",
+      "quantity": 0,
+      "value": 0,
+      "startDate": "2025-07-04T19:00:00.000Z",
+      "endDate": "2025-07-04T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437347-y4kxsbb",
+      "projectId": "proj-1752598261837",
+      "name": "ALIMENTADOR DESNUDO ALUMINIO 15KV ACAR 3F#1/0",
+      "quantity": 58258,
+      "value": 3.79,
+      "startDate": "2025-07-07T09:00:00.000Z",
+      "endDate": "2025-08-01T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-07T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-08T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-09T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-10T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-11T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-12T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-13T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-14T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-15T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-16T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-17T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-18T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-19T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-20T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-21T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-22T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-23T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-24T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-25T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-26T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-27T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-28T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-29T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-30T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-31T00:00:00.000Z",
+          "plannedQuantity": 2240.69230769231,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-01T00:00:00.000Z",
+          "plannedQuantity": 2240.6923076922394,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437347-8s3s9vz",
+      "projectId": "proj-1752598261837",
+      "name": "ALIMENTADOR DESNUDO ALUMINIO 15KV ACAR 3F#4/0AWG",
+      "quantity": 3760,
+      "value": 10.2,
+      "startDate": "2025-07-07T09:00:00.000Z",
+      "endDate": "2025-07-11T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-07T00:00:00.000Z",
+          "plannedQuantity": 752,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-08T00:00:00.000Z",
+          "plannedQuantity": 752,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-09T00:00:00.000Z",
+          "plannedQuantity": 752,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-10T00:00:00.000Z",
+          "plannedQuantity": 752,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-11T00:00:00.000Z",
+          "plannedQuantity": 752,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437353-o04ilhd",
+      "projectId": "proj-1752598261837",
+      "name": "ALIMENTADOR DESNUDO ALUMINIO ACAR N#2AWG",
+      "quantity": 62018,
+      "value": 0.8899999999999999,
+      "startDate": "2025-07-07T09:00:00.000Z",
+      "endDate": "2025-08-01T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-07T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-08T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-09T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-10T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-11T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-12T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-13T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-14T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-15T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-16T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-17T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-18T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-19T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-20T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-21T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-22T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-23T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-24T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-25T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-26T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-27T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-28T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-29T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-30T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-31T00:00:00.000Z",
+          "plannedQuantity": 2385.30769230769,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-01T00:00:00.000Z",
+          "plannedQuantity": 2385.307692307768,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437353-odoszkg",
+      "projectId": "proj-1752598261837",
+      "name": "Fin de instalacion de cables de media tension",
+      "quantity": 0,
+      "value": 0,
+      "startDate": "2025-08-01T19:00:00.000Z",
+      "endDate": "2025-08-01T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437353-4a6j6w4",
+      "projectId": "proj-1752598261837",
+      "name": "CAJA PORTAFUSIBLE 3F 27KV INCLUYE FUSIBLE 5 A 100A Y CRUCETA",
+      "quantity": 150,
+      "value": 757.98,
+      "startDate": "2025-08-04T09:00:00.000Z",
+      "endDate": "2025-08-22T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 7.89473684210526,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-05T00:00:00.000Z",
+          "plannedQuantity": 7.89473684210526,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-06T00:00:00.000Z",
+          "plannedQuantity": 7.89473684210526,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-07T00:00:00.000Z",
+          "plannedQuantity": 7.89473684210526,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-08T00:00:00.000Z",
+          "plannedQuantity": 7.89473684210526,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-09T00:00:00.000Z",
+          "plannedQuantity": 7.89473684210526,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-10T00:00:00.000Z",
+          "plannedQuantity": 7.89473684210526,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-11T00:00:00.000Z",
+          "plannedQuantity": 7.89473684210526,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-12T00:00:00.000Z",
+          "plannedQuantity": 7.89473684210526,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-13T00:00:00.000Z",
+          "plannedQuantity": 7.89473684210526,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-14T00:00:00.000Z",
+          "plannedQuantity": 7.89473684210526,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-15T00:00:00.000Z",
+          "plannedQuantity": 7.89473684210526,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-16T00:00:00.000Z",
+          "plannedQuantity": 7.89473684210526,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-17T00:00:00.000Z",
+          "plannedQuantity": 7.89473684210526,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-18T00:00:00.000Z",
+          "plannedQuantity": 7.89473684210526,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-19T00:00:00.000Z",
+          "plannedQuantity": 7.89473684210526,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-20T00:00:00.000Z",
+          "plannedQuantity": 7.89473684210526,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-21T00:00:00.000Z",
+          "plannedQuantity": 7.89473684210526,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-22T00:00:00.000Z",
+          "plannedQuantity": 7.894736842105317,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437353-www5v15",
+      "projectId": "proj-1752598261837",
+      "name": "CAJA PORTAFUSIBLE 3F 27KV INCLUYE FUSIBLE 5 A 100A NO INCLUYE CRUCETA",
+      "quantity": 140,
+      "value": 534.73,
+      "startDate": "2025-08-04T09:00:00.000Z",
+      "endDate": "2025-08-21T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 7.77777777777778,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-05T00:00:00.000Z",
+          "plannedQuantity": 7.77777777777778,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-06T00:00:00.000Z",
+          "plannedQuantity": 7.77777777777778,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-07T00:00:00.000Z",
+          "plannedQuantity": 7.77777777777778,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-08T00:00:00.000Z",
+          "plannedQuantity": 7.77777777777778,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-09T00:00:00.000Z",
+          "plannedQuantity": 7.77777777777778,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-10T00:00:00.000Z",
+          "plannedQuantity": 7.77777777777778,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-11T00:00:00.000Z",
+          "plannedQuantity": 7.77777777777778,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-12T00:00:00.000Z",
+          "plannedQuantity": 7.77777777777778,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-13T00:00:00.000Z",
+          "plannedQuantity": 7.77777777777778,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-14T00:00:00.000Z",
+          "plannedQuantity": 7.77777777777778,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-15T00:00:00.000Z",
+          "plannedQuantity": 7.77777777777778,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-16T00:00:00.000Z",
+          "plannedQuantity": 7.77777777777778,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-17T00:00:00.000Z",
+          "plannedQuantity": 7.77777777777778,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-18T00:00:00.000Z",
+          "plannedQuantity": 7.77777777777778,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-19T00:00:00.000Z",
+          "plannedQuantity": 7.77777777777778,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-20T00:00:00.000Z",
+          "plannedQuantity": 7.77777777777778,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-21T00:00:00.000Z",
+          "plannedQuantity": 7.777777777777715,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437353-fnnqmz6",
+      "projectId": "proj-1752598261837",
+      "name": "SECCIONADOR TIPO CUCHILLA PARA MONTAJE EN POSTE 3F 300A 150KVBIL",
+      "quantity": 5,
+      "value": 1178.79,
+      "startDate": "2025-08-04T09:00:00.000Z",
+      "endDate": "2025-08-04T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 5,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437354-2ql1tkj",
+      "projectId": "proj-1752598261837",
+      "name": "PARARRAYO DE POLIMERO TIPO DISTRIBUCIÓN EN POSTE 3F DE 10 KV NO INCLUYE CRUCETA",
+      "quantity": 290,
+      "value": 272.44,
+      "startDate": "2025-08-04T09:00:00.000Z",
+      "endDate": "2025-09-02T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-05T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-06T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-07T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-08T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-09T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-10T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-11T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-12T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-13T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-14T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-15T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-16T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-17T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-18T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-19T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-20T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-21T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-22T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-23T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-24T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-25T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-26T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-27T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-28T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-29T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-30T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-31T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-01T00:00:00.000Z",
+          "plannedQuantity": 9.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-02T00:00:00.000Z",
+          "plannedQuantity": 9.666666666666686,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437354-0ku8ctd",
+      "projectId": "proj-1752598261837",
+      "name": "DESBROCE DE ZONA CON VEGETACIÓN",
+      "quantity": 62018,
+      "value": 0.15999999999999998,
+      "startDate": "2025-08-04T09:00:00.000Z",
+      "endDate": "2025-09-05T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-05T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-06T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-07T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-08T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-09T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-10T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-11T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-12T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-13T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-14T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-15T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-16T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-17T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-18T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-19T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-20T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-21T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-22T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-23T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-24T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-25T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-26T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-27T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-28T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-29T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-30T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-31T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-01T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-02T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-03T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-04T00:00:00.000Z",
+          "plannedQuantity": 1879.33333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-05T00:00:00.000Z",
+          "plannedQuantity": 1879.333333333474,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437354-l63wwb3",
+      "projectId": "proj-1752598261837",
+      "name": "PUENTE PRIMARIO TRIFÁSICO",
+      "quantity": 220,
+      "value": 108.31,
+      "startDate": "2025-08-04T09:00:00.000Z",
+      "endDate": "2025-08-15T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 18.3333333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-05T00:00:00.000Z",
+          "plannedQuantity": 18.3333333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-06T00:00:00.000Z",
+          "plannedQuantity": 18.3333333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-07T00:00:00.000Z",
+          "plannedQuantity": 18.3333333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-08T00:00:00.000Z",
+          "plannedQuantity": 18.3333333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-09T00:00:00.000Z",
+          "plannedQuantity": 18.3333333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-10T00:00:00.000Z",
+          "plannedQuantity": 18.3333333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-11T00:00:00.000Z",
+          "plannedQuantity": 18.3333333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-12T00:00:00.000Z",
+          "plannedQuantity": 18.3333333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-13T00:00:00.000Z",
+          "plannedQuantity": 18.3333333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-14T00:00:00.000Z",
+          "plannedQuantity": 18.3333333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-15T00:00:00.000Z",
+          "plannedQuantity": 18.333333333333655,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437354-hy3x0r4",
+      "projectId": "proj-1752598261837",
+      "name": "PUENTE NEUTRO",
+      "quantity": 220,
+      "value": 23.96,
+      "startDate": "2025-08-04T09:00:00.000Z",
+      "endDate": "2025-08-29T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-05T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-06T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-07T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-08T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-09T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-10T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-11T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-12T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-13T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-14T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-15T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-16T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-17T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-18T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-19T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-20T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-21T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-22T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-23T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-24T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-25T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-26T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-27T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-28T00:00:00.000Z",
+          "plannedQuantity": 8.46153846153846,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-29T00:00:00.000Z",
+          "plannedQuantity": 8.461538461538623,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437354-dvvplkg",
+      "projectId": "proj-1752598261837",
+      "name": "Fin de protecciones y seccionamiento",
+      "quantity": 0,
+      "value": 0,
+      "startDate": "2025-09-05T19:00:00.000Z",
+      "endDate": "2025-09-05T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437354-iuphlvv",
+      "projectId": "proj-1752598261837",
+      "name": "TRANSFORMADOR CONVENCIONAL 3F 13,8kV/460-266V 30kVA (INCLUYE PROTECTOR AVIFAUNA Y CHICOTE DE CABLE CON AISLAMIENTO)",
+      "quantity": 5,
+      "value": 4374.63,
+      "startDate": "2025-08-04T09:00:00.000Z",
+      "endDate": "2025-08-04T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 5,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437354-f0n2zcg",
+      "projectId": "proj-1752598261837",
+      "name": "TRANSFORMADOR CONVENCIONAL 3F 13,8kV/460-266V 50kVA (INCLUYE PROTECTOR AVIFAUNA Y CHICOTE DE CABLE CON AISLAMIENTO)",
+      "quantity": 59,
+      "value": 4500.45,
+      "startDate": "2025-08-04T09:00:00.000Z",
+      "endDate": "2025-08-11T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-05T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-06T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-07T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-08T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-09T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-10T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-11T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437354-3c9u03p",
+      "projectId": "proj-1752598261837",
+      "name": "TRANSFORMADOR CONVENCIONAL 3F 13,8kV/460-266V 75kVA (INCLUYE PROTECTOR AVIFAUNA Y CHICOTE DE CABLE CON AISLAMIENTO)",
+      "quantity": 72,
+      "value": 5297.22,
+      "startDate": "2025-08-04T09:00:00.000Z",
+      "endDate": "2025-08-15T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 6,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-05T00:00:00.000Z",
+          "plannedQuantity": 6,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-06T00:00:00.000Z",
+          "plannedQuantity": 6,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-07T00:00:00.000Z",
+          "plannedQuantity": 6,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-08T00:00:00.000Z",
+          "plannedQuantity": 6,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-09T00:00:00.000Z",
+          "plannedQuantity": 6,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-10T00:00:00.000Z",
+          "plannedQuantity": 6,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-11T00:00:00.000Z",
+          "plannedQuantity": 6,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-12T00:00:00.000Z",
+          "plannedQuantity": 6,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-13T00:00:00.000Z",
+          "plannedQuantity": 6,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-14T00:00:00.000Z",
+          "plannedQuantity": 6,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-15T00:00:00.000Z",
+          "plannedQuantity": 6,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437354-62wt98d",
+      "projectId": "proj-1752598261837",
+      "name": "TRANSFORMADOR CONVENCIONAL 3F 13,8kV/460-266V 100kVA (INCLUYE PROTECTOR AVIFAUNA Y CHICOTE DE CABLE CON AISLAMIENTO)",
+      "quantity": 78,
+      "value": 7750.25,
+      "startDate": "2025-08-04T09:00:00.000Z",
+      "endDate": "2025-08-15T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-05T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-06T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-07T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-08T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-09T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-10T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-11T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-12T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-13T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-14T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-15T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437354-iu30bgw",
+      "projectId": "proj-1752598261837",
+      "name": "TRANSFORMADOR CONVENCIONAL 3F 13,8kV/460-266V 15kVA (INCLUYE PROTECTOR AVIFAUNA Y CHICOTE DE CABLE CON AISLAMIENTO)",
+      "quantity": 5,
+      "value": 3580.84,
+      "startDate": "2025-08-04T09:00:00.000Z",
+      "endDate": "2025-08-04T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 5,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437354-pllw5rk",
+      "projectId": "proj-1752598261837",
+      "name": "Fin de instalacion de transformadores de distribucion MT-BT",
+      "quantity": 0,
+      "value": 0,
+      "startDate": "2025-08-15T19:00:00.000Z",
+      "endDate": "2025-08-15T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437354-s88d1v9",
+      "projectId": "proj-1752598261837",
+      "name": "POSTE DE HORMIGÓN CIRCULAR DE 10M 400KGF PARA BT",
+      "quantity": 97,
+      "value": 725.23,
+      "startDate": "2025-06-02T09:00:00.000Z",
+      "endDate": "2025-06-06T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-02T00:00:00.000Z",
+          "plannedQuantity": 19.4,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-03T00:00:00.000Z",
+          "plannedQuantity": 19.4,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-04T00:00:00.000Z",
+          "plannedQuantity": 19.4,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-05T00:00:00.000Z",
+          "plannedQuantity": 19.4,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-06T00:00:00.000Z",
+          "plannedQuantity": 19.400000000000006,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437354-moh91nc",
+      "projectId": "proj-1752598261837",
+      "name": "Fin de instalacion de posteria de baja tension",
+      "quantity": 0,
+      "value": 0,
+      "startDate": "2025-06-06T19:00:00.000Z",
+      "endDate": "2025-06-06T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437354-p7n8i2k",
+      "projectId": "proj-1752598261837",
+      "name": "TENSOR TIERRA SIMPLE BT TAD-0TS",
+      "quantity": 157,
+      "value": 79.95,
+      "startDate": "2025-06-09T09:00:00.000Z",
+      "endDate": "2025-06-27T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-09T00:00:00.000Z",
+          "plannedQuantity": 8.26315789473684,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-10T00:00:00.000Z",
+          "plannedQuantity": 8.26315789473684,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-11T00:00:00.000Z",
+          "plannedQuantity": 8.26315789473684,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-12T00:00:00.000Z",
+          "plannedQuantity": 8.26315789473684,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-13T00:00:00.000Z",
+          "plannedQuantity": 8.26315789473684,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-14T00:00:00.000Z",
+          "plannedQuantity": 8.26315789473684,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-15T00:00:00.000Z",
+          "plannedQuantity": 8.26315789473684,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-16T00:00:00.000Z",
+          "plannedQuantity": 8.26315789473684,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-17T00:00:00.000Z",
+          "plannedQuantity": 8.26315789473684,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-18T00:00:00.000Z",
+          "plannedQuantity": 8.26315789473684,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-19T00:00:00.000Z",
+          "plannedQuantity": 8.26315789473684,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-20T00:00:00.000Z",
+          "plannedQuantity": 8.26315789473684,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-21T00:00:00.000Z",
+          "plannedQuantity": 8.26315789473684,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-22T00:00:00.000Z",
+          "plannedQuantity": 8.26315789473684,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-23T00:00:00.000Z",
+          "plannedQuantity": 8.26315789473684,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-24T00:00:00.000Z",
+          "plannedQuantity": 8.26315789473684,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-25T00:00:00.000Z",
+          "plannedQuantity": 8.26315789473684,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-26T00:00:00.000Z",
+          "plannedQuantity": 8.26315789473684,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-27T00:00:00.000Z",
+          "plannedQuantity": 8.263157894736878,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437354-6i85801",
+      "projectId": "proj-1752598261837",
+      "name": "TENSOR FAROL SIMPLE BT TAD-0FS",
+      "quantity": 2,
+      "value": 107.75,
+      "startDate": "2025-06-09T09:00:00.000Z",
+      "endDate": "2025-06-09T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-09T00:00:00.000Z",
+          "plannedQuantity": 2,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437354-by8iuhs",
+      "projectId": "proj-1752598261837",
+      "name": "Fin de instalacion de tensores de baja tension",
+      "quantity": 0,
+      "value": 0,
+      "startDate": "2025-06-27T19:00:00.000Z",
+      "endDate": "2025-06-27T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437354-3rk30vd",
+      "projectId": "proj-1752598261837",
+      "name": "ESTRUCTURA DE 1 VÍA PREENSAMBLADO BT RETENCIÓN O TERMINAL CON 4 CONDUCTORES ESU-1PR4",
+      "quantity": 289,
+      "value": 98.17,
+      "startDate": "2025-06-09T09:00:00.000Z",
+      "endDate": "2025-06-20T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-09T00:00:00.000Z",
+          "plannedQuantity": 24.0833333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-10T00:00:00.000Z",
+          "plannedQuantity": 24.0833333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-11T00:00:00.000Z",
+          "plannedQuantity": 24.0833333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-12T00:00:00.000Z",
+          "plannedQuantity": 24.0833333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-13T00:00:00.000Z",
+          "plannedQuantity": 24.0833333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-14T00:00:00.000Z",
+          "plannedQuantity": 24.0833333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-15T00:00:00.000Z",
+          "plannedQuantity": 24.0833333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-16T00:00:00.000Z",
+          "plannedQuantity": 24.0833333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-17T00:00:00.000Z",
+          "plannedQuantity": 24.0833333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-18T00:00:00.000Z",
+          "plannedQuantity": 24.0833333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-19T00:00:00.000Z",
+          "plannedQuantity": 24.0833333333333,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-20T00:00:00.000Z",
+          "plannedQuantity": 24.083333333333655,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437354-59ww33v",
+      "projectId": "proj-1752598261837",
+      "name": "ESTRUCTURA DE 1 VÍA PREENSAMBLADO BT ANGULAR CON 4 CONDUCTORES ESU-1PA4",
+      "quantity": 129,
+      "value": 30.04,
+      "startDate": "2025-06-09T09:00:00.000Z",
+      "endDate": "2025-06-13T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-09T00:00:00.000Z",
+          "plannedQuantity": 25.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-10T00:00:00.000Z",
+          "plannedQuantity": 25.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-11T00:00:00.000Z",
+          "plannedQuantity": 25.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-12T00:00:00.000Z",
+          "plannedQuantity": 25.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-06-13T00:00:00.000Z",
+          "plannedQuantity": 25.799999999999997,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437354-ldurnda",
+      "projectId": "proj-1752598261837",
+      "name": "Fin de instalacion de estructuras de postes de baja tension",
+      "quantity": 0,
+      "value": 0,
+      "startDate": "2025-06-20T19:00:00.000Z",
+      "endDate": "2025-06-20T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437355-41yx3ef",
+      "projectId": "proj-1752598261837",
+      "name": "ALIMENTADOR PREENSAMBLADO ALUMINIO 3F#2+T#2",
+      "quantity": 5625,
+      "value": 4.09,
+      "startDate": "2025-06-30T09:00:00.000Z",
+      "endDate": "2025-07-11T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-06-30T00:00:00.000Z",
+          "plannedQuantity": 468.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-01T00:00:00.000Z",
+          "plannedQuantity": 468.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-02T00:00:00.000Z",
+          "plannedQuantity": 468.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-03T00:00:00.000Z",
+          "plannedQuantity": 468.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-04T00:00:00.000Z",
+          "plannedQuantity": 468.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-05T00:00:00.000Z",
+          "plannedQuantity": 468.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-06T00:00:00.000Z",
+          "plannedQuantity": 468.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-07T00:00:00.000Z",
+          "plannedQuantity": 468.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-08T00:00:00.000Z",
+          "plannedQuantity": 468.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-09T00:00:00.000Z",
+          "plannedQuantity": 468.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-10T00:00:00.000Z",
+          "plannedQuantity": 468.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-11T00:00:00.000Z",
+          "plannedQuantity": 468.75,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437355-nvr5rgh",
+      "projectId": "proj-1752598261837",
+      "name": "Fin de instalacion de alimentadores de baja tension",
+      "quantity": 0,
+      "value": 0,
+      "startDate": "2025-07-11T19:00:00.000Z",
+      "endDate": "2025-07-11T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437355-zlnnw33",
+      "projectId": "proj-1752598261837",
+      "name": "TABLERO DE 2 AIREADORES DE 6HP A 460V",
+      "quantity": 7,
+      "value": 3551.43,
+      "startDate": "2025-07-14T09:00:00.000Z",
+      "endDate": "2025-07-14T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-14T00:00:00.000Z",
+          "plannedQuantity": 7,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437355-4p7wg0f",
+      "projectId": "proj-1752598261837",
+      "name": "TABLERO DE 3 AIREADORES DE 6HP A 460V",
+      "quantity": 8,
+      "value": 3551.43,
+      "startDate": "2025-07-14T09:00:00.000Z",
+      "endDate": "2025-07-14T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-14T00:00:00.000Z",
+          "plannedQuantity": 8,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437355-dsnoxeo",
+      "projectId": "proj-1752598261837",
+      "name": "TABLERO DE 4 AIREADORES DE 6HP A 460V",
+      "quantity": 14,
+      "value": 3551.43,
+      "startDate": "2025-07-14T09:00:00.000Z",
+      "endDate": "2025-07-14T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-14T00:00:00.000Z",
+          "plannedQuantity": 14,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437355-7rv3diq",
+      "projectId": "proj-1752598261837",
+      "name": "TABLERO DE 5 AIREADORES DE 6HP A 460V",
+      "quantity": 49,
+      "value": 3422.91,
+      "startDate": "2025-07-14T09:00:00.000Z",
+      "endDate": "2025-07-18T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-14T00:00:00.000Z",
+          "plannedQuantity": 9.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-15T00:00:00.000Z",
+          "plannedQuantity": 9.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-16T00:00:00.000Z",
+          "plannedQuantity": 9.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-17T00:00:00.000Z",
+          "plannedQuantity": 9.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-18T00:00:00.000Z",
+          "plannedQuantity": 9.799999999999997,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437355-u0qqup6",
+      "projectId": "proj-1752598261837",
+      "name": "TABLERO DE 6 AIREADORES DE 6HP A 460V",
+      "quantity": 92,
+      "value": 3592.36,
+      "startDate": "2025-07-14T09:00:00.000Z",
+      "endDate": "2025-07-24T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-14T00:00:00.000Z",
+          "plannedQuantity": 8.36363636363636,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-15T00:00:00.000Z",
+          "plannedQuantity": 8.36363636363636,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-16T00:00:00.000Z",
+          "plannedQuantity": 8.36363636363636,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-17T00:00:00.000Z",
+          "plannedQuantity": 8.36363636363636,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-18T00:00:00.000Z",
+          "plannedQuantity": 8.36363636363636,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-19T00:00:00.000Z",
+          "plannedQuantity": 8.36363636363636,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-20T00:00:00.000Z",
+          "plannedQuantity": 8.36363636363636,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-21T00:00:00.000Z",
+          "plannedQuantity": 8.36363636363636,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-22T00:00:00.000Z",
+          "plannedQuantity": 8.36363636363636,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-23T00:00:00.000Z",
+          "plannedQuantity": 8.36363636363636,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-24T00:00:00.000Z",
+          "plannedQuantity": 8.363636363636402,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437355-04e4eba",
+      "projectId": "proj-1752598261837",
+      "name": "TABLERO DE 7 AIREADORES DE 6HP A 460V",
+      "quantity": 115,
+      "value": 3712.29,
+      "startDate": "2025-07-14T09:00:00.000Z",
+      "endDate": "2025-07-28T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-14T00:00:00.000Z",
+          "plannedQuantity": 7.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-15T00:00:00.000Z",
+          "plannedQuantity": 7.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-16T00:00:00.000Z",
+          "plannedQuantity": 7.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-17T00:00:00.000Z",
+          "plannedQuantity": 7.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-18T00:00:00.000Z",
+          "plannedQuantity": 7.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-19T00:00:00.000Z",
+          "plannedQuantity": 7.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-20T00:00:00.000Z",
+          "plannedQuantity": 7.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-21T00:00:00.000Z",
+          "plannedQuantity": 7.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-22T00:00:00.000Z",
+          "plannedQuantity": 7.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-23T00:00:00.000Z",
+          "plannedQuantity": 7.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-24T00:00:00.000Z",
+          "plannedQuantity": 7.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-25T00:00:00.000Z",
+          "plannedQuantity": 7.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-26T00:00:00.000Z",
+          "plannedQuantity": 7.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-27T00:00:00.000Z",
+          "plannedQuantity": 7.66666666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-28T00:00:00.000Z",
+          "plannedQuantity": 7.666666666666615,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437355-0m1j6mv",
+      "projectId": "proj-1752598261837",
+      "name": "TABLERO DE 8 AIREADORES DE 6HP A 460V",
+      "quantity": 51,
+      "value": 3897.38,
+      "startDate": "2025-07-14T09:00:00.000Z",
+      "endDate": "2025-07-18T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-14T00:00:00.000Z",
+          "plannedQuantity": 10.2,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-15T00:00:00.000Z",
+          "plannedQuantity": 10.2,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-16T00:00:00.000Z",
+          "plannedQuantity": 10.2,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-17T00:00:00.000Z",
+          "plannedQuantity": 10.2,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-18T00:00:00.000Z",
+          "plannedQuantity": 10.200000000000003,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437355-qbybeed",
+      "projectId": "proj-1752598261837",
+      "name": "Fin de instalacion de tableros de distribucion",
+      "quantity": 0,
+      "value": 0,
+      "startDate": "2025-07-28T19:00:00.000Z",
+      "endDate": "2025-07-28T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437355-luuadkc",
+      "projectId": "proj-1752598261837",
+      "name": "TABLERO DE COMPENSACIÓN Y PROTECCIÓN DE LÍNEA 3F 460-266V 15KVAR 1 PASOS",
+      "quantity": 59,
+      "value": 2932.96,
+      "startDate": "2025-07-14T09:00:00.000Z",
+      "endDate": "2025-07-21T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-14T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-15T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-16T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-17T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-18T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-19T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-20T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-21T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437355-sdtvmcd",
+      "projectId": "proj-1752598261837",
+      "name": "TABLERO DE COMPENSACIÓN Y PROTECCIÓN DE LÍNEA 3F 460-266V 25KVAR 2 PASOS",
+      "quantity": 72,
+      "value": 2912.3500000000004,
+      "startDate": "2025-07-14T09:00:00.000Z",
+      "endDate": "2025-07-22T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-14T00:00:00.000Z",
+          "plannedQuantity": 8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-15T00:00:00.000Z",
+          "plannedQuantity": 8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-16T00:00:00.000Z",
+          "plannedQuantity": 8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-17T00:00:00.000Z",
+          "plannedQuantity": 8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-18T00:00:00.000Z",
+          "plannedQuantity": 8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-19T00:00:00.000Z",
+          "plannedQuantity": 8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-20T00:00:00.000Z",
+          "plannedQuantity": 8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-21T00:00:00.000Z",
+          "plannedQuantity": 8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-22T00:00:00.000Z",
+          "plannedQuantity": 8,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437355-z0q8z75",
+      "projectId": "proj-1752598261837",
+      "name": "TABLERO DE COMPENSACIÓN Y PROTECCIÓN DE LÍNEA 3F 460-266V 35KVAR 3 PASOS",
+      "quantity": 78,
+      "value": 3216.6400000000003,
+      "startDate": "2025-07-14T09:00:00.000Z",
+      "endDate": "2025-07-23T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-14T00:00:00.000Z",
+          "plannedQuantity": 7.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-15T00:00:00.000Z",
+          "plannedQuantity": 7.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-16T00:00:00.000Z",
+          "plannedQuantity": 7.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-17T00:00:00.000Z",
+          "plannedQuantity": 7.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-18T00:00:00.000Z",
+          "plannedQuantity": 7.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-19T00:00:00.000Z",
+          "plannedQuantity": 7.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-20T00:00:00.000Z",
+          "plannedQuantity": 7.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-21T00:00:00.000Z",
+          "plannedQuantity": 7.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-22T00:00:00.000Z",
+          "plannedQuantity": 7.8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-23T00:00:00.000Z",
+          "plannedQuantity": 7.800000000000011,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437355-ak1unda",
+      "projectId": "proj-1752598261837",
+      "name": "Fin de instalacion de tableros de compesacion reactiva y proteccion de linea",
+      "quantity": 0,
+      "value": 0,
+      "startDate": "2025-07-23T19:00:00.000Z",
+      "endDate": "2025-07-23T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437355-82t0q4a",
+      "projectId": "proj-1752598261837",
+      "name": "CAJA DE PASO DE HORMIGÓN 50X50X50CM INCLUYE VARILLA PUESTA A TIERRA Y BARRA DE DISTRIBUCIÓN",
+      "quantity": 336,
+      "value": 287.52,
+      "startDate": "2025-07-14T09:00:00.000Z",
+      "endDate": "2025-08-01T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-14T00:00:00.000Z",
+          "plannedQuantity": 17.6842105263158,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-15T00:00:00.000Z",
+          "plannedQuantity": 17.6842105263158,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-16T00:00:00.000Z",
+          "plannedQuantity": 17.6842105263158,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-17T00:00:00.000Z",
+          "plannedQuantity": 17.6842105263158,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-18T00:00:00.000Z",
+          "plannedQuantity": 17.6842105263158,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-19T00:00:00.000Z",
+          "plannedQuantity": 17.6842105263158,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-20T00:00:00.000Z",
+          "plannedQuantity": 17.6842105263158,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-21T00:00:00.000Z",
+          "plannedQuantity": 17.6842105263158,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-22T00:00:00.000Z",
+          "plannedQuantity": 17.6842105263158,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-23T00:00:00.000Z",
+          "plannedQuantity": 17.6842105263158,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-24T00:00:00.000Z",
+          "plannedQuantity": 17.6842105263158,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-25T00:00:00.000Z",
+          "plannedQuantity": 17.6842105263158,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-26T00:00:00.000Z",
+          "plannedQuantity": 17.6842105263158,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-27T00:00:00.000Z",
+          "plannedQuantity": 17.6842105263158,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-28T00:00:00.000Z",
+          "plannedQuantity": 17.6842105263158,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-29T00:00:00.000Z",
+          "plannedQuantity": 17.6842105263158,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-30T00:00:00.000Z",
+          "plannedQuantity": 17.6842105263158,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-31T00:00:00.000Z",
+          "plannedQuantity": 17.6842105263158,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-01T00:00:00.000Z",
+          "plannedQuantity": 17.68421052631561,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437355-ys2pp4v",
+      "projectId": "proj-1752598261837",
+      "name": "PUNTO DE PUESTA A TIERRA CON CABLE DESNUDO #4AWG PARA TABLEROS",
+      "quantity": 545,
+      "value": 47.839999999999996,
+      "startDate": "2025-08-04T09:00:00.000Z",
+      "endDate": "2025-08-15T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 45.4166666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-05T00:00:00.000Z",
+          "plannedQuantity": 45.4166666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-06T00:00:00.000Z",
+          "plannedQuantity": 45.4166666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-07T00:00:00.000Z",
+          "plannedQuantity": 45.4166666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-08T00:00:00.000Z",
+          "plannedQuantity": 45.4166666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-09T00:00:00.000Z",
+          "plannedQuantity": 45.4166666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-10T00:00:00.000Z",
+          "plannedQuantity": 45.4166666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-11T00:00:00.000Z",
+          "plannedQuantity": 45.4166666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-12T00:00:00.000Z",
+          "plannedQuantity": 45.4166666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-13T00:00:00.000Z",
+          "plannedQuantity": 45.4166666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-14T00:00:00.000Z",
+          "plannedQuantity": 45.4166666666667,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-15T00:00:00.000Z",
+          "plannedQuantity": 45.4166666666664,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437355-u6od1mt",
+      "projectId": "proj-1752598261837",
+      "name": "ATERRIZAMIENTO DE PARARRAYOS(#2 AWG), TRANSFORMADOR(#4 AWG) Y NEUTRO DE MEDIA TENSION(#4 AWG)",
+      "quantity": 209,
+      "value": 336.41,
+      "startDate": "2025-08-04T09:00:00.000Z",
+      "endDate": "2025-08-22T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 11,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-05T00:00:00.000Z",
+          "plannedQuantity": 11,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-06T00:00:00.000Z",
+          "plannedQuantity": 11,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-07T00:00:00.000Z",
+          "plannedQuantity": 11,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-08T00:00:00.000Z",
+          "plannedQuantity": 11,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-09T00:00:00.000Z",
+          "plannedQuantity": 11,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-10T00:00:00.000Z",
+          "plannedQuantity": 11,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-11T00:00:00.000Z",
+          "plannedQuantity": 11,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-12T00:00:00.000Z",
+          "plannedQuantity": 11,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-13T00:00:00.000Z",
+          "plannedQuantity": 11,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-14T00:00:00.000Z",
+          "plannedQuantity": 11,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-15T00:00:00.000Z",
+          "plannedQuantity": 11,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-16T00:00:00.000Z",
+          "plannedQuantity": 11,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-17T00:00:00.000Z",
+          "plannedQuantity": 11,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-18T00:00:00.000Z",
+          "plannedQuantity": 11,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-19T00:00:00.000Z",
+          "plannedQuantity": 11,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-20T00:00:00.000Z",
+          "plannedQuantity": 11,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-21T00:00:00.000Z",
+          "plannedQuantity": 11,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-22T00:00:00.000Z",
+          "plannedQuantity": 11,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437355-nj5ktd2",
+      "projectId": "proj-1752598261837",
+      "name": "ATERRIZAMIENTO PARA PARARRAYOS #2AWG DESNUDOS DE COBRE",
+      "quantity": 81,
+      "value": 206.98999999999998,
+      "startDate": "2025-08-04T09:00:00.000Z",
+      "endDate": "2025-08-15T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 6.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-05T00:00:00.000Z",
+          "plannedQuantity": 6.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-06T00:00:00.000Z",
+          "plannedQuantity": 6.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-07T00:00:00.000Z",
+          "plannedQuantity": 6.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-08T00:00:00.000Z",
+          "plannedQuantity": 6.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-09T00:00:00.000Z",
+          "plannedQuantity": 6.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-10T00:00:00.000Z",
+          "plannedQuantity": 6.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-11T00:00:00.000Z",
+          "plannedQuantity": 6.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-12T00:00:00.000Z",
+          "plannedQuantity": 6.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-13T00:00:00.000Z",
+          "plannedQuantity": 6.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-14T00:00:00.000Z",
+          "plannedQuantity": 6.75,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-15T00:00:00.000Z",
+          "plannedQuantity": 6.75,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437355-wol1ytv",
+      "projectId": "proj-1752598261837",
+      "name": "Fin de aterrizamiento de tableros",
+      "quantity": 0,
+      "value": 0,
+      "startDate": "2025-08-22T19:00:00.000Z",
+      "endDate": "2025-08-22T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437356-7pmyixz",
+      "projectId": "proj-1752598261837",
+      "name": "ALIMENTADOR 4X8 AWG PARA TABLEROS DE AIREACIÓN - TA",
+      "quantity": 170,
+      "value": 246.17999999999998,
+      "startDate": "2025-07-24T09:00:00.000Z",
+      "endDate": "2025-08-15T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-24T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-25T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-26T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-27T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-28T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-29T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-30T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-31T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-01T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-02T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-03T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-05T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-06T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-07T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-08T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-09T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-10T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-11T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-12T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-13T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-14T00:00:00.000Z",
+          "plannedQuantity": 7.39130434782609,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-15T00:00:00.000Z",
+          "plannedQuantity": 7.3913043478259794,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437356-vr3tyl3",
+      "projectId": "proj-1752598261837",
+      "name": "ALIMENTADOR 3X1/0 AWG PARA TABLEROS DE COMPENSACION Y  PROTECCIÓN - TRANSFORMADORES DE 100KVA",
+      "quantity": 78,
+      "value": 1125.53,
+      "startDate": "2025-07-24T09:00:00.000Z",
+      "endDate": "2025-08-04T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-24T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-25T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-26T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-27T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-28T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-29T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-30T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-31T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-01T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-02T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-03T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 6.5,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437356-hy0s1fl",
+      "projectId": "proj-1752598261837",
+      "name": "ALIMENTADOR 3X4 AWG PARA TABLERO DE COMPENSACION Y PROTECCION - TRANSFORMADORES DE 50KVA",
+      "quantity": 59,
+      "value": 654.15,
+      "startDate": "2025-07-24T09:00:00.000Z",
+      "endDate": "2025-07-31T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-24T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-25T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-26T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-27T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-28T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-29T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-30T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-31T00:00:00.000Z",
+          "plannedQuantity": 7.375,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437356-ywhbwx9",
+      "projectId": "proj-1752598261837",
+      "name": "ALIMENTADOR 3X2 AWG PARA TABLEROS DE COMPENSACION Y  PROTECCIÓN - TRANSFORMADORES DE 75KVA",
+      "quantity": 72,
+      "value": 842.25,
+      "startDate": "2025-07-24T09:00:00.000Z",
+      "endDate": "2025-08-01T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-24T00:00:00.000Z",
+          "plannedQuantity": 8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-25T00:00:00.000Z",
+          "plannedQuantity": 8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-26T00:00:00.000Z",
+          "plannedQuantity": 8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-27T00:00:00.000Z",
+          "plannedQuantity": 8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-28T00:00:00.000Z",
+          "plannedQuantity": 8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-29T00:00:00.000Z",
+          "plannedQuantity": 8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-30T00:00:00.000Z",
+          "plannedQuantity": 8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-31T00:00:00.000Z",
+          "plannedQuantity": 8,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-01T00:00:00.000Z",
+          "plannedQuantity": 8,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437356-7mi1s9l",
+      "projectId": "proj-1752598261837",
+      "name": "ALIMENTADOR 4X6 AWG PARA TABLEROS DE AIREACION",
+      "quantity": 166,
+      "value": 301.13,
+      "startDate": "2025-07-24T09:00:00.000Z",
+      "endDate": "2025-08-15T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-24T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-25T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-26T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-27T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-28T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-29T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-30T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-31T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-01T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-02T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-03T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-05T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-06T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-07T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-08T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-09T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-10T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-11T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-12T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-13T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-14T00:00:00.000Z",
+          "plannedQuantity": 7.21739130434783,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-15T00:00:00.000Z",
+          "plannedQuantity": 7.2173913043477,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437356-ykxhlha",
+      "projectId": "proj-1752598261837",
+      "name": "Fin de alimentadores para TA, PL Y TCR",
+      "quantity": 0,
+      "value": 0,
+      "startDate": "2025-08-15T19:00:00.000Z",
+      "endDate": "2025-08-15T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437356-9p88kzz",
+      "projectId": "proj-1752598261837",
+      "name": "PUNTO DE COMUNICACIÓN ENTRE TA Y TCP (SEÑAL RG) CON CABLE CONCENTRICO 2X16AWG",
+      "quantity": 545,
+      "value": 18.46,
+      "startDate": "2025-07-29T09:00:00.000Z",
+      "endDate": "2025-08-11T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-29T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-30T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-31T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-01T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-02T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-03T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-05T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-06T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-07T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-08T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-09T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-10T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-11T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285719,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437356-nzuj4s9",
+      "projectId": "proj-1752598261837",
+      "name": "PUNTO DE COMUNICACIÓN ENTRE TA Y TCP (SEÑAL MODBUS) CON CABLE CONCENTRICO APANTALLADO 3X16 AWG",
+      "quantity": 545,
+      "value": 29.01,
+      "startDate": "2025-07-29T09:00:00.000Z",
+      "endDate": "2025-08-11T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-29T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-30T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-31T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-01T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-02T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-03T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-05T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-06T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-07T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-08T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-09T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-10T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-11T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285719,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437356-uiqfhsf",
+      "projectId": "proj-1752598261837",
+      "name": "Fin de comunicación entre TCP y TA",
+      "quantity": 0,
+      "value": 0,
+      "startDate": "2025-08-11T19:00:00.000Z",
+      "endDate": "2025-08-11T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437356-v30s1il",
+      "projectId": "proj-1752598261837",
+      "name": "CABLE SUMERGIBLE 4G2,5 mm2",
+      "quantity": 316323,
+      "value": 2.97,
+      "startDate": "2025-08-26T09:00:00.000Z",
+      "endDate": "2025-09-22T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-08-26T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-27T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-28T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-29T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-30T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-31T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-01T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-02T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-03T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-04T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-05T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-06T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-07T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-08T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-09T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-10T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-11T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-12T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-13T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-14T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-15T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-16T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-17T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-18T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-19T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-20T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-21T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-22T00:00:00.000Z",
+          "plannedQuantity": 11297.25,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437356-dhbeo8i",
+      "projectId": "proj-1752598261837",
+      "name": "PUNTO DE AIREADOR 3F 460-266V 6HP",
+      "quantity": 2104,
+      "value": 64.77,
+      "startDate": "2025-09-23T09:00:00.000Z",
+      "endDate": "2025-10-06T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-09-23T00:00:00.000Z",
+          "plannedQuantity": 150.285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-24T00:00:00.000Z",
+          "plannedQuantity": 150.285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-25T00:00:00.000Z",
+          "plannedQuantity": 150.285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-26T00:00:00.000Z",
+          "plannedQuantity": 150.285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-27T00:00:00.000Z",
+          "plannedQuantity": 150.285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-28T00:00:00.000Z",
+          "plannedQuantity": 150.285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-29T00:00:00.000Z",
+          "plannedQuantity": 150.285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-09-30T00:00:00.000Z",
+          "plannedQuantity": 150.285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-10-01T00:00:00.000Z",
+          "plannedQuantity": 150.285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-10-02T00:00:00.000Z",
+          "plannedQuantity": 150.285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-10-03T00:00:00.000Z",
+          "plannedQuantity": 150.285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-10-04T00:00:00.000Z",
+          "plannedQuantity": 150.285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-10-05T00:00:00.000Z",
+          "plannedQuantity": 150.285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-10-06T00:00:00.000Z",
+          "plannedQuantity": 150.2857142857181,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437356-y7vcjrr",
+      "projectId": "proj-1752598261837",
+      "name": "Fin de instalacion de alimentador de equipos de aireacion",
+      "quantity": 0,
+      "value": 0,
+      "startDate": "2025-10-06T19:00:00.000Z",
+      "endDate": "2025-10-06T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437356-82yi0ow",
+      "projectId": "proj-1752598261837",
+      "name": "INSTALACIÓN DE AIREADOR DE 6HP 460V",
+      "quantity": 2104,
+      "value": 31.279999999999998,
+      "startDate": "2025-07-29T09:00:00.000Z",
+      "endDate": "2025-08-25T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-29T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-30T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-31T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-01T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-02T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-03T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-05T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-06T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-07T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-08T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-09T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-10T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-11T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-12T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-13T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-14T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-15T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-16T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-17T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-18T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-19T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-20T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-21T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-22T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-23T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-24T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-25T00:00:00.000Z",
+          "plannedQuantity": 75.14285714285825,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437357-hb2l3ly",
+      "projectId": "proj-1752598261837",
+      "name": "ESTACADO Y FIJACIÓN DE AIREADORES",
+      "quantity": 2104,
+      "value": 61.89,
+      "startDate": "2025-07-29T09:00:00.000Z",
+      "endDate": "2025-08-25T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-07-29T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-30T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-07-31T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-01T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-02T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-03T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-04T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-05T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-06T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-07T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-08T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-09T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-10T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-11T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-12T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-13T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-14T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-15T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-16T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-17T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-18T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-19T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-20T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-21T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-22T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-23T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-24T00:00:00.000Z",
+          "plannedQuantity": 75.1428571428571,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-08-25T00:00:00.000Z",
+          "plannedQuantity": 75.14285714285825,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437357-2kex5b4",
+      "projectId": "proj-1752598261837",
+      "name": "Fin de instalacion de aireadores tipo paleta trifasicos",
+      "quantity": 0,
+      "value": 0,
+      "startDate": "2025-08-25T19:00:00.000Z",
+      "endDate": "2025-08-25T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437357-d3ef3m5",
+      "projectId": "proj-1752598261837",
+      "name": "COMISIONADO Y PUESTA EN MARCHA DE TABLEROS DE AIREADORES TA Y TABLEROS DE COMPENSACIÓN PRINCIPAL TCP",
+      "quantity": 545,
+      "value": 150.64000000000001,
+      "startDate": "2025-10-07T09:00:00.000Z",
+      "endDate": "2025-10-20T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [
+        {
+          "date": "2025-10-07T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-10-08T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-10-09T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-10-10T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-10-11T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-10-12T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-10-13T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-10-14T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-10-15T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-10-16T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-10-17T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-10-18T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-10-19T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285714,
+          "consumedQuantity": 0
+        },
+        {
+          "date": "2025-10-20T00:00:00.000Z",
+          "plannedQuantity": 38.9285714285719,
+          "consumedQuantity": 0
+        }
+      ],
+      "consumedQuantity": 0,
+      "validations": []
+    },
+    {
+      "id": "task-1752598437357-epgmyle",
+      "projectId": "proj-1752598261837",
+      "name": "Fin de comisionado de tableros de aireadores",
+      "quantity": 0,
+      "value": 0,
+      "startDate": "2025-10-20T19:00:00.000Z",
+      "endDate": "2025-10-20T19:00:00.000Z",
+      "status": "pendiente",
+      "dailyConsumption": [],
+      "consumedQuantity": 0,
+      "validations": []
+    }
+  ]
 }
