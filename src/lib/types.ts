@@ -17,6 +17,8 @@ export type Project = {
   name: string;
   company: string;
   externalCompanyId?: number;
+  client?: string;
+  externalClientId?: number;
   totalValue: number;
   consumedValue: number;
   taskCount: number;

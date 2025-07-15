@@ -68,6 +68,7 @@ const ExternalProjectSchema = z.object({
     id: z.number(),
     name: z.string(),
     company_id: z.tuple([z.number(), z.string()]),
+    partner_id: z.union([z.tuple([z.number(), z.string()]), z.literal(false)]),
 });
 
 const ApiResponseSchema = z.object({
@@ -112,7 +113,7 @@ export async function syncProjectsFromEndpoint(jsonData: any) {
 
   if (!parsedData.success) {
     console.error('Zod validation error:', parsedData.error.flatten());
-    throw new Error('Sincronización cancelada: no cumple con el formato solicitado.');
+    throw new Error('Sincronización cancelada: los datos no cumplen con el formato solicitado.');
   }
 
   const externalProjects = parsedData.data?.['project.project'];
@@ -130,12 +131,15 @@ export async function syncProjectsFromEndpoint(jsonData: any) {
     externalProjectIds.add(projectId);
 
     const existingProjectIndex = db.projects.findIndex(p => p.id === projectId);
+    
+    const clientData = extProj.partner_id ? { client: extProj.partner_id[1], externalClientId: extProj.partner_id[0] } : { client: '', externalClientId: undefined };
 
     const projectData: Partial<Project> = {
         name: extProj.name,
         company: extProj.company_id[1],
         externalId: extProj.id,
         externalCompanyId: extProj.company_id[0],
+        ...clientData
     };
 
     if (existingProjectIndex > -1) {
@@ -146,9 +150,13 @@ export async function syncProjectsFromEndpoint(jsonData: any) {
         };
     } else {
         // Add new project
-        const newProject = {
+        const newProject: Omit<Project, 'totalValue' | 'taskCount' | 'completedTasks' | 'consumedValue'> = {
             id: projectId,
-            ...projectData
+            name: extProj.name,
+            company: extProj.company_id[1],
+            externalId: extProj.id,
+            externalCompanyId: extProj.company_id[0],
+            ...clientData
         };
         db.projects.push(newProject as Project);
     }
@@ -228,15 +236,14 @@ export async function createProject(formData: FormData) {
     });
 
     if (!validatedFields.success) {
-        console.error(validatedFields.error.flatten().fieldErrors);
-        throw new Error('Datos del proyecto inválidos.');
+        throw new Error(validatedFields.error.flatten().fieldErrors.name?.[0] || validatedFields.error.flatten().fieldErrors.company?.[0] || 'Datos del proyecto inválidos.');
     }
 
     const { name, company } = validatedFields.data;
     
     const db = await readDb();
 
-    const newProject: Omit<Project, 'totalValue' | 'taskCount' | 'completedTasks' | 'consumedValue' | 'externalId' | 'externalCompanyId'> = {
+    const newProject: Omit<Project, 'totalValue' | 'taskCount' | 'completedTasks' | 'consumedValue'> = {
         id: `proj-${Date.now()}`,
         name,
         company,
@@ -247,6 +254,7 @@ export async function createProject(formData: FormData) {
 
     revalidatePath('/dashboard');
     revalidatePath('/');
+    return { success: true };
 }
 
 export async function updateProject(formData: FormData) {
@@ -257,8 +265,7 @@ export async function updateProject(formData: FormData) {
     });
 
     if (!validatedFields.success || !validatedFields.data.id) {
-        console.error(validatedFields.error?.flatten().fieldErrors);
-        throw new Error('Datos del proyecto inválidos para actualizar.');
+         throw new Error(validatedFields.error?.flatten().fieldErrors.name?.[0] || validatedFields.error?.flatten().fieldErrors.company?.[0] || 'Datos del proyecto inválidos para actualizar.');
     }
     
     const { id, name, company } = validatedFields.data;
@@ -279,6 +286,7 @@ export async function updateProject(formData: FormData) {
 
     revalidatePath('/dashboard');
     revalidatePath(`/projects/${id}`);
+    return { success: true };
 }
 
 export async function deleteProject(projectId: string) {
@@ -291,6 +299,7 @@ export async function deleteProject(projectId: string) {
 
     revalidatePath('/dashboard');
     revalidatePath(`/projects`);
+    return { success: true };
 }
 
 export async function deleteMultipleProjects(projectIds: string[]) {
@@ -308,6 +317,7 @@ export async function deleteMultipleProjects(projectIds: string[]) {
 
     revalidatePath('/dashboard');
     revalidatePath(`/projects`);
+    return { success: true };
 }
 
 export async function createTask(projectId: string, formData: FormData) {
@@ -320,7 +330,6 @@ export async function createTask(projectId: string, formData: FormData) {
   });
 
   if (!validatedFields.success) {
-    console.error(validatedFields.error.flatten().fieldErrors);
     throw new Error('Datos de la tarea inválidos.');
   }
 
@@ -355,6 +364,7 @@ export async function createTask(projectId: string, formData: FormData) {
 
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/dashboard`);
+  return { success: true };
 }
 
 export async function deleteTask(taskId: string, projectId: string) {
@@ -363,6 +373,7 @@ export async function deleteTask(taskId: string, projectId: string) {
     await writeDb(db);
     revalidatePath(`/projects/${projectId}`);
     revalidatePath(`/dashboard`);
+    return { success: true };
 }
 
 export async function deleteMultipleTasks(taskIds: string[], projectId: string) {
@@ -379,6 +390,7 @@ export async function deleteMultipleTasks(taskIds: string[], projectId: string) 
 
     revalidatePath(`/projects/${projectId}`);
     revalidatePath(`/dashboard`);
+    return { success: true };
 }
 
 export async function updateTaskConsumption(taskId: string, date: string, consumedQuantity: number) {
@@ -480,11 +492,6 @@ export async function validateTask(formData: FormData) {
     await writeDb(db);
 
     revalidatePath(`/projects/${projectId}`);
-}
-
-export async function getSettings(): Promise<AppConfig> {
-  const config = await getAppConfig();
-  return config;
 }
 
 export async function importTasksFromXML(projectId: string, formData: FormData) {
@@ -612,4 +619,5 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
 
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/dashboard`);
+  return { success: true };
 }

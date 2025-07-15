@@ -77,6 +77,25 @@ export default function ProjectList({ projects, view, onSuccess }: ProjectListPr
             )
         },
         {
+            accessorKey: "client",
+            header: "Cliente",
+            cell: ({ row }) => {
+              const client = row.original.client;
+              return (
+                <div className="flex items-center text-sm text-muted-foreground gap-1.5">
+                  {client ? (
+                    <>
+                      <User className="h-4 w-4 flex-shrink-0" />
+                      <p className="line-clamp-1">{client}</p>
+                    </>
+                  ) : (
+                    <span className="text-muted-foreground/60">-</span>
+                  )}
+                </div>
+              );
+            },
+        },
+        {
             header: "Progreso",
             cell: ({ row }) => {
                 const project = row.original;
@@ -237,7 +256,9 @@ export default function ProjectList({ projects, view, onSuccess }: ProjectListPr
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id} onClick={(e) => {
                             if (cell.column.id !== 'select') {
-                                e.stopPropagation();
+                                // Allow row selection by clicking on cells
+                            } else {
+                              e.stopPropagation();
                             }
                         }}>
                           {flexRender(

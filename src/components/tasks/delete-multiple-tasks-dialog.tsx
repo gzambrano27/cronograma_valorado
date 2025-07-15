@@ -48,13 +48,15 @@ export function DeleteMultipleTasksDialog({
 
     startTransition(async () => {
       try {
-        await deleteMultipleTasks(taskIds, projectId);
-        toast({
-          title: "Tareas Eliminadas",
-          description: "Las tareas seleccionadas han sido eliminadas.",
-        });
-        onOpenChange(false);
-        onSuccess();
+        const result = await deleteMultipleTasks(taskIds, projectId);
+        if (result?.success) {
+          toast({
+            title: "Tareas Eliminadas",
+            description: "Las tareas seleccionadas han sido eliminadas.",
+          });
+          onOpenChange(false);
+          onSuccess();
+        }
       } catch (error) {
         toast({
           variant: "destructive",

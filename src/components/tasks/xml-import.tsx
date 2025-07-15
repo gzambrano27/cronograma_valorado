@@ -19,12 +19,14 @@ export function XmlImport({ projectId, onSuccess }: { projectId: string, onSucce
            startTransition(async () => {
                 const formData = new FormData(formRef.current!);
                 try {
-                    await importTasksFromXML(projectId, formData);
-                    toast({
-                        title: "Importación Exitosa",
-                        description: "Las tareas del archivo XML han sido importadas.",
-                    });
-                    onSuccess();
+                    const result = await importTasksFromXML(projectId, formData);
+                    if (result?.success) {
+                        toast({
+                            title: "Importación Exitosa",
+                            description: "Las tareas del archivo XML han sido importadas.",
+                        });
+                        onSuccess();
+                    }
                 } catch (error: any) {
                     toast({
                         variant: "destructive",

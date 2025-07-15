@@ -14,7 +14,6 @@ import { Button } from "../ui/button";
 import { deleteProject } from "@/lib/actions";
 import { useTransition } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
 
 interface DeleteProjectDialogProps {
   projectId: string;
@@ -31,19 +30,19 @@ export function DeleteProjectDialog({
 }: DeleteProjectDialogProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
-  const router = useRouter();
 
   const handleDelete = async () => {
     startTransition(async () => {
       try {
-        await deleteProject(projectId);
-        toast({
-          title: "Proyecto Eliminado",
-          description: "El proyecto ha sido eliminado exitosamente.",
-        });
-        onOpenChange(false);
-        onSuccess(); // Refresh the list
-        router.push('/dashboard');
+        const result = await deleteProject(projectId);
+        if (result?.success) {
+          toast({
+            title: "Proyecto Eliminado",
+            description: "El proyecto ha sido eliminado exitosamente.",
+          });
+          onOpenChange(false);
+          onSuccess();
+        }
       } catch (error) {
         toast({
           variant: "destructive",

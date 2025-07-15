@@ -36,13 +36,15 @@ export function DeleteTaskDialog({
   const handleDelete = async () => {
     startTransition(async () => {
       try {
-        await deleteTask(taskId, projectId);
-        toast({
-          title: "Tarea Eliminada",
-          description: "La tarea ha sido eliminada exitosamente del proyecto.",
-        });
-        onOpenChange(false);
-        onSuccess();
+        const result = await deleteTask(taskId, projectId);
+        if (result?.success) {
+          toast({
+            title: "Tarea Eliminada",
+            description: "La tarea ha sido eliminada exitosamente del proyecto.",
+          });
+          onOpenChange(false);
+          onSuccess();
+        }
       } catch (error) {
         toast({
           variant: "destructive",

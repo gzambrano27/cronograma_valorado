@@ -19,9 +19,9 @@ import { Calendar } from "../ui/calendar"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import React, { useEffect, useRef, useActionState } from "react"
+import React, { useEffect, useRef } from "react"
 import { useToast } from "@/hooks/use-toast"
-import { useFormStatus } from "react-dom"
+import { useFormStatus, useFormState } from "react-dom"
 import { createTask } from "@/lib/actions"
 
 function SubmitButton() {
@@ -41,39 +41,38 @@ export function AddTaskSheet({ projectId, onSuccess }: { projectId: string, onSu
   const [startDate, setStartDate] = React.useState<Date>()
   const [endDate, setEndDate] = React.useState<Date>()
 
-  const createTaskWithProps = createTask.bind(null, projectId, onSuccess);
+  const createTaskWithSuccess = async (formData: FormData) => {
+    try {
+        const result = await createTask(projectId, formData);
+        if (result?.success) {
+            toast({
+                title: "Tarea Creada",
+                description: "La nueva tarea ha sido añadida al cronograma.",
+            });
+            onSuccess();
+            setOpen(false);
+            return { success: true, message: "Tarea creada." };
+        }
+    } catch (error: any) {
+         toast({
+            variant: "destructive",
+            title: "Error al crear la tarea",
+            description: error.message || "No se pudo crear la tarea.",
+          });
+          return { success: false, message: error.message || "No se pudo crear la tarea." };
+    }
+  };
 
-  const [state, formAction] = useActionState(async (_prevState: any, formData: FormData) => {
-    // Add dates to formData
+
+  const [state, formAction] = useFormState(async (_prevState: any, formData: FormData) => {
     if (startDate) {
         formData.set('startDate', format(startDate, 'yyyy-MM-dd'));
     }
     if (endDate) {
         formData.set('endDate', format(endDate, 'yyyy-MM-dd'));
     }
-
-    try {
-      await createTaskWithProps(formData);
-      toast({
-        title: "Tarea Creada",
-        description: "La nueva tarea ha sido añadida al cronograma.",
-      });
-      setOpen(false);
-      return { success: true, message: "Tarea creada." };
-    } catch (error: any) {
-      return { success: false, message: error.message || "No se pudo crear la tarea." };
-    }
+    return createTaskWithSuccess(formData);
   }, { message: '', success: false });
-
-  useEffect(() => {
-    if (state.message && !state.success) {
-      toast({
-        variant: "destructive",
-        title: "Error al crear la tarea",
-        description: state.message,
-      });
-    }
-  }, [state, toast]);
 
   useEffect(() => {
     if (!open) {

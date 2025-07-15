@@ -37,13 +37,15 @@ export function DeleteMultipleProjectsDialog({
   const handleDelete = async () => {
     startTransition(async () => {
       try {
-        await deleteMultipleProjects(projectIds);
-        toast({
-          title: "Proyectos Eliminados",
-          description: "Los proyectos seleccionados han sido eliminados.",
-        });
-        onOpenChange(false);
-        onSuccess(); // Call onSuccess to trigger data reload
+        const result = await deleteMultipleProjects(projectIds);
+        if (result?.success) {
+          toast({
+            title: "Proyectos Eliminados",
+            description: "Los proyectos seleccionados han sido eliminados.",
+          });
+          onOpenChange(false);
+          onSuccess(); // Call onSuccess to trigger data reload
+        }
       } catch (error) {
         toast({
           variant: "destructive",
