@@ -8,11 +8,12 @@ export function useIsMobile() {
   React.useEffect(() => {
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
 
-    setIsMobile(mql.matches)
-
     const onChange = (e: MediaQueryListEvent) => {
       setIsMobile(e.matches)
     }
+
+    // Set the initial value after the first render on the client
+    setIsMobile(mql.matches)
 
     mql.addEventListener("change", onChange)
 
