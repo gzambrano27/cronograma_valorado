@@ -117,11 +117,11 @@ export async function syncProjectsFromEndpoint() {
   const externalProjects = parsedData.data['project.project'];
   const db = await readDb();
 
-  const externalProjectIds = new Set<string>();
-
   if (!Array.isArray(externalProjects)) {
       throw new Error('Error de Sincronización: La respuesta del endpoint no contiene una lista de proyectos válida.');
   }
+  
+  const externalProjectIds = new Set<string>();
 
   externalProjects.forEach(extProj => {
     const projectId = `ext-${extProj.id}`;
@@ -129,7 +129,7 @@ export async function syncProjectsFromEndpoint() {
 
     const existingProjectIndex = db.projects.findIndex(p => p.id === projectId);
     
-    const isPartnerValid = extProj.partner_id && typeof extProj.partner_id !== 'boolean';
+    const isPartnerValid = Array.isArray(extProj.partner_id);
 
     const projectData = {
         name: extProj.name,
@@ -615,6 +615,7 @@ export async function importTasksFromXML(projectId: string, onSuccess: () => voi
   revalidatePath(`/dashboard`);
   onSuccess();
 }
+
 
 
 
