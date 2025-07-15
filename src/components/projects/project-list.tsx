@@ -114,7 +114,7 @@ export default function ProjectList({ projects, view, onSuccess }: ProjectListPr
             id: "actions",
             cell: ({ row }) => (
               <div className="flex justify-end">
-                <ProjectActions project={row.original} />
+                <ProjectActions project={row.original} onSuccess={onSuccess} />
               </div>
             ),
         }
@@ -140,7 +140,7 @@ export default function ProjectList({ projects, view, onSuccess }: ProjectListPr
           <Card key={project.id} className="flex flex-col overflow-hidden transition-all duration-300 group hover:shadow-xl border">
             <CardHeader className="p-4 relative">
                  <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <ProjectActions project={project} />
+                    <ProjectActions project={project} onSuccess={onSuccess}/>
                 </div>
                 <Link href={`/projects/${project.id}`} className="focus:outline-none focus:underline">
                     <CardTitle className="font-headline mb-1 group-hover:text-primary transition-colors text-lg line-clamp-2 h-14">{project.name}</CardTitle>

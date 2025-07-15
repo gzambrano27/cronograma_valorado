@@ -14,9 +14,10 @@ import {
 
 interface ProjectActionsProps {
   project: Project;
+  onSuccess: () => void;
 }
 
-export function ProjectActions({ project }: ProjectActionsProps) {
+export function ProjectActions({ project, onSuccess }: ProjectActionsProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -39,6 +40,7 @@ export function ProjectActions({ project }: ProjectActionsProps) {
         projectId={project.id}
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
+        onSuccess={onSuccess}
       />
 
       <Tooltip>

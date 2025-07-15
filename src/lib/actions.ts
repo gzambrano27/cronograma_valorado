@@ -6,7 +6,6 @@ import fs from 'fs/promises';
 import path from 'path';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { getAppConfig } from './data';
 import { eachDayOfInterval } from 'date-fns';
 
@@ -69,7 +68,6 @@ const ExternalProjectSchema = z.object({
     id: z.number(),
     name: z.string(),
     company_id: z.tuple([z.number(), z.string()]),
-    partner_id: z.union([z.tuple([z.number(), z.string()]), z.literal(false)]).optional(),
 });
 
 const ApiResponseSchema = z.object({
@@ -248,7 +246,7 @@ export async function createProject(formData: FormData) {
     await writeDb(db);
 
     revalidatePath('/dashboard');
-    redirect('/dashboard');
+    revalidatePath('/');
 }
 
 export async function updateProject(formData: FormData) {
@@ -293,7 +291,6 @@ export async function deleteProject(projectId: string) {
 
     revalidatePath('/dashboard');
     revalidatePath(`/projects`);
-    redirect('/dashboard');
 }
 
 export async function deleteMultipleProjects(projectIds: string[]) {
