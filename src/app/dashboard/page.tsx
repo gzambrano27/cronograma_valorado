@@ -50,6 +50,8 @@ export default function DashboardPage() {
     .map(p => ({
       name: p.name.length > 20 ? `${p.name.substring(0, 20)}...` : p.name,
       value: p.totalValue,
+      consumed: p.consumedValue,
+      progress: p.taskCount > 0 ? (p.completedTasks / p.taskCount) * 100 : 0
     }))
     .sort((a, b) => b.value - a.value)
     .slice(0, 7); 

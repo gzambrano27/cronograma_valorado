@@ -11,13 +11,51 @@ import {
 } from "recharts"
 import {
   ChartContainer,
-  ChartTooltipContent,
 } from "@/components/ui/chart"
+import { Progress } from "@/components/ui/progress"
 import { formatCurrency } from "@/lib/utils"
+import { TrendingUp, TrendingDown, CheckCircle } from "lucide-react"
 
 interface ProjectValueChartProps {
-  data: { name: string; value: number }[]
+  data: { name: string; value: number; consumed: number; progress: number }[]
 }
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="p-4 bg-background/95 backdrop-blur-sm border rounded-lg shadow-xl text-sm min-w-[280px]">
+        <p className="font-bold text-base mb-2">{label}</p>
+        <div className="space-y-2">
+          <div className="flex justify-between items-center gap-4">
+            <span className="flex items-center text-muted-foreground">
+              <TrendingUp className="h-4 w-4 mr-2 text-primary" />
+              Valor Total:
+            </span>
+            <span className="font-mono font-semibold">{formatCurrency(data.value, 0)}</span>
+          </div>
+          <div className="flex justify-between items-center gap-4">
+            <span className="flex items-center text-muted-foreground">
+              <TrendingDown className="h-4 w-4 mr-2" />
+              Valor Consumido:
+            </span>
+            <span className="font-mono font-semibold">{formatCurrency(data.consumed)}</span>
+          </div>
+          <div className="flex justify-between items-center gap-4 pt-2 mt-2 border-t">
+            <span className="flex items-center font-semibold">
+              <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+              Progreso:
+            </span>
+             <span className="font-mono font-semibold">{`${data.progress.toFixed(1)}%`}</span>
+          </div>
+          <Progress value={data.progress} className="h-2" />
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+};
 
 export function ProjectValueChart({ data }: ProjectValueChartProps) {
   return (
@@ -53,11 +91,7 @@ export function ProjectValueChart({ data }: ProjectValueChartProps) {
           />
           <Tooltip 
             cursor={{ fill: 'hsl(var(--muted))' }}
-            content={<ChartTooltipContent 
-                formatter={(value) => formatCurrency(value as number)} 
-                labelKey="name"
-                indicator="dot"
-            />}
+            content={<CustomTooltip />}
           />
           <Bar dataKey="value" fill="url(#fillBar)" radius={[0, 4, 4, 0]} barSize={24} />
         </BarChart>
