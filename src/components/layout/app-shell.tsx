@@ -41,13 +41,21 @@ export default function AppShell({
 }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
+  const [isClient, setIsClient] = React.useState(false);
 
   React.useEffect(() => {
-    const sidebarCookie = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith(`${SIDEBAR_COOKIE_NAME}=`))
-      ?.split("=")[1];
-    setSidebarOpen(sidebarCookie ? sidebarCookie === "true" : true);
+    setIsClient(true);
+    try {
+      const sidebarCookie = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith(`${SIDEBAR_COOKIE_NAME}=`))
+        ?.split("=")[1];
+      if (sidebarCookie) {
+        setSidebarOpen(sidebarCookie === "true");
+      }
+    } catch (error) {
+      console.error("Failed to parse sidebar cookie", error);
+    }
   }, []);
 
   const isHomePage = pathname === "/";
@@ -134,7 +142,9 @@ export default function AppShell({
         </Sidebar>
         <SidebarMain>
           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-            <SidebarTrigger />
+            <div className="md:hidden">
+              <SidebarTrigger />
+            </div>
             <Breadcrumb projects={projects} />
             <div className="flex-1" />
             <ThemeToggle />
