@@ -73,11 +73,7 @@ const ExternalProjectSchema = z.object({
     partner_id: z.tuple([z.number(), z.string()]).optional(),
 });
 
-const ApiResponseSchema = z.object({
-  data: z.object({
-    'project.project': z.array(ExternalProjectSchema),
-  }),
-});
+const ApiResponseSchema = z.array(ExternalProjectSchema);
 
 export async function syncProjectsFromEndpoint() {
   const config = await getAppConfig();
@@ -114,7 +110,7 @@ export async function syncProjectsFromEndpoint() {
     throw new Error('Sincronización cancelada: no cumple con el formato solicitado.');
   }
   
-  const externalProjects = parsedData.data.data['project.project'];
+  const externalProjects = parsedData.data;
   const db = await readDb();
 
   const externalProjectIds = new Set<string>();
