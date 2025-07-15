@@ -1,9 +1,9 @@
 
-
 'use client';
 
 import { useState, useEffect } from "react";
-import { getSettings, updateSettings, fetchEndpointData } from "@/lib/actions";
+import { updateSettings, fetchEndpointData } from "@/lib/actions";
+import { getAppConfig } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -26,7 +26,7 @@ export default function SettingsPage() {
 
 
     useEffect(() => {
-        getSettings().then(config => {
+        getAppConfig().then(config => {
             setUrl(config.endpointUrl || '');
             setIsLoading(false);
         }).catch(error => {
