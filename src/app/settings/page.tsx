@@ -1,8 +1,9 @@
 
+
 'use client';
 
-import { useState, useEffect, useTransition } from "react";
-import { getSettings, updateSettings, syncProjectsFromEndpoint } from "@/lib/actions";
+import { useState, useEffect } from "react";
+import { getSettings, updateSettings, fetchEndpointData } from "@/lib/actions";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -12,11 +13,14 @@ import { Terminal, DownloadCloud, Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { ConfirmSyncDialog } from "@/components/settings/confirm-sync-dialog";
 
 export default function SettingsPage() {
     const [url, setUrl] = useState('');
     const [isLoading, setIsLoading] = useState(true);
-    const [isSyncing, startSyncTransition] = useTransition();
+    const [isFetching, setIsFetching] = useState(false);
+    const [syncData, setSyncData] = useState<any>(null);
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const { toast } = useToast();
     const router = useRouter();
 
@@ -31,24 +35,30 @@ export default function SettingsPage() {
         });
     }, []);
 
-    const handleSyncSubmit = () => {
-        startSyncTransition(async () => {
-            try {
-                await syncProjectsFromEndpoint();
-                toast({
-                    title: "Sincronización Exitosa",
-                    description: "Los proyectos se han actualizado correctamente.",
-                });
-                router.push('/dashboard');
-            } catch (error) {
-                toast({
-                    variant: "destructive",
-                    title: "Error de Sincronización",
-                    description: error instanceof Error ? error.message : "Ocurrió un error inesperado.",
-                });
-            }
-        });
+    const handleFetchData = async () => {
+        setIsFetching(true);
+        try {
+            const data = await fetchEndpointData();
+            setSyncData(data);
+            setIsConfirmOpen(true);
+        } catch (error) {
+            toast({
+                variant: "destructive",
+                title: "Error al Obtener Datos",
+                description: error instanceof Error ? error.message : "Ocurrió un error inesperado al obtener los datos.",
+            });
+        } finally {
+            setIsFetching(false);
+        }
     };
+    
+    const onSyncSuccess = () => {
+        toast({
+            title: "Sincronización Exitosa",
+            description: "Los proyectos se han actualizado correctamente.",
+        });
+        router.push('/dashboard');
+    }
 
     if (isLoading) {
         return (
@@ -91,6 +101,14 @@ export default function SettingsPage() {
 
     return (
         <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
+             {syncData && (
+                <ConfirmSyncDialog
+                    data={syncData}
+                    open={isConfirmOpen}
+                    onOpenChange={setIsConfirmOpen}
+                    onSuccess={onSyncSuccess}
+                />
+            )}
             <div className="flex items-center justify-between space-y-2">
                 <h1 className="text-3xl font-bold tracking-tight font-headline">
                     Configuración
@@ -127,7 +145,7 @@ export default function SettingsPage() {
                 </Card>
 
                 <Card>
-                     <form action={handleSyncSubmit}>
+                     <form action={handleFetchData}>
                         <CardHeader>
                             <CardTitle>Sincronización</CardTitle>
                             <CardDescription>
@@ -144,13 +162,13 @@ export default function SettingsPage() {
                             </Alert>
                         </CardContent>
                         <CardFooter className="border-t px-6 py-4">
-                            <Button type="submit" variant="secondary" disabled={isSyncing}>
-                                {isSyncing ? (
+                            <Button type="submit" variant="secondary" disabled={isFetching}>
+                                {isFetching ? (
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                 ) : (
                                     <DownloadCloud className="mr-2 h-4 w-4" />
                                 )}
-                                {isSyncing ? "Sincronizando..." : "Sincronizar Proyectos"}
+                                {isFetching ? "Obteniendo datos..." : "Sincronizar Proyectos"}
                             </Button>
                         </CardFooter>
                     </form>

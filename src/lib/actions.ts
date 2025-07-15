@@ -79,36 +79,38 @@ const ApiResponseSchema = z.object({
     })
 });
 
-export async function syncProjectsFromEndpoint() {
-  const config = await getAppConfig();
-  const url = config.endpointUrl;
+export async function fetchEndpointData() {
+    const config = await getAppConfig();
+    const url = config.endpointUrl;
 
-  if (!url) {
-    throw new Error('No se ha configurado un endpoint en la página de Configuración.');
-  }
+    if (!url) {
+        throw new Error('No se ha configurado un endpoint en la página de Configuración.');
+    }
 
-  let response;
-  try {
-    response = await fetch(url, { cache: 'no-store' });
-  } catch (e) {
-      console.error('Fetch error:', e);
-      throw new Error('Sincronización cancelada: No se pudo contactar el endpoint.');
-  }
-  
-  if (!response.ok) {
-    throw new Error(`Sincronización cancelada: El endpoint devolvió un error (${response.statusText}).`);
-  }
-  
-  let jsonData;
-  try {
-      jsonData = await response.json();
-  } catch (e) {
-      console.error('JSON parsing error:', e);
-      throw new Error('Sincronización cancelada: La respuesta del endpoint no es un JSON válido.');
-  }
-  
-  console.log('Datos recibidos del endpoint:', JSON.stringify(jsonData, null, 2));
+    let response;
+    try {
+        response = await fetch(url, { cache: 'no-store' });
+    } catch (e) {
+        console.error('Fetch error:', e);
+        throw new Error('Sincronización cancelada: No se pudo contactar el endpoint.');
+    }
 
+    if (!response.ok) {
+        throw new Error(`Sincronización cancelada: El endpoint devolvió un error (${response.statusText}).`);
+    }
+
+    let jsonData;
+    try {
+        jsonData = await response.json();
+    } catch (e) {
+        console.error('JSON parsing error:', e);
+        throw new Error('Sincronización cancelada: La respuesta del endpoint no es un JSON válido.');
+    }
+    
+    return jsonData;
+}
+
+export async function syncProjectsFromEndpoint(jsonData: any) {
   const parsedData = ApiResponseSchema.safeParse(jsonData);
 
   if (!parsedData.success) {
@@ -118,13 +120,11 @@ export async function syncProjectsFromEndpoint() {
   
   const externalProjects = parsedData.data?.['project.project'];
   
-  console.log('Proyectos extraídos después de la validación:', externalProjects);
-  
-  const db = await readDb();
-
   if (!Array.isArray(externalProjects)) {
       throw new Error('Error de Sincronización: La respuesta del endpoint no contiene una lista de proyectos válida.');
   }
+  
+  const db = await readDb();
   
   const externalProjectIds = new Set<string>();
 
@@ -139,6 +139,7 @@ export async function syncProjectsFromEndpoint() {
     const projectData = {
         name: extProj.name,
         company: extProj.company_id[1],
+        externalId: extProj.id,
         externalCompanyId: extProj.company_id[0],
         client: isPartnerValid ? extProj.partner_id[1] : undefined,
         clientId: isPartnerValid ? extProj.partner_id[0] : undefined,
@@ -154,7 +155,6 @@ export async function syncProjectsFromEndpoint() {
         // Add new project
         const newProject = {
             id: projectId,
-            externalId: extProj.id,
             ...projectData
         };
         db.projects.push(newProject as Project);
@@ -620,6 +620,7 @@ export async function importTasksFromXML(projectId: string, onSuccess: () => voi
   revalidatePath(`/dashboard`);
   onSuccess();
 }
+
 
 
 
