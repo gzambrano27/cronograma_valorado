@@ -15,6 +15,7 @@ import {
 import { LayoutGrid, List } from "lucide-react";
 import ProjectList from "./project-list";
 import { CreateProjectDialog } from "./create-project-dialog";
+import { TooltipProvider } from "../ui/tooltip";
 
 export function ProjectView({ projects, onSuccess }: { projects: Project[], onSuccess: () => void }) {
   const [view, setView] = useState<"grid" | "list">("grid");
@@ -134,8 +135,9 @@ export function ProjectView({ projects, onSuccess }: { projects: Project[], onSu
           </SelectContent>
         </Select>
       </div>
-
-      <ProjectList projects={paginatedProjects} view={view} onSuccess={onSuccess} />
+      <TooltipProvider>
+        <ProjectList projects={paginatedProjects} view={view} onSuccess={onSuccess} />
+      </TooltipProvider>
 
       {totalPages > 1 && (
         <div className="flex items-center justify-end py-4 space-x-4">
@@ -167,3 +169,4 @@ export function ProjectView({ projects, onSuccess }: { projects: Project[], onSu
     </div>
   );
 }
+
