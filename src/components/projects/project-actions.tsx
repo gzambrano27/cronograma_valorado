@@ -45,7 +45,7 @@ export function ProjectActions({ project, onSuccess }: ProjectActionsProps) {
         onSuccess={onSuccess}
       />
 
-      <Tooltip>
+      <Tooltip delayDuration={0}>
         <TooltipTrigger asChild>
           <Button
             variant="ghost"
@@ -62,7 +62,7 @@ export function ProjectActions({ project, onSuccess }: ProjectActionsProps) {
         </TooltipContent>
       </Tooltip>
 
-      <Tooltip>
+      <Tooltip delayDuration={0}>
         <TooltipTrigger asChild>
           <Button
             variant="ghost"
