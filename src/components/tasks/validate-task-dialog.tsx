@@ -45,10 +45,12 @@ export function ValidateTaskDialog({
   task,
   open,
   onOpenChange,
+  onSuccess,
 }: {
   task: Task;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess: () => void;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const [location, setLocation] = useState<string | null>(null);
@@ -86,6 +88,7 @@ export function ValidateTaskDialog({
           title: "Tarea Validada",
           description: "La imagen y ubicación han sido guardadas.",
       });
+      onSuccess();
       onOpenChange(false);
     } catch (error: any) {
        toast({

@@ -157,7 +157,7 @@ export default function ProjectList({ projects, view, onSuccess }: ProjectListPr
     return (
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {projects.map((project) => (
-          <Card key={project.id} className="flex flex-col overflow-hidden transition-all duration-300 group hover:shadow-xl border">
+          <Card key={project.id} className="flex flex-col transition-all duration-300 group hover:shadow-xl border">
             <CardHeader className="p-4 pb-2 relative">
                  <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <ProjectActions project={project} onSuccess={onSuccess}/>

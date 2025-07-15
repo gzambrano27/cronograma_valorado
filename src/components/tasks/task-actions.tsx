@@ -41,6 +41,7 @@ export function TaskActions({ task, onSuccess }: TaskActionsProps) {
         task={task}
         open={isValidateDialogOpen}
         onOpenChange={setIsValidateDialogOpen}
+        onSuccess={onSuccess}
       />
       {hasValidations && (
         <ViewValidationsDialog

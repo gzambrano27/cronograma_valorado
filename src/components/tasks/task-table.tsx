@@ -223,7 +223,7 @@ const getColumns = (onSuccess: () => void): ColumnDef<Task>[] => [
   {
     id: "actions",
     header: () => <div className="text-right">Acciones</div>,
-    cell: ({ row }) => <TaskActions task={row.original} />,
+    cell: ({ row }) => <TaskActions task={row.original} onSuccess={onSuccess} />,
   },
 ]
 
