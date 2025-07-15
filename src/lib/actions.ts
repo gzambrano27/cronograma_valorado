@@ -109,6 +109,16 @@ export async function fetchEndpointData() {
 }
 
 export async function syncProjectsFromEndpoint(jsonData: any) {
+  // Defensive check for data structure
+  if (!jsonData?.data?.['project.project']) {
+    throw new Error('Sincronización cancelada: la respuesta del endpoint no contiene la ruta data.project.project esperada.');
+  }
+  
+  // Handle case where a single project is returned as an object instead of an array
+  if (!Array.isArray(jsonData.data['project.project'])) {
+    jsonData.data['project.project'] = [jsonData.data['project.project']];
+  }
+  
   const parsedData = ApiResponseSchema.safeParse(jsonData);
 
   if (!parsedData.success) {
@@ -117,10 +127,6 @@ export async function syncProjectsFromEndpoint(jsonData: any) {
   }
   
   const externalProjects = parsedData.data.data['project.project'];
-  
-  if (!Array.isArray(externalProjects)) {
-      throw new Error('Error de Sincronización: La respuesta del endpoint no contiene una lista de proyectos válida.');
-  }
   
   const db = await readDb();
   
@@ -596,6 +602,8 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
   db.tasks.push(...newTasks);
   await writeDb(db);
 
+  revalidatePath(`/projects/${projectId}`);
+  revalidatePath('/dashboard');
   return { success: true, message: `${newTasks.length} tareas importadas con éxito.` };
 }
 
