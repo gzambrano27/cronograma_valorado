@@ -19,9 +19,9 @@ import { Calendar } from "../ui/calendar"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useActionState } from "react"
 import { useToast } from "@/hooks/use-toast"
-import { useFormStatus, useFormState } from "react-dom"
+import { useFormStatus } from "react-dom"
 import { createTask } from "@/lib/actions"
 
 function SubmitButton() {
@@ -41,7 +41,13 @@ export function AddTaskSheet({ projectId, onSuccess }: { projectId: string, onSu
   const [startDate, setStartDate] = React.useState<Date>()
   const [endDate, setEndDate] = React.useState<Date>()
 
-  const createTaskWithSuccess = async (formData: FormData) => {
+  const createTaskWithSuccess = async (_prevState: any, formData: FormData) => {
+    if (startDate) {
+        formData.set('startDate', format(startDate, 'yyyy-MM-dd'));
+    }
+    if (endDate) {
+        formData.set('endDate', format(endDate, 'yyyy-MM-dd'));
+    }
     try {
         const result = await createTask(projectId, formData);
         if (result?.success) {
@@ -52,6 +58,8 @@ export function AddTaskSheet({ projectId, onSuccess }: { projectId: string, onSu
             onSuccess();
             setOpen(false);
             return { success: true, message: "Tarea creada." };
+        } else {
+             throw new Error(result?.message || 'Error al crear la tarea');
         }
     } catch (error: any) {
          toast({
@@ -64,15 +72,7 @@ export function AddTaskSheet({ projectId, onSuccess }: { projectId: string, onSu
   };
 
 
-  const [state, formAction] = useFormState(async (_prevState: any, formData: FormData) => {
-    if (startDate) {
-        formData.set('startDate', format(startDate, 'yyyy-MM-dd'));
-    }
-    if (endDate) {
-        formData.set('endDate', format(endDate, 'yyyy-MM-dd'));
-    }
-    return createTaskWithSuccess(formData);
-  }, { message: '', success: false });
+  const [state, formAction] = useActionState(createTaskWithSuccess, { message: '', success: false });
 
   useEffect(() => {
     if (!open) {
