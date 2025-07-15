@@ -73,12 +73,6 @@ export default function ProjectList({ projects, view, onSuccess }: ProjectListPr
                       <Building2 className="h-4 w-4 flex-shrink-0" />
                       <p className="line-clamp-1">{row.original.company}</p>
                     </div>
-                     {row.original.client && (
-                        <div className="flex items-center text-sm text-muted-foreground gap-1.5 mt-1">
-                            <User className="h-4 w-4 flex-shrink-0" />
-                            <p className="line-clamp-1">{row.original.client}</p>
-                        </div>
-                     )}
                 </div>
             )
         },
@@ -155,12 +149,6 @@ export default function ProjectList({ projects, view, onSuccess }: ProjectListPr
                     <Building2 className="h-4 w-4 flex-shrink-0" />
                     <p className="truncate">{project.company}</p>
                 </div>
-                {project.client && (
-                    <div className="flex items-center text-sm text-muted-foreground gap-2">
-                        <User className="h-4 w-4 flex-shrink-0" />
-                        <p className="truncate">{project.client}</p>
-                    </div>
-                )}
             </CardHeader>
 
             <CardContent className="flex flex-1 flex-col p-4 pt-0">

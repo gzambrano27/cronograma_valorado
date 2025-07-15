@@ -70,7 +70,6 @@ const ExternalProjectSchema = z.object({
     id: z.number(),
     name: z.string(),
     company_id: z.tuple([z.number(), z.string()]),
-    partner_id: z.union([z.tuple([z.number(), z.string()]), z.literal(false)]).optional(),
 });
 
 const ApiResponseSchema = z.object({
@@ -133,16 +132,12 @@ export async function syncProjectsFromEndpoint(jsonData: any) {
     externalProjectIds.add(projectId);
 
     const existingProjectIndex = db.projects.findIndex(p => p.id === projectId);
-    
-    const isPartnerValid = Array.isArray(extProj.partner_id);
 
     const projectData = {
         name: extProj.name,
         company: extProj.company_id[1],
         externalId: extProj.id,
         externalCompanyId: extProj.company_id[0],
-        client: isPartnerValid ? extProj.partner_id[1] : undefined,
-        clientId: isPartnerValid ? extProj.partner_id[0] : undefined,
     };
 
     if (existingProjectIndex > -1) {
