@@ -1,29 +1,19 @@
 
-'use client'
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import AppShell from '@/components/layout/app-shell';
 import { getProjects } from '@/lib/data';
 import { ThemeProvider } from '@/components/layout/theme-provider';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import type { Project } from '@/lib/types';
 
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [projects, setProjects] = useState<Project[]>([]);
-  
-  useEffect(() => {
-    async function fetchData() {
-      const fetchedProjects = await getProjects();
-      setProjects(fetchedProjects);
-    }
-    fetchData();
-  }, []);
-
+  const projects = await getProjects();
   const title = "Menú";
 
   return (
