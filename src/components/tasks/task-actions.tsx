@@ -18,9 +18,10 @@ import { ViewValidationsDialog } from "./view-validations-dialog";
 
 interface TaskActionsProps {
   task: Task;
+  onSuccess: () => void;
 }
 
-export function TaskActions({ task }: TaskActionsProps) {
+export function TaskActions({ task, onSuccess }: TaskActionsProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isValidateDialogOpen, setIsValidateDialogOpen] = useState(false);
   const [isViewValidationsOpen, setIsViewValidationsOpen] = useState(false);
@@ -34,6 +35,7 @@ export function TaskActions({ task }: TaskActionsProps) {
         projectId={task.projectId}
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
+        onSuccess={onSuccess}
       />
       <ValidateTaskDialog
         task={task}

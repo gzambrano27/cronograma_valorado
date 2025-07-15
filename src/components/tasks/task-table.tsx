@@ -267,8 +267,6 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
         endDate: false,
       });
     } else {
-      // For desktop, set the default visibility here if it's different from the initial state
-      // This will run once when the component mounts on the client
       setColumnVisibility({
         value: false,
         subtotalValued: false,

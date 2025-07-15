@@ -24,7 +24,7 @@ export function XmlImport({ projectId, onSuccess }: { projectId: string, onSucce
                         title: "Importación Exitosa",
                         description: "Las tareas del archivo XML han sido importadas.",
                     });
-                    onSuccess(); // The onSuccess is called on the client after the server action completes.
+                    onSuccess();
                 } catch (error: any) {
                     toast({
                         variant: "destructive",

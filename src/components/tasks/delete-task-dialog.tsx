@@ -20,6 +20,7 @@ interface DeleteTaskDialogProps {
   projectId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess: () => void;
 }
 
 export function DeleteTaskDialog({
@@ -27,6 +28,7 @@ export function DeleteTaskDialog({
   projectId,
   open,
   onOpenChange,
+  onSuccess,
 }: DeleteTaskDialogProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
@@ -40,6 +42,7 @@ export function DeleteTaskDialog({
           description: "La tarea ha sido eliminada exitosamente del proyecto.",
         });
         onOpenChange(false);
+        onSuccess();
       } catch (error) {
         toast({
           variant: "destructive",
