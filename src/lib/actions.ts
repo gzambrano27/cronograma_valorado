@@ -107,6 +107,9 @@ export async function syncProjectsFromEndpoint() {
       throw new Error('Sincronización cancelada: La respuesta del endpoint no es un JSON válido.');
   }
   
+  // Log para depuración
+  console.log('Datos recibidos del endpoint:', JSON.stringify(jsonData, null, 2));
+
   const parsedData = ApiResponseSchema.safeParse(jsonData);
 
   if (!parsedData.success) {
@@ -115,6 +118,10 @@ export async function syncProjectsFromEndpoint() {
   }
   
   const externalProjects = parsedData.data['project.project'];
+  
+  // Log para depuración
+  console.log('Proyectos extraídos después de la validación:', externalProjects);
+  
   const db = await readDb();
 
   if (!Array.isArray(externalProjects)) {
@@ -615,6 +622,7 @@ export async function importTasksFromXML(projectId: string, onSuccess: () => voi
   revalidatePath(`/dashboard`);
   onSuccess();
 }
+
 
 
 
