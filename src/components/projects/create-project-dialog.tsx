@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -31,11 +32,13 @@ export function CreateProjectDialog({
   project,
   open,
   onOpenChange,
+  onSuccess,
   children
 }: {
   project?: Project;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  onSuccess: () => void;
   children?: React.ReactNode;
 }) {
   const isEditing = !!project;
@@ -61,6 +64,7 @@ export function CreateProjectDialog({
           ref={formRef} 
           action={async (formData) => {
             await formAction(formData);
+            onSuccess();
             setIsOpen(false);
           }}
           key={project?.id || 'new'}
@@ -71,8 +75,8 @@ export function CreateProjectDialog({
             </DialogTitle>
             <DialogDescription>
               {isEditing
-                ? "Edita los detalles de tu proyecto, como el nombre y la compañía."
-                : "Añade los detalles de tu nuevo proyecto, incluyendo la compañía a la que pertenece."}
+                ? "Edita los detalles de tu proyecto, como el nombre, la compañía y el cliente."
+                : "Añade los detalles de tu nuevo proyecto, incluyendo la compañía y el cliente."}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -96,10 +100,20 @@ export function CreateProjectDialog({
               <Input
                 id="company"
                 name="company"
-                placeholder="Nombre de la compañía"
                 defaultValue={project?.company || ""}
                 className="col-span-3"
                 required
+              />
+            </div>
+             <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="client" className="text-right">
+                Cliente
+              </Label>
+              <Input
+                id="client"
+                name="client"
+                defaultValue={project?.client || ""}
+                className="col-span-3"
               />
             </div>
           </div>

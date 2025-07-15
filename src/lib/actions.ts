@@ -5,7 +5,6 @@ import type { Database, Project, Task, TaskValidation, AppConfig, DailyConsumpti
 import fs from 'fs/promises';
 import path from 'path';
 import { z } from 'zod';
-import { revalidatePath } from 'next/cache';
 import { getAppConfig } from './data';
 import { eachDayOfInterval } from 'date-fns';
 
@@ -61,7 +60,7 @@ export async function updateSettings(formData: FormData) {
   config.endpointUrl = url;
   await writeConfig(config);
 
-  revalidatePath('/settings');
+  return { success: true };
 }
 
 const ExternalProjectSchema = z.object({
@@ -109,16 +108,11 @@ export async function fetchEndpointData() {
 }
 
 export async function syncProjectsFromEndpoint(jsonData: any) {
-  // Defensive check for data structure
-  if (!jsonData?.data?.['project.project']) {
-    throw new Error('Sincronización cancelada: la respuesta del endpoint no contiene la ruta data.project.project esperada.');
-  }
-  
-  // Handle case where a single project is returned as an object instead of an array
-  if (!Array.isArray(jsonData.data['project.project'])) {
+  // Defensive check for data structure and handle single object case
+  if (jsonData?.data?.['project.project'] && !Array.isArray(jsonData.data['project.project'])) {
     jsonData.data['project.project'] = [jsonData.data['project.project']];
   }
-  
+
   const parsedData = ApiResponseSchema.safeParse(jsonData);
 
   if (!parsedData.success) {
@@ -178,6 +172,7 @@ export async function syncProjectsFromEndpoint(jsonData: any) {
   db.tasks = db.tasks.filter(task => allValidProjectIds.has(task.projectId));
   
   await writeDb(db);
+  return { success: true };
 }
 
 
@@ -185,6 +180,7 @@ const ProjectSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(3, { message: 'El nombre debe tener al menos 3 caracteres.' }),
   company: z.string().min(1, { message: 'El nombre de la compañía es requerido.' }),
+  client: z.string().optional(),
 });
 
 const TaskSchema = z.object({
@@ -236,13 +232,14 @@ export async function createProject(formData: FormData) {
     const validatedFields = ProjectSchema.safeParse({
         name: formData.get('name'),
         company: formData.get('company'),
+        client: formData.get('client'),
     });
 
     if (!validatedFields.success) {
         throw new Error(validatedFields.error.flatten().fieldErrors.name?.[0] || validatedFields.error.flatten().fieldErrors.company?.[0] || 'Datos del proyecto inválidos.');
     }
 
-    const { name, company } = validatedFields.data;
+    const { name, company, client } = validatedFields.data;
     
     const db = await readDb();
 
@@ -250,6 +247,7 @@ export async function createProject(formData: FormData) {
         id: `proj-${Date.now()}`,
         name,
         company,
+        client: client || '',
     };
 
     db.projects.unshift(newProject as Project);
@@ -262,13 +260,14 @@ export async function updateProject(formData: FormData) {
         id: formData.get('id'),
         name: formData.get('name'),
         company: formData.get('company'),
+        client: formData.get('client'),
     });
 
     if (!validatedFields.success || !validatedFields.data.id) {
          throw new Error(validatedFields.error?.flatten().fieldErrors.name?.[0] || validatedFields.error?.flatten().fieldErrors.company?.[0] || 'Datos del proyecto inválidos para actualizar.');
     }
     
-    const { id, name, company } = validatedFields.data;
+    const { id, name, company, client } = validatedFields.data;
     const db = await readDb();
     const projectIndex = db.projects.findIndex(p => p.id === id);
 
@@ -280,6 +279,7 @@ export async function updateProject(formData: FormData) {
         ...db.projects[projectIndex],
         name,
         company,
+        client: client || '',
     };
 
     await writeDb(db);
@@ -421,8 +421,7 @@ export async function updateTaskConsumption(taskId: string, date: string, consum
     db.tasks[taskIndex] = task;
     await writeDb(db);
 
-    revalidatePath(`/projects/${task.projectId}`);
-    revalidatePath(`/dashboard`);
+    return { success: true };
 }
 
 const ValidateTaskSchema = z.object({
@@ -475,8 +474,7 @@ export async function validateTask(formData: FormData) {
     db.tasks[taskIndex].validations?.push(newValidation);
 
     await writeDb(db);
-
-    revalidatePath(`/projects/${projectId}`);
+    return { success: true };
 }
 
 export async function importTasksFromXML(projectId: string, formData: FormData) {
@@ -556,6 +554,7 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
             console.warn('Omitiendo tarea con valor de costo no numérico:', name, 'Valor:', costRaw);
             continue;
         }
+        
         const totalTaskValue = parsedCost / 100;
 
         let quantity = 0;
@@ -602,9 +601,5 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
   db.tasks.push(...newTasks);
   await writeDb(db);
 
-  revalidatePath(`/projects/${projectId}`);
-  revalidatePath('/dashboard');
   return { success: true, message: `${newTasks.length} tareas importadas con éxito.` };
 }
-
-    

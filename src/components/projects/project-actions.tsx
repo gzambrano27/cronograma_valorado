@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -35,6 +36,7 @@ export function ProjectActions({ project, onSuccess }: ProjectActionsProps) {
         project={project}
         open={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
+        onSuccess={onSuccess}
       />
       <DeleteProjectDialog
         projectId={project.id}

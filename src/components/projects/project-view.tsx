@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
@@ -19,13 +20,18 @@ export function ProjectView({ projects, onSuccess }: { projects: Project[], onSu
   const [view, setView] = useState<"grid" | "list">("grid");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCompany, setSelectedCompany] = useState("all");
+  const [selectedClient, setSelectedClient] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
 
   const ITEMS_PER_PAGE = view === 'grid' ? 6 : 10;
 
-  const companies = useMemo(() => {
+  const { companies, clients } = useMemo(() => {
     const allCompanies = [...new Set(projects.map((p) => p.company))].sort();
-    return ["all", ...allCompanies];
+    const allClients = [...new Set(projects.map((p) => p.client).filter(Boolean) as string[])].sort();
+    return {
+      companies: ["all", ...allCompanies],
+      clients: ["all", ...allClients],
+    };
   }, [projects]);
 
   const filteredProjects = useMemo(() => {
@@ -36,14 +42,18 @@ export function ProjectView({ projects, onSuccess }: { projects: Project[], onSu
       .filter(
         (project) =>
           selectedCompany === "all" || project.company === selectedCompany
+      )
+      .filter(
+        (project) =>
+          selectedClient === "all" || project.client === selectedClient
       );
-  }, [projects, searchTerm, selectedCompany]);
+  }, [projects, searchTerm, selectedCompany, selectedClient]);
   
   const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedCompany, view]);
+  }, [searchTerm, selectedCompany, selectedClient, view]);
 
   useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) {
@@ -88,25 +98,37 @@ export function ProjectView({ projects, onSuccess }: { projects: Project[], onSu
               <span className="sr-only">List View</span>
             </Button>
           </div>
-          <CreateProjectDialog />
+          <CreateProjectDialog onSuccess={onSuccess} />
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 mb-6 sm:flex-row">
+      <div className="flex flex-col gap-4 mb-6 md:flex-row">
         <Input
           placeholder="Buscar por nombre..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full sm:max-w-xs"
+          className="w-full md:max-w-xs"
         />
         <Select value={selectedCompany} onValueChange={setSelectedCompany}>
-          <SelectTrigger className="w-full sm:w-[280px]">
+          <SelectTrigger className="w-full md:w-[240px]">
             <SelectValue placeholder="Filtrar por compañía" />
           </SelectTrigger>
           <SelectContent>
             {companies.map((company) => (
               <SelectItem key={company} value={company}>
                 {company === "all" ? "Todas las Compañías" : company}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={selectedClient} onValueChange={setSelectedClient}>
+          <SelectTrigger className="w-full md:w-[240px]">
+            <SelectValue placeholder="Filtrar por cliente" />
+          </SelectTrigger>
+          <SelectContent>
+            {clients.map((client) => (
+              <SelectItem key={client} value={client}>
+                {client === "all" ? "Todos los Clientes" : client}
               </SelectItem>
             ))}
           </SelectContent>

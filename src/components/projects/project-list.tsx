@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from "react";
@@ -157,20 +158,28 @@ export default function ProjectList({ projects, view, onSuccess }: ProjectListPr
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {projects.map((project) => (
           <Card key={project.id} className="flex flex-col overflow-hidden transition-all duration-300 group hover:shadow-xl border">
-            <CardHeader className="p-4 relative">
+            <CardHeader className="p-4 pb-2 relative">
                  <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <ProjectActions project={project} onSuccess={onSuccess}/>
                 </div>
                 <Link href={`/projects/${project.id}`} className="focus:outline-none focus:underline">
                     <CardTitle className="font-headline mb-1 group-hover:text-primary transition-colors text-lg line-clamp-2 h-14">{project.name}</CardTitle>
                 </Link>
-                <div className="flex items-center text-sm text-muted-foreground gap-2">
+                <div className="flex flex-col gap-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
                     <Building2 className="h-4 w-4 flex-shrink-0" />
                     <p className="truncate">{project.company}</p>
+                  </div>
+                  {project.client && (
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4 flex-shrink-0" />
+                      <p className="truncate">{project.client}</p>
+                    </div>
+                  )}
                 </div>
             </CardHeader>
 
-            <CardContent className="flex flex-1 flex-col p-4 pt-0">
+            <CardContent className="flex flex-1 flex-col p-4 pt-4">
               <div className="mt-auto space-y-3">
                  <div>
                     <div className="flex justify-between items-center mb-1 text-sm text-muted-foreground">
