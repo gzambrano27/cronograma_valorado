@@ -109,7 +109,7 @@ export async function fetchEndpointData() {
 }
 
 export async function syncProjectsFromEndpoint(jsonData: any) {
-  const parsedData = ApiResponseSchema.safeParse(jsonData);
+  const parsedData = ApiResponseSchema.safeParse(jsonData.data);
 
   if (!parsedData.success) {
     console.error('Zod validation error:', parsedData.error.flatten());
@@ -298,7 +298,6 @@ export async function deleteProject(projectId: string) {
     await writeDb(db);
 
     revalidatePath('/dashboard');
-    revalidatePath(`/projects`);
     return { success: true };
 }
 
@@ -316,7 +315,6 @@ export async function deleteMultipleProjects(projectIds: string[]) {
     await writeDb(db);
 
     revalidatePath('/dashboard');
-    revalidatePath(`/projects`);
     return { success: true };
 }
 
@@ -619,5 +617,7 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
 
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/dashboard`);
-  return { success: true };
+  return { success: true, message: `${newTasks.length} tareas importadas con éxito.` };
 }
+
+    
