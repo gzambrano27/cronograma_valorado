@@ -109,14 +109,14 @@ export async function fetchEndpointData() {
 }
 
 export async function syncProjectsFromEndpoint(jsonData: any) {
-  const parsedData = ApiResponseSchema.safeParse(jsonData.data);
+  const parsedData = ApiResponseSchema.safeParse(jsonData);
 
   if (!parsedData.success) {
     console.error('Zod validation error:', parsedData.error.flatten());
     throw new Error('Sincronización cancelada: los datos no cumplen con el formato solicitado.');
   }
-
-  const externalProjects = parsedData.data?.['project.project'];
+  
+  const externalProjects = parsedData.data.data['project.project'];
   
   if (!Array.isArray(externalProjects)) {
       throw new Error('Error de Sincronización: La respuesta del endpoint no contiene una lista de proyectos válida.');
@@ -172,9 +172,6 @@ export async function syncProjectsFromEndpoint(jsonData: any) {
   db.tasks = db.tasks.filter(task => allValidProjectIds.has(task.projectId));
   
   await writeDb(db);
-
-  revalidatePath('/dashboard');
-  revalidatePath('/settings');
 }
 
 
@@ -251,9 +248,6 @@ export async function createProject(formData: FormData) {
 
     db.projects.unshift(newProject as Project);
     await writeDb(db);
-
-    revalidatePath('/dashboard');
-    revalidatePath('/');
     return { success: true };
 }
 
@@ -283,9 +277,6 @@ export async function updateProject(formData: FormData) {
     };
 
     await writeDb(db);
-
-    revalidatePath('/dashboard');
-    revalidatePath(`/projects/${id}`);
     return { success: true };
 }
 
@@ -296,14 +287,12 @@ export async function deleteProject(projectId: string) {
     db.tasks = db.tasks.filter(t => t.projectId !== projectId);
 
     await writeDb(db);
-
-    revalidatePath('/dashboard');
     return { success: true };
 }
 
 export async function deleteMultipleProjects(projectIds: string[]) {
     if (!projectIds || projectIds.length === 0) {
-        return;
+        return { success: false, message: 'No project IDs provided.' };
     }
     const db = await readDb();
 
@@ -314,7 +303,6 @@ export async function deleteMultipleProjects(projectIds: string[]) {
 
     await writeDb(db);
 
-    revalidatePath('/dashboard');
     return { success: true };
 }
 
@@ -360,8 +348,6 @@ export async function createTask(projectId: string, formData: FormData) {
   db.tasks.push(newTask);
   await writeDb(db);
 
-  revalidatePath(`/projects/${projectId}`);
-  revalidatePath(`/dashboard`);
   return { success: true };
 }
 
@@ -369,14 +355,12 @@ export async function deleteTask(taskId: string, projectId: string) {
     const db = await readDb();
     db.tasks = db.tasks.filter(t => t.id !== taskId);
     await writeDb(db);
-    revalidatePath(`/projects/${projectId}`);
-    revalidatePath(`/dashboard`);
     return { success: true };
 }
 
 export async function deleteMultipleTasks(taskIds: string[], projectId: string) {
     if (!taskIds || taskIds.length === 0) {
-        return;
+        return { success: false, message: 'No task IDs provided.'};
     }
     const db = await readDb();
 
@@ -385,9 +369,6 @@ export async function deleteMultipleTasks(taskIds: string[], projectId: string) 
     db.tasks = db.tasks.filter(t => !taskIdsSet.has(t.id));
 
     await writeDb(db);
-
-    revalidatePath(`/projects/${projectId}`);
-    revalidatePath(`/dashboard`);
     return { success: true };
 }
 
@@ -615,8 +596,6 @@ export async function importTasksFromXML(projectId: string, formData: FormData) 
   db.tasks.push(...newTasks);
   await writeDb(db);
 
-  revalidatePath(`/projects/${projectId}`);
-  revalidatePath(`/dashboard`);
   return { success: true, message: `${newTasks.length} tareas importadas con éxito.` };
 }
 
