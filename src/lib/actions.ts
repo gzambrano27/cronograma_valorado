@@ -133,7 +133,7 @@ export async function syncProjectsFromEndpoint(jsonData: any) {
 
     const existingProjectIndex = db.projects.findIndex(p => p.id === projectId);
 
-    const projectData = {
+    const projectData: Partial<Project> = {
         name: extProj.name,
         company: extProj.company_id[1],
         externalId: extProj.id,
@@ -536,7 +536,7 @@ export async function importTasksFromXML(projectId: string, onSuccess: () => voi
   }
 
   const extendedAttrDefs = projectData.ExtendedAttributes?.ExtendedAttribute || [];
-  const cantidadAttrDef = extendedAttrDefs.find((attr: any) => attr.Alias === 'Cantidades');
+  const cantidadAttrDef = extendedAttrDefs.find((attr: any) => attr.Alias?.toLowerCase() === 'cantidades');
   const cantidadFieldId = cantidadAttrDef?.FieldID;
 
   const newTasks: Task[] = [];
@@ -568,7 +568,7 @@ export async function importTasksFromXML(projectId: string, onSuccess: () => voi
             console.warn('Omitiendo tarea con valor de costo no numérico:', name, 'Valor:', costRaw);
             continue;
         }
-        const value = parsedCost / 100;
+        const value = parsedCost;
 
         let quantity = 0;
         if (cantidadFieldId && Array.isArray(task.ExtendedAttribute)) {
