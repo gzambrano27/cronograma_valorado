@@ -32,7 +32,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
               <TrendingUp className="h-4 w-4 mr-2 text-primary" />
               Valor Total:
             </span>
-            <span className="font-mono font-semibold">{formatCurrency(data.value, 0)}</span>
+            <span className="font-mono font-semibold">{formatCurrency(data.value)}</span>
           </div>
           <div className="flex justify-between items-center gap-4">
             <span className="flex items-center text-muted-foreground">

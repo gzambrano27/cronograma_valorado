@@ -80,7 +80,7 @@ export default function DashboardPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold">{formatCurrency(totalValue, 0)}</div>
+            <div className="text-xl font-bold">{formatCurrency(totalValue)}</div>
             <p className="text-xs text-muted-foreground">
               Valor combinado de todos los proyectos
             </p>

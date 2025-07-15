@@ -126,7 +126,7 @@ export default function ProjectList({ projects, view, onSuccess }: ProjectListPr
             header: () => <div className="text-right hidden sm:table-cell">Valor Total</div>,
             cell: ({ row }) => (
                 <div className="text-right font-mono hidden sm:table-cell">
-                    {formatCurrency(row.original.totalValue, 0)}
+                    {formatCurrency(row.original.totalValue)}
                 </div>
             )
         },
@@ -201,7 +201,7 @@ export default function ProjectList({ projects, view, onSuccess }: ProjectListPr
               </div>
               <div className="flex justify-between items-baseline w-full">
                 <p className="text-xs text-muted-foreground">Valor Total</p>
-                <p className="font-bold text-base">{formatCurrency(project.totalValue, 0)}</p>
+                <p className="font-bold text-base">{formatCurrency(project.totalValue)}</p>
               </div>
             </CardFooter>
           </Card>

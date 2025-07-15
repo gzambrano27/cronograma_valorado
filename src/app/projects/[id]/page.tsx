@@ -81,7 +81,7 @@ export default function ProjectPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold">{formatCurrency(project.totalValue, 0)}</div>
+            <div className="text-xl font-bold">{formatCurrency(project.totalValue)}</div>
             <p className="text-xs text-muted-foreground">Valor estimado del proyecto</p>
           </CardContent>
         </Card>
