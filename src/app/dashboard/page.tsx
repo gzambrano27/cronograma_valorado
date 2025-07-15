@@ -10,7 +10,6 @@ import type { ChartConfig } from "@/components/ui/chart";
 import { formatCurrency } from "@/lib/utils";
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Project, Task } from '@/lib/types';
-import { Skeleton } from "@/components/ui/skeleton";
 
 const taskStatusConfig = {
   completado: {
@@ -31,14 +30,11 @@ const taskStatusConfig = {
 export default function DashboardPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
 
   const reloadData = useCallback(async () => {
-    setLoading(true);
     const [fetchedProjects, fetchedTasks] = await Promise.all([getProjects(), getTasks()]);
     setProjects(fetchedProjects);
     setTasks(fetchedTasks);
-    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -67,24 +63,6 @@ export default function DashboardPage() {
     status,
     tasks: count,
   })).filter(item => item.tasks > 0);
-
-  if (loading) {
-     return (
-        <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
-            <Skeleton className="h-9 w-48 mb-4" />
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <Skeleton className="h-32" />
-                <Skeleton className="h-32" />
-                <Skeleton className="h-32" />
-            </div>
-             <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-                <Skeleton className="lg:col-span-3 h-[400px]" />
-                <Skeleton className="lg:col-span-2 h-[400px]" />
-             </div>
-             <Skeleton className="h-96" />
-        </div>
-     )
-  }
 
   return (
     <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">

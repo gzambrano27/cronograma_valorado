@@ -12,7 +12,6 @@ import { SCurveCard } from "@/components/tasks/s-curve-card";
 import { formatCurrency } from "@/lib/utils";
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Project, Task, SCurveData } from '@/lib/types';
-import { Skeleton } from "@/components/ui/skeleton";
 
 
 export default function ProjectPage() {
@@ -21,11 +20,9 @@ export default function ProjectPage() {
   const [project, setProject] = useState<Project | null>(null);
   const [projectTasks, setProjectTasks] = useState<Task[]>([]);
   const [sCurve, setSCurve] = useState<SCurveData[]>([]);
-  const [loading, setLoading] = useState(true);
 
   const reloadData = useCallback(async () => {
     try {
-        setLoading(true);
         const fetchedProject = await getProjectById(id);
         if (!fetchedProject) {
             notFound();
@@ -42,8 +39,6 @@ export default function ProjectPage() {
     } catch(error) {
         console.error("Failed to load project data", error);
         // Optionally redirect to an error page or show a message
-    } finally {
-        setLoading(false);
     }
   }, [id]);
 
@@ -52,27 +47,15 @@ export default function ProjectPage() {
         reloadData();
     }
   }, [id, reloadData]);
-
-  if (loading) {
-     return (
-        <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
-            <Skeleton className="h-9 w-1/3 mb-4" />
-             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <Skeleton className="h-28" />
-                <Skeleton className="h-28" />
-                <Skeleton className="h-28" />
-            </div>
-             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                <Skeleton className="lg:col-span-2 h-[450px]" />
-                <Skeleton className="lg:col-span-1 h-[450px]" />
-            </div>
-            <Skeleton className="h-96 w-full" />
-        </div>
-     );
-  }
   
   if (!project) {
-    return notFound();
+    return (
+       <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
+          <div className="text-center text-muted-foreground py-10">
+              Cargando datos del proyecto...
+          </div>
+       </div>
+    );
   }
 
   const progressPercentage = project.taskCount > 0 ? (project.completedTasks / project.taskCount) * 100 : 0;
