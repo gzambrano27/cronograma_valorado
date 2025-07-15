@@ -51,3 +51,8 @@ export type SCurveData = {
 export type AppConfig = {
   endpointUrl: string;
 };
+
+export interface Database {
+  projects: Omit<Project, 'totalValue' | 'taskCount' | 'completedTasks' | 'consumedValue'>[];
+  tasks: Task[];
+}

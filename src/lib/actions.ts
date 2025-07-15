@@ -69,6 +69,7 @@ const ExternalProjectSchema = z.object({
     id: z.number(),
     name: z.string(),
     company_id: z.tuple([z.number(), z.string()]),
+    partner_id: z.union([z.tuple([z.number(), z.string()]), z.literal(false)]).optional(),
 });
 
 const ApiResponseSchema = z.object({
@@ -109,12 +110,16 @@ export async function fetchEndpointData() {
 }
 
 export async function syncProjectsFromEndpoint(jsonData: any) {
+  console.log('Datos recibidos del endpoint:', JSON.stringify(jsonData, null, 2));
+
   const parsedData = ApiResponseSchema.safeParse(jsonData);
 
   if (!parsedData.success) {
     console.error('Zod validation error:', parsedData.error.flatten());
     throw new Error('Sincronización cancelada: no cumple con el formato solicitado.');
   }
+
+  console.log('Datos validados por Zod:', JSON.stringify(parsedData.data, null, 2));
   
   const externalProjects = parsedData.data?.['project.project'];
   
@@ -237,7 +242,7 @@ export async function createProject(formData: FormData) {
     
     const db = await readDb();
 
-    const newProject: Omit<Project, 'totalValue' | 'taskCount' | 'completedTasks' | 'consumedValue' | 'externalId' | 'externalCompanyId' | 'client' | 'clientId'> = {
+    const newProject: Omit<Project, 'totalValue' | 'taskCount' | 'completedTasks' | 'consumedValue' | 'externalId' | 'externalCompanyId'> = {
         id: `proj-${Date.now()}`,
         name,
         company,
@@ -490,7 +495,7 @@ export async function getSettings(): Promise<AppConfig> {
   return config;
 }
 
-export async function importTasksFromXML(projectId: string, onSuccess: () => void, formData: FormData) {
+export async function importTasksFromXML(projectId: string, formData: FormData) {
   const { XMLParser } = await import('fast-xml-parser');
   
   const file = formData.get('xmlFile') as File | null;
@@ -612,7 +617,6 @@ export async function importTasksFromXML(projectId: string, onSuccess: () => voi
 
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/dashboard`);
-  onSuccess();
 }
 
 

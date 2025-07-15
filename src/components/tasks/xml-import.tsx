@@ -16,15 +16,15 @@ export function XmlImport({ projectId, onSuccess }: { projectId: string, onSucce
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file && formRef.current) {
-            const importWithProps = importTasksFromXML.bind(null, projectId, onSuccess);
            startTransition(async () => {
                 const formData = new FormData(formRef.current!);
                 try {
-                    await importWithProps(formData);
+                    await importTasksFromXML(projectId, formData);
                     toast({
                         title: "Importación Exitosa",
                         description: "Las tareas del archivo XML han sido importadas.",
                     });
+                    onSuccess(); // The onSuccess is called on the client after the server action completes.
                 } catch (error: any) {
                     toast({
                         variant: "destructive",
