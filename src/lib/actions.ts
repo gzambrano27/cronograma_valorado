@@ -1,5 +1,4 @@
 
-
 'use server';
 
 import type { Database, Project, Task, TaskValidation, AppConfig, DailyConsumption } from './types';
@@ -568,7 +567,7 @@ export async function importTasksFromXML(projectId: string, onSuccess: () => voi
             console.warn('Omitiendo tarea con valor de costo no numérico:', name, 'Valor:', costRaw);
             continue;
         }
-        const value = parsedCost;
+        const value = parsedCost / 100;
 
         let quantity = 0;
         if (cantidadFieldId && Array.isArray(task.ExtendedAttribute)) {
