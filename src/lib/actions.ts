@@ -119,6 +119,10 @@ export async function syncProjectsFromEndpoint() {
 
   const externalProjectIds = new Set<string>();
 
+  if (!Array.isArray(externalProjects)) {
+      throw new Error('Error de Sincronización: La respuesta del endpoint no contiene una lista de proyectos válida.');
+  }
+
   externalProjects.forEach(extProj => {
     const projectId = `ext-${extProj.id}`;
     externalProjectIds.add(projectId);
@@ -611,5 +615,6 @@ export async function importTasksFromXML(projectId: string, onSuccess: () => voi
   revalidatePath(`/dashboard`);
   onSuccess();
 }
+
 
 
