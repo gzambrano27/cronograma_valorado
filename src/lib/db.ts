@@ -1,9 +1,14 @@
+
 import postgres from 'postgres';
+import dotenv from 'dotenv';
+
+// Explicitly load environment variables from .env file
+dotenv.config();
 
 const { db_host, db_port, db_name, db_user, db_password } = process.env;
 
 if (!db_host || !db_port || !db_name || !db_user || !db_password) {
-  throw new Error('Database connection environment variables are not set');
+  throw new Error('Database connection environment variables are not set. Please check your .env file.');
 }
 
 const connectionString = `postgres://${db_user}:${db_password}@${db_host}:${db_port}/${db_name}`;
