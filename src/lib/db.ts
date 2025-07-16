@@ -1,10 +1,12 @@
 import postgres from 'postgres';
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL environment variable is not set');
+const { db_host, db_port, db_name, db_user, db_password } = process.env;
+
+if (!db_host || !db_port || !db_name || !db_user || !db_password) {
+  throw new Error('Database connection environment variables are not set');
 }
 
-const connectionString = process.env.DATABASE_URL.replace('localhost', '127.0.0.1');
+const connectionString = `postgres://${db_user}:${db_password}@${db_host}:${db_port}/${db_name}`;
 
 export const sql = postgres(connectionString);
 
@@ -21,6 +23,7 @@ export async function query<T>(queryString: string, params: any[] = []): Promise
 
 export async function checkDbConnection(): Promise<boolean> {
   try {
+    // Use a simple query that doesn't depend on any specific table
     await sql`SELECT 1`;
     return true;
   } catch (error) {
