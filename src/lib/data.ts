@@ -5,7 +5,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { eachDayOfInterval, format, startOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { sql } from './db';
+import { query } from './db';
 
 // Helper to convert DB numeric string types to numbers
 const toFloat = (value: string | number | null): number => {
@@ -52,7 +52,7 @@ export async function getAppConfig(): Promise<AppConfig> {
 }
 
 export async function getProjects(): Promise<Project[]> {
-    const projects_raw = await sql`
+    const projects_raw = await query<any>(`
         SELECT 
             pp.id, 
             pp.name, 
@@ -62,9 +62,9 @@ export async function getProjects(): Promise<Project[]> {
         LEFT JOIN public.res_company rc ON pp.company_id = rc.id
         LEFT JOIN public.res_partner rp ON pp.partner_id = rp.id
         ORDER BY pp.name
-    `;
+    `);
 
-    const tasks_raw = await sql`SELECT * FROM public.externo_tasks`;
+    const tasks_raw = await query<Task>(`SELECT * FROM public.externo_tasks`);
     
     const tasks = tasks_raw.map(processTask);
     const projects = projects_raw.map(p => ({
@@ -93,7 +93,7 @@ export async function getProjects(): Promise<Project[]> {
 }
 
 export async function getTasks(): Promise<Task[]> {
-  const tasks_raw = await sql`SELECT * FROM public.externo_tasks`;
+  const tasks_raw = await query<Task>(`SELECT * FROM public.externo_tasks`);
   return tasks_raw.map(processTask);
 }
 
@@ -103,7 +103,7 @@ export async function getProjectById(id: number): Promise<Project | undefined> {
 }
 
 export async function getTasksByProjectId(id: number): Promise<Task[]> {
-    const tasks_raw = await sql`
+    const tasks_raw = await query<Task>(`
       SELECT t.*,
         (
           SELECT json_agg(v.*)
@@ -111,9 +111,9 @@ export async function getTasksByProjectId(id: number): Promise<Task[]> {
           WHERE v.taskId = t.id
         ) as validations
       FROM public.externo_tasks t
-      WHERE t.projectId = ${id}
+      WHERE t.projectId = $1
       ORDER BY t.startDate
-    `;
+    `, [id]);
     return tasks_raw.map(processTask);
 }
 
