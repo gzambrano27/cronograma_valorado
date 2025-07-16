@@ -7,7 +7,7 @@ import path from 'path';
 import { z } from 'zod';
 import { getAppConfig } from './data';
 import { eachDayOfInterval, format } from 'date-fns';
-import { sql } from './db';
+import { query } from './db';
 import { revalidatePath } from 'next/cache';
 
 const configPath = path.join(process.cwd(), 'src', 'lib', 'config.json');
@@ -99,10 +99,10 @@ export async function createTask(projectId: number, formData: FormData) {
   
   const dailyConsumption = createDailyConsumption(start, end, quantity);
 
-  await sql`
+  await query(`
     INSERT INTO public.externo_tasks (projectId, name, quantity, value, startDate, endDate, status, consumedQuantity, dailyConsumption)
-    VALUES (${projectId}, ${name}, ${quantity}, ${value}, ${start.toISOString()}, ${end.toISOString()}, 'pendiente', 0, ${JSON.stringify(dailyConsumption)}::jsonb)
-  `;
+    VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7)
+  `, [projectId, name, quantity, value, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption)]);
   
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/dashboard`);
@@ -110,7 +110,7 @@ export async function createTask(projectId: number, formData: FormData) {
 }
 
 export async function deleteTask(taskId: number, projectId: number) {
-    await sql`DELETE FROM public.externo_tasks WHERE id = ${taskId}`;
+    await query(`DELETE FROM public.externo_tasks WHERE id = $1`, [taskId]);
     revalidatePath(`/projects/${projectId}`);
     revalidatePath(`/dashboard`);
     return { success: true };
@@ -123,15 +123,18 @@ export async function deleteMultipleTasks(taskIds: number[], projectId: number |
     if (projectId === undefined) {
         return { success: false, message: 'Project ID is missing.' };
     }
-    await sql`DELETE FROM public.externo_tasks WHERE id IN ${sql(taskIds)}`;
+    // pg driver doesn't support array binding like node-postgres did.
+    // We create the numbered placeholders dynamically.
+    const placeholders = taskIds.map((_, i) => `$${i + 1}`).join(',');
+    await query(`DELETE FROM public.externo_tasks WHERE id IN (${placeholders})`, taskIds);
     revalidatePath(`/projects/${projectId}`);
     revalidatePath(`/dashboard`);
     return { success: true };
 }
 
 export async function updateTaskConsumption(taskId: number, date: string, consumedQuantity: number) {
-    const result = await sql`SELECT * FROM public.externo_tasks WHERE id = ${taskId}`;
-    const task = result[0] as unknown as Task;
+    const result = await query<Task>(`SELECT * FROM public.externo_tasks WHERE id = $1`, [taskId]);
+    const task = result[0];
 
 
     if (!task) {
@@ -157,14 +160,14 @@ export async function updateTaskConsumption(taskId: number, date: string, consum
     const totalConsumed = dailyConsumption.reduce((sum, c) => sum + c.consumedQuantity, 0);
     const newStatus = totalConsumed >= task.quantity ? 'completado' : (totalConsumed > 0 ? 'en-progreso' : 'pendiente');
 
-    await sql`
+    await query(`
         UPDATE public.externo_tasks
         SET 
-            dailyConsumption = ${JSON.stringify(dailyConsumption)}::jsonb,
-            consumedQuantity = ${totalConsumed},
-            status = ${newStatus}
-        WHERE id = ${taskId}
-    `;
+            dailyConsumption = $1,
+            consumedQuantity = $2,
+            status = $3
+        WHERE id = $4
+    `, [JSON.stringify(dailyConsumption), totalConsumed, newStatus, taskId]);
 
     revalidatePath(`/projects/${task.projectId}`);
     revalidatePath(`/dashboard`);
@@ -207,10 +210,10 @@ export async function validateTask(formData: FormData) {
       taskId: taskId,
     };
 
-    await sql`
+    await query(`
       INSERT INTO public.externo_task_validations (taskId, date, imageUrl, location)
-      VALUES (${newValidation.taskId}, ${newValidation.date.toISOString()}, ${newValidation.imageUrl}, ${newValidation.location})
-    `;
+      VALUES ($1, $2, $3, $4)
+    `, [newValidation.taskId, newValidation.date.toISOString(), newValidation.imageUrl, newValidation.location]);
     
     revalidatePath(`/projects/${projectId}`);
     return { success: true };
@@ -304,14 +307,12 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   }
 
   // Batch insert
-  await sql.begin(async sql => {
-    for (const task of newTasks) {
-      await sql`
-        INSERT INTO public.externo_tasks (projectId, name, quantity, value, startDate, endDate, status, consumedQuantity, dailyConsumption)
-        VALUES (${task.projectId}, ${task.name}, ${task.quantity}, ${task.value}, ${task.startDate.toISOString()}, ${task.endDate.toISOString()}, 'pendiente', 0, ${JSON.stringify(task.dailyConsumption)}::jsonb)
-      `;
-    }
-  });
+  for (const task of newTasks) {
+    await query(`
+      INSERT INTO public.externo_tasks (projectId, name, quantity, value, startDate, endDate, status, consumedQuantity, dailyConsumption)
+      VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7)
+    `, [task.projectId, task.name, task.quantity, task.value, task.startDate.toISOString(), task.endDate.toISOString(), JSON.stringify(task.dailyConsumption)]);
+  }
 
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/dashboard`);

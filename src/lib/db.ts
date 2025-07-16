@@ -1,38 +1,56 @@
+import { Pool, types } from 'pg';
+import 'dotenv/config';
 
-import postgres from 'postgres';
-import dotenv from 'dotenv';
-
-// Explicitly load environment variables from .env file
-dotenv.config();
-
-const { db_host, db_port, db_name, db_user, db_password } = process.env;
-
-if (!db_host || !db_port || !db_name || !db_user || !db_password) {
-  throw new Error('Database connection environment variables are not set. Please check your .env file.');
+// Ensure environment variables are loaded
+if (!process.env.db_host) {
+    console.error("Database environment variables are not set. Please check your .env file.");
+    throw new Error('Database environment variables are not set.');
 }
 
-const connectionString = `postgres://${db_user}:${db_password}@${db_host}:${db_port}/${db_name}`;
+// Convert NUMERIC types from string to float to avoid calculation errors in JS
+types.setTypeParser(types.builtins.NUMERIC, (value: string) => {
+    return parseFloat(value);
+});
 
-export const sql = postgres(connectionString);
+const pool = new Pool({
+  host: process.env.db_host,
+  port: process.env.db_port ? parseInt(process.env.db_port, 10) : 5432,
+  user: process.env.db_user,
+  password: process.env.db_password,
+  database: process.env.db_name,
+});
 
-/**
- * Executes a SQL query and returns the result with a specific type.
- * @param queryString The SQL query string.
- * @param params Optional parameters for the query.
- * @returns A promise that resolves with the query result.
- */
-export async function query<T>(queryString: string, params: any[] = []): Promise<T[]> {
-  const result = await sql.unsafe(queryString, params);
-  return result as T[];
-}
+pool.on('connect', () => {
+    console.log('🔗 Connected to the database via connection pool');
+});
+
+pool.on('error', (err, client) => {
+  console.error('Unexpected error on idle client', err);
+  process.exit(-1);
+});
+
+export const query = async <T>(text: string, params: any[] = []): Promise<T[]> => {
+  try {
+    const res = await pool.query(text, params);
+    return res.rows;
+  } catch (error) {
+    console.error('Error executing query', { text, params, error });
+    throw error;
+  }
+};
 
 export async function checkDbConnection(): Promise<boolean> {
+  let client;
   try {
-    // Use a simple query that doesn't depend on any specific table
-    await sql`SELECT 1`;
+    client = await pool.connect();
+    // A successful connection is enough. No need to query.
     return true;
   } catch (error) {
     console.error("Database connection failed:", error);
     return false;
+  } finally {
+    if (client) {
+      client.release();
+    }
   }
 }
