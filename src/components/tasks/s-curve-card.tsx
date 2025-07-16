@@ -40,7 +40,7 @@ export function SCurveCard({ data }: SCurveCardProps) {
               <span className="sr-only">Agrandar Gráfico</span>
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-4xl h-4/5 flex flex-col">
+          <DialogContent className="w-[95vw] max-w-[95vw] h-[90vh] flex flex-col">
             <DialogHeader>
               <DialogTitle className="font-headline">Curva "S" de Avance (Vista Ampliada)</DialogTitle>
             </DialogHeader>
