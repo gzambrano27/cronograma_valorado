@@ -52,12 +52,15 @@ export function MapPicker({ onLocationSelect, onLocationError }: MapPickerProps)
         setIsLocating(false);
       },
       (error) => {
-        console.error("Error de geolocalización:", error);
-        let message = "No se pudo obtener la ubicación. Por favor, seleccione una manualmente.";
+        // Only show a user-facing error if permission is denied or a real error occurs.
+        // Some browser extensions can trigger a timeout or other errors but still provide a location.
+        // We handle the most common user-actionable errors here.
         if (error.code === error.PERMISSION_DENIED) {
-            message = "Permiso de ubicación denegado. Por favor, habilite los permisos o seleccione una ubicación manualmente."
+            onLocationError("Permiso de ubicación denegado. Por favor, habilite los permisos o seleccione una ubicación manualmente.")
+        } else if (error.code === error.POSITION_UNAVAILABLE || error.code === error.TIMEOUT) {
+             onLocationError("No se pudo obtener la ubicación. Por favor, inténtelo de nuevo o seleccione una manualmente.");
         }
-        onLocationError(message);
+        
         setIsLocating(false);
       },
       {
