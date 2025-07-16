@@ -39,7 +39,6 @@ function processTask(rawTask: RawTask): Task {
       imageUrl: v.imageurl,
       location: v.location,
     })),
-    displayorder: rawTask.displayorder,
   };
 }
 
@@ -128,7 +127,7 @@ export async function getTasksByProjectId(id: number): Promise<Task[]> {
         ) as validations
       FROM "externo_tasks" t
       WHERE t."projectid" = $1
-      ORDER BY t."displayorder"
+      ORDER BY t."startdate", t.id
     `, [id]);
     return tasks_raw.map(processTask);
 }

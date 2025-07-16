@@ -99,13 +99,10 @@ export async function createTask(projectId: number, formData: FormData) {
   
   const dailyConsumption = createDailyConsumption(start, end, quantity);
 
-  const maxOrderResult = await query<{ max: number | null }>(`SELECT MAX("displayorder") as max FROM "externo_tasks" WHERE "projectid" = $1`, [projectId]);
-  const newDisplayOrder = (maxOrderResult[0]?.max || 0) + 1;
-
   await query(`
-    INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption", "displayorder")
-    VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7, $8)
-  `, [projectId, name, quantity, value, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption), newDisplayOrder]);
+    INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
+    VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7)
+  `, [projectId, name, quantity, value, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption)]);
   
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/dashboard`);
@@ -261,7 +258,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   const cantidadAttrDef = extendedAttrDefs.find((attr: any) => attr.Alias?.toLowerCase() === 'cantidades');
   const cantidadFieldId = cantidadAttrDef?.FieldID;
 
-  const newTasks: Omit<Task, 'id' | 'consumedQuantity' | 'displayorder'>[] = [];
+  const newTasks: Omit<Task, 'id' | 'consumedQuantity'>[] = [];
   const tasks = projectData.Tasks.Task;
 
   for (const task of tasks) {
@@ -316,15 +313,11 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
     throw new Error('No se encontraron tareas válidas para importar (verifique que tengan costo y cantidad).');
   }
 
-  const maxOrderResult = await query<{ max: number | null }>(`SELECT MAX("displayorder") as max FROM "externo_tasks" WHERE "projectid" = $1`, [projectId]);
-  let currentDisplayOrder = (maxOrderResult[0]?.max || 0);
-
   for (const task of newTasks) {
-    currentDisplayOrder++;
     await query(`
-      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption", "displayorder")
-      VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7, $8)
-    `, [task.projectId, task.name, task.quantity, task.value, task.startDate.toISOString(), task.endDate.toISOString(), JSON.stringify(task.dailyConsumption), currentDisplayOrder]);
+      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
+      VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7)
+    `, [task.projectId, task.name, task.quantity, task.value, task.startDate.toISOString(), task.endDate.toISOString(), JSON.stringify(task.dailyConsumption)]);
   }
 
   revalidatePath(`/projects/${projectId}`);

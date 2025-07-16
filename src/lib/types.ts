@@ -45,7 +45,6 @@ export type RawTask = {
   validations?: RawTaskValidation[];
   status: 'pendiente' | 'en-progreso' | 'completado';
   dailyconsumption?: DailyConsumption[];
-  displayorder: number;
 };
 
 export type Task = {
@@ -60,7 +59,6 @@ export type Task = {
   validations?: TaskValidation[];
   status: 'pendiente' | 'en-progreso' | 'completado';
   dailyConsumption?: DailyConsumption[];
-  displayorder: number;
 };
 
 export type SCurveData = {
