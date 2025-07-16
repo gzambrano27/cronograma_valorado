@@ -222,6 +222,13 @@ export async function validateTask(formData: FormData) {
     return { success: true };
 }
 
+export async function deleteValidation(validationId: number, projectId: number) {
+    await query(`DELETE FROM "externo_task_validations" WHERE id = $1`, [validationId]);
+    revalidatePath(`/projects/${projectId}`);
+    return { success: true };
+}
+
+
 export async function importTasksFromXML(projectId: number, formData: FormData) {
   const { XMLParser } = await import('fast-xml-parser');
   

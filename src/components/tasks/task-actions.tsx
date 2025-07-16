@@ -45,10 +45,10 @@ export function TaskActions({ task, onSuccess }: TaskActionsProps) {
       />
       {hasValidations && (
         <ViewValidationsDialog
-          validations={task.validations!}
-          taskName={task.name}
+          task={task}
           open={isViewValidationsOpen}
           onOpenChange={setIsViewValidationsOpen}
+          onSuccess={onSuccess}
         />
       )}
       <DropdownMenu>
