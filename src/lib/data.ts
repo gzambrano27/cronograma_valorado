@@ -19,13 +19,13 @@ function processTask(task: any): Task {
   return {
     ...task,
     id: parseInt(task.id, 10),
-    projectId: parseInt(task.projectid, 10),
+    projectId: parseInt(task.projectId, 10),
     quantity: toFloat(task.quantity),
-    consumedQuantity: toFloat(task.consumedquantity),
+    consumedQuantity: toFloat(task.consumedQuantity),
     value: toFloat(task.value),
-    startDate: new Date(task.startdate),
-    endDate: new Date(task.enddate),
-    dailyConsumption: (task.dailyconsumption || []).map((dc: any) => ({
+    startDate: new Date(task.startDate),
+    endDate: new Date(task.endDate),
+    dailyConsumption: (task.dailyConsumption || []).map((dc: any) => ({
       ...dc,
       date: new Date(dc.date),
       plannedQuantity: toFloat(dc.plannedQuantity),
