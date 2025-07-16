@@ -235,12 +235,12 @@
       "value": 1335.49,
       "startDate": "2025-06-02T09:00:00.000Z",
       "endDate": "2025-06-03T19:00:00.000Z",
-      "status": "pendiente",
+      "status": "en-progreso",
       "dailyConsumption": [
         {
           "date": "2025-06-02T00:00:00.000Z",
           "plannedQuantity": 2.5,
-          "consumedQuantity": 0
+          "consumedQuantity": 2.5
         },
         {
           "date": "2025-06-03T00:00:00.000Z",
@@ -248,7 +248,7 @@
           "consumedQuantity": 0
         }
       ],
-      "consumedQuantity": 0,
+      "consumedQuantity": 2.5,
       "validations": []
     },
     {
