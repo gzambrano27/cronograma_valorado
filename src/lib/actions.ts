@@ -99,10 +99,14 @@ export async function createTask(projectId: number, formData: FormData) {
   
   const dailyConsumption = createDailyConsumption(start, end, quantity);
 
+  // Get the max display order for the project and add 1
+  const maxOrderResult = await query<{ max: number | null }>(`SELECT MAX("displayorder") as max FROM "externo_tasks" WHERE "projectid" = $1`, [projectId]);
+  const newDisplayOrder = (maxOrderResult[0]?.max || 0) + 1;
+
   await query(`
-    INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
-    VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7)
-  `, [projectId, name, quantity, value, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption)]);
+    INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption", "displayorder")
+    VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7, $8)
+  `, [projectId, name, quantity, value, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption), newDisplayOrder]);
   
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/dashboard`);
@@ -262,6 +266,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
 
   const newTasks: Omit<Task, 'id' | 'consumedQuantity'>[] = [];
   const tasks = projectData.Tasks.Task;
+  let displayOrder = 0;
 
   for (const task of tasks) {
     try {
@@ -296,6 +301,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
 
         const value = quantity > 0 ? totalTaskValue / quantity : 0;
         const dailyConsumption = createDailyConsumption(startDate, endDate, quantity);
+        displayOrder++;
         
         newTasks.push({
             projectId,
@@ -305,7 +311,8 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
             startDate,
             endDate,
             status: 'pendiente',
-            dailyConsumption
+            dailyConsumption,
+            displayOrder
         });
     } catch (e) {
         console.error("Error procesando tarea del XML:", task?.Name, e);
@@ -319,9 +326,9 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   // Batch insert
   for (const task of newTasks) {
     await query(`
-      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
-      VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7)
-    `, [task.projectId, task.name, task.quantity, task.value, task.startDate.toISOString(), task.endDate.toISOString(), JSON.stringify(task.dailyConsumption)]);
+      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption", "displayorder")
+      VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7, $8)
+    `, [task.projectId, task.name, task.quantity, task.value, task.startDate.toISOString(), task.endDate.toISOString(), JSON.stringify(task.dailyConsumption), task.displayOrder]);
   }
 
   revalidatePath(`/projects/${projectId}`);

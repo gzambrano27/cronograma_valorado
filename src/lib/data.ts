@@ -39,6 +39,7 @@ function processTask(rawTask: RawTask): Task {
       imageUrl: v.imageurl,
       location: v.location,
     })),
+    displayOrder: rawTask.displayorder,
   };
 }
 
@@ -76,7 +77,7 @@ export async function getProjects(): Promise<Project[]> {
         FROM "project_project" pp
         LEFT JOIN "res_company" rc ON pp."company_id" = rc.id
         LEFT JOIN "res_partner" rp ON pp."partner_id" = rp.id
-        WHERE pp.name->>'en_US' != 'Interno' AND pp.name->>'es_EC' != 'Interno' OR pp.name->>'en_US' IS NULL
+        WHERE (pp.name->>'en_US' != 'Interno' AND pp.name->>'es_EC' != 'Interno') OR pp.name->>'en_US' IS NULL
         ORDER BY pp.name
     `);
 
@@ -128,7 +129,7 @@ export async function getTasksByProjectId(id: number): Promise<Task[]> {
         ) as validations
       FROM "externo_tasks" t
       WHERE t."projectid" = $1
-      ORDER BY t."startdate"
+      ORDER BY t."displayorder"
     `, [id]);
     return tasks_raw.map(processTask);
 }
@@ -210,4 +211,3 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
       deviation: Math.round(point.deviation * 100) / 100,
     }));
 }
-
