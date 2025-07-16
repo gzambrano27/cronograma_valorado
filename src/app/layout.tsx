@@ -6,14 +6,21 @@ import { getProjects } from '@/lib/data';
 import { ThemeProvider } from '@/components/layout/theme-provider';
 import React from 'react';
 import type { Project } from '@/lib/types';
-
+import { checkDbConnection } from '@/lib/db';
+import { ConnectionError } from '@/components/layout/connection-error';
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const projects = await getProjects();
+  const isDbConnected = await checkDbConnection();
+
+  let projects: Project[] = [];
+  if (isDbConnected) {
+    projects = await getProjects();
+  }
+  
   const title = "Menú";
 
   return (
@@ -25,7 +32,6 @@ export default async function RootLayout({
         <meta name="theme-color" content="#3F51B5" />
          <title>Centro de Aplicaciones</title>
          <meta name="description" content="Evalúa tus proyectos con precisión." />
-         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className="font-body antialiased">
         <ThemeProvider
@@ -34,9 +40,13 @@ export default async function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <AppShell projects={projects} title={title}>
-            {children}
-          </AppShell>
+          {isDbConnected ? (
+            <AppShell projects={projects} title={title}>
+              {children}
+            </AppShell>
+          ) : (
+            <ConnectionError />
+          )}
           <Toaster />
         </ThemeProvider>
       </body>
