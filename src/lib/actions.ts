@@ -100,7 +100,7 @@ export async function createTask(projectId: number, formData: FormData) {
   const dailyConsumption = createDailyConsumption(start, end, quantity);
 
   await query(`
-    INSERT INTO public.externo_tasks (projectId, name, quantity, value, startDate, endDate, status, consumedQuantity, dailyConsumption)
+    INSERT INTO externo_tasks (projectId, name, quantity, value, startDate, endDate, status, consumedQuantity, dailyConsumption)
     VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7)
   `, [projectId, name, quantity, value, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption)]);
   
@@ -110,7 +110,7 @@ export async function createTask(projectId: number, formData: FormData) {
 }
 
 export async function deleteTask(taskId: number, projectId: number) {
-    await query(`DELETE FROM public.externo_tasks WHERE id = $1`, [taskId]);
+    await query(`DELETE FROM externo_tasks WHERE id = $1`, [taskId]);
     revalidatePath(`/projects/${projectId}`);
     revalidatePath(`/dashboard`);
     return { success: true };
@@ -126,14 +126,14 @@ export async function deleteMultipleTasks(taskIds: number[], projectId: number |
     // pg driver doesn't support array binding like node-postgres did.
     // We create the numbered placeholders dynamically.
     const placeholders = taskIds.map((_, i) => `$${i + 1}`).join(',');
-    await query(`DELETE FROM public.externo_tasks WHERE id IN (${placeholders})`, taskIds);
+    await query(`DELETE FROM externo_tasks WHERE id IN (${placeholders})`, taskIds);
     revalidatePath(`/projects/${projectId}`);
     revalidatePath(`/dashboard`);
     return { success: true };
 }
 
 export async function updateTaskConsumption(taskId: number, date: string, consumedQuantity: number) {
-    const result = await query<Task>(`SELECT * FROM public.externo_tasks WHERE id = $1`, [taskId]);
+    const result = await query<Task>(`SELECT * FROM externo_tasks WHERE id = $1`, [taskId]);
     const task = result[0];
 
 
@@ -161,7 +161,7 @@ export async function updateTaskConsumption(taskId: number, date: string, consum
     const newStatus = totalConsumed >= task.quantity ? 'completado' : (totalConsumed > 0 ? 'en-progreso' : 'pendiente');
 
     await query(`
-        UPDATE public.externo_tasks
+        UPDATE externo_tasks
         SET 
             dailyConsumption = $1,
             consumedQuantity = $2,
@@ -211,7 +211,7 @@ export async function validateTask(formData: FormData) {
     };
 
     await query(`
-      INSERT INTO public.externo_task_validations (taskId, date, imageUrl, location)
+      INSERT INTO externo_task_validations (taskId, date, imageUrl, location)
       VALUES ($1, $2, $3, $4)
     `, [newValidation.taskId, newValidation.date.toISOString(), newValidation.imageUrl, newValidation.location]);
     
@@ -309,7 +309,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   // Batch insert
   for (const task of newTasks) {
     await query(`
-      INSERT INTO public.externo_tasks (projectId, name, quantity, value, startDate, endDate, status, consumedQuantity, dailyConsumption)
+      INSERT INTO externo_tasks (projectId, name, quantity, value, startDate, endDate, status, consumedQuantity, dailyConsumption)
       VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7)
     `, [task.projectId, task.name, task.quantity, task.value, task.startDate.toISOString(), task.endDate.toISOString(), JSON.stringify(task.dailyConsumption)]);
   }

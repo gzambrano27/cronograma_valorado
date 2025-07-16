@@ -58,13 +58,13 @@ export async function getProjects(): Promise<Project[]> {
             pp.name, 
             rc.name as company, 
             rp.name as client
-        FROM public.project_project pp
-        LEFT JOIN public.res_company rc ON pp.company_id = rc.id
-        LEFT JOIN public.res_partner rp ON pp.partner_id = rp.id
+        FROM project_project pp
+        LEFT JOIN res_company rc ON pp.company_id = rc.id
+        LEFT JOIN res_partner rp ON pp.partner_id = rp.id
         ORDER BY pp.name
     `);
 
-    const tasks_raw = await query<Task>(`SELECT * FROM public.externo_tasks`);
+    const tasks_raw = await query<Task>(`SELECT * FROM externo_tasks`);
     
     const tasks = tasks_raw.map(processTask);
     const projects = projects_raw.map(p => ({
@@ -93,7 +93,7 @@ export async function getProjects(): Promise<Project[]> {
 }
 
 export async function getTasks(): Promise<Task[]> {
-  const tasks_raw = await query<Task>(`SELECT * FROM public.externo_tasks`);
+  const tasks_raw = await query<Task>(`SELECT * FROM externo_tasks`);
   return tasks_raw.map(processTask);
 }
 
@@ -107,10 +107,10 @@ export async function getTasksByProjectId(id: number): Promise<Task[]> {
       SELECT t.*,
         (
           SELECT json_agg(v.*)
-          FROM public.externo_task_validations v
+          FROM externo_task_validations v
           WHERE v.taskId = t.id
         ) as validations
-      FROM public.externo_tasks t
+      FROM externo_tasks t
       WHERE t.projectId = $1
       ORDER BY t.startDate
     `, [id]);
