@@ -41,10 +41,8 @@ export default function AppShell({
 }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
-  const [isClient, setIsClient] = React.useState(false);
-
+  
   React.useEffect(() => {
-    setIsClient(true);
     try {
       const sidebarCookie = document.cookie
         .split("; ")
@@ -72,7 +70,6 @@ export default function AppShell({
                   {title}
                 </h2>
               </div>
-              <SidebarTrigger className="md:flex hidden" />
             </div>
           </SidebarHeader>
           <SidebarContent>
@@ -142,6 +139,7 @@ export default function AppShell({
         </Sidebar>
         <SidebarMain>
           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+            <SidebarTrigger className="hidden md:flex" />
             <div className="md:hidden">
               <SidebarTrigger />
             </div>
