@@ -51,6 +51,18 @@ export async function getAppConfig(): Promise<AppConfig> {
   }
 }
 
+// Helper function to extract translated names from Odoo's JSONB format
+const getTranslatedName = (nameField: any): string => {
+    if (typeof nameField === 'string') {
+        return nameField;
+    }
+    if (typeof nameField === 'object' && nameField !== null && 'en_US' in nameField) {
+        return nameField.en_US || 'N/A';
+    }
+    return 'N/A';
+};
+
+
 export async function getProjects(): Promise<Project[]> {
     const projects_raw = await query<any>(`
         SELECT 
@@ -69,9 +81,9 @@ export async function getProjects(): Promise<Project[]> {
     const tasks = tasks_raw.map(processTask);
     const projects = projects_raw.map(p => ({
         id: p.id,
-        name: p.name,
-        company: p.company || 'N/A',
-        client: p.client || ''
+        name: getTranslatedName(p.name),
+        company: getTranslatedName(p.company),
+        client: p.client ? getTranslatedName(p.client) : ''
     }));
 
     return projects.map(project => {
