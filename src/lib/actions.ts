@@ -289,6 +289,11 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
             }
         }
         
+        // Filter out tasks with zero cost or zero quantity
+        if (totalTaskValue === 0 || quantity === 0) {
+            continue;
+        }
+
         const value = quantity > 0 ? totalTaskValue / quantity : 0;
         const dailyConsumption = createDailyConsumption(startDate, endDate, quantity);
         
@@ -308,7 +313,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   }
 
   if (newTasks.length === 0) {
-    throw new Error('No se encontraron tareas válidas para importar.');
+    throw new Error('No se encontraron tareas válidas para importar (verifique que tengan costo y cantidad).');
   }
 
   // Batch insert
