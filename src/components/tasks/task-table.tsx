@@ -50,6 +50,8 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { Checkbox } from "../ui/checkbox"
 import { DeleteMultipleTasksDialog } from "./delete-multiple-tasks-dialog"
+import { Switch } from "../ui/switch"
+import { Label } from "../ui/label"
 import { cn, formatCurrency } from "@/lib/utils"
 
 const statusTranslations: Record<Task['status'], string> = {
@@ -60,11 +62,6 @@ const statusTranslations: Record<Task['status'], string> = {
 
 const adjustDateForTimezone = (date: Date | string): Date => {
     const d = new Date(date);
-    // When a date string like "2025-06-02T00:00:00.000Z" is parsed,
-    // new Date() converts it to the browser's local timezone.
-    // If the timezone is west of UTC (e.g., in the Americas), the local date becomes June 1st.
-    // getTimezoneOffset() returns the difference in minutes between UTC and local time.
-    // For UTC-5, it's 300. We add this offset back to correct the date.
     const userTimezoneOffset = d.getTimezoneOffset() * 60000;
     return new Date(d.getTime() + userTimezoneOffset);
 };
@@ -246,6 +243,7 @@ const columnTranslations: Record<string, string> = {
 export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => void }) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+  const [showAll, setShowAll] = React.useState(false);
   
   const isMobile = useIsMobile();
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
@@ -304,6 +302,10 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
     },
   })
 
+  React.useEffect(() => {
+    table.setPageSize(showAll ? data.length : 10);
+  }, [showAll, data.length, table]);
+
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const selectedTasks = table.getFilteredSelectedRowModel().rows.map(row => row.original);
 
@@ -356,6 +358,14 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
                 ))}
             </SelectContent>
         </Select>
+         <div className="flex items-center space-x-2">
+            <Switch
+              id="show-all-tasks"
+              checked={showAll}
+              onCheckedChange={setShowAll}
+            />
+            <Label htmlFor="show-all-tasks" className="text-sm">Ver todo</Label>
+          </div>
         <div className="flex-1" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -453,24 +463,29 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Anterior
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Siguiente
-        </Button>
-      </div>
+      {!showAll && table.getPageCount() > 1 && (
+        <div className="flex items-center justify-end space-x-2 py-4">
+            <span className="text-sm text-muted-foreground">
+                Página {table.getState().pagination.pageIndex + 1} de {table.getPageCount()}
+            </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Anterior
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Siguiente
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
