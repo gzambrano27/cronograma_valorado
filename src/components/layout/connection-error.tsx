@@ -1,18 +1,40 @@
 
-import { AlertTriangle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+"use client";
+
+import { AlertTriangle, RefreshCw } from "lucide-react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import { Button } from "../ui/button";
 
 export function ConnectionError() {
+
+  const handleReload = () => {
+    window.location.reload();
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
-      <Alert variant="destructive" className="max-w-lg">
-        <AlertTriangle className="h-4 w-4" />
-        <AlertTitle className="font-headline text-xl">Error de Conexión</AlertTitle>
-        <AlertDescription className="mt-2">
-          <p>No se pudo establecer una conexión con la base de datos.</p>
-          <p className="mt-2 text-sm text-muted-foreground">Por favor, asegúrese de que el servidor de la base de datos PostgreSQL esté en ejecución y que las credenciales en el archivo `.env` sean correctas. Una vez solucionado, recargue la página.</p>
-        </AlertDescription>
-      </Alert>
+    <div className="flex items-center justify-center min-h-screen bg-muted/40 p-4">
+      <Card className="w-full max-w-md text-center border-destructive/50 shadow-lg shadow-destructive/10">
+        <CardHeader>
+          <div className="mx-auto bg-destructive/10 p-4 rounded-full w-fit">
+            <AlertTriangle className="h-12 w-12 text-destructive" />
+          </div>
+          <CardTitle className="font-headline text-2xl pt-4">Error de Conexión</CardTitle>
+          <CardDescription className="text-base">
+            No se pudo establecer una conexión con la base de datos.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">
+            Por favor, asegúrese de que el servidor de la base de datos PostgreSQL esté en ejecución y que las credenciales en el archivo `.env` sean correctas.
+          </p>
+        </CardContent>
+        <CardFooter>
+          <Button onClick={handleReload} className="w-full" variant="destructive">
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Intentar de Nuevo
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 }
