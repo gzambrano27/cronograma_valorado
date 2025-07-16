@@ -62,7 +62,7 @@ export default function AppShell({
 
   return (
     <TooltipProvider>
-      <SidebarProvider title={title} defaultOpen={sidebarOpen}>
+      <SidebarProvider title={title} defaultOpen={sidebarOpen} onOpenChange={setSidebarOpen}>
         <Sidebar>
           <SidebarHeader>
             <div className="flex items-center group-data-[state=expanded]/sidebar:justify-between group-data-[state=collapsed]/sidebar:justify-center p-2">
@@ -72,7 +72,7 @@ export default function AppShell({
                   {title}
                 </h2>
               </div>
-              <SidebarTrigger className="group-data-[state=expanded]/sidebar:hidden group-data-[state=collapsed]/sidebar:hidden" />
+              <SidebarTrigger className="hidden md:flex" />
             </div>
           </SidebarHeader>
           <SidebarContent>

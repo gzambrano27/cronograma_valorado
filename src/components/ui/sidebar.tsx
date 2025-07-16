@@ -207,7 +207,7 @@ const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
 >(({ className, onClick, ...props }, ref) => {
-  const { toggleSidebar } = useSidebar()
+  const { toggleSidebar, state } = useSidebar()
 
   return (
     <Button
@@ -222,8 +222,8 @@ const SidebarTrigger = React.forwardRef<
       }}
       {...props}
     >
-      <PanelLeftOpen className="group-data-[state=collapsed]/sidebar:hidden" />
-      <PanelRightOpen className="hidden group-data-[state=collapsed]/sidebar:block" />
+      <PanelLeftOpen className={cn(state === 'collapsed' && 'hidden')} />
+      <PanelRightOpen className={cn(state === 'expanded' && 'hidden')} />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )
