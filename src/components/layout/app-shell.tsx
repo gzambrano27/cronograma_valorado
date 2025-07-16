@@ -72,7 +72,7 @@ export default function AppShell({
                   {title}
                 </h2>
               </div>
-              <SidebarTrigger className="hidden md:flex" />
+              <SidebarTrigger className="md:flex hidden" />
             </div>
           </SidebarHeader>
           <SidebarContent>
