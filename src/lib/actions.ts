@@ -1,7 +1,7 @@
 
 'use server';
 
-import type { Project, Task, TaskValidation, AppConfig, DailyConsumption } from './types';
+import type { Project, Task, TaskValidation, AppConfig, DailyConsumption, RawTask } from './types';
 import fs from 'fs/promises';
 import path from 'path';
 import { z } from 'zod';
@@ -100,7 +100,7 @@ export async function createTask(projectId: number, formData: FormData) {
   const dailyConsumption = createDailyConsumption(start, end, quantity);
 
   await query(`
-    INSERT INTO "externo_tasks" ("projectId", "name", "quantity", "value", "startDate", "endDate", "status", "consumedQuantity", "dailyConsumption")
+    INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
     VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7)
   `, [projectId, name, quantity, value, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption)]);
   
@@ -133,15 +133,20 @@ export async function deleteMultipleTasks(taskIds: number[], projectId: number |
 }
 
 export async function updateTaskConsumption(taskId: number, date: string, consumedQuantity: number) {
-    const result = await query<Task>(`SELECT * FROM "externo_tasks" WHERE id = $1`, [taskId]);
-    const task = result[0];
+    const result = await query<RawTask>(`SELECT * FROM "externo_tasks" WHERE id = $1`, [taskId]);
+    const taskData = result[0];
 
 
-    if (!task) {
+    if (!taskData) {
         throw new Error('Tarea no encontrada.');
     }
+    
+    const task = {
+        ...taskData,
+        quantity: parseFloat(taskData.quantity)
+    }
 
-    const dailyConsumption = (task.dailyConsumption || []).map(dc => ({
+    const dailyConsumption = (task.dailyconsumption || []).map(dc => ({
       ...dc,
       date: new Date(dc.date)
     })) as DailyConsumption[];
@@ -163,13 +168,13 @@ export async function updateTaskConsumption(taskId: number, date: string, consum
     await query(`
         UPDATE "externo_tasks"
         SET 
-            "dailyConsumption" = $1,
-            "consumedQuantity" = $2,
+            "dailyconsumption" = $1,
+            "consumedquantity" = $2,
             "status" = $3
         WHERE id = $4
     `, [JSON.stringify(dailyConsumption), totalConsumed, newStatus, taskId]);
 
-    revalidatePath(`/projects/${task.projectId}`);
+    revalidatePath(`/projects/${taskData.projectid}`);
     revalidatePath(`/dashboard`);
     return { success: true };
 }
@@ -211,7 +216,7 @@ export async function validateTask(formData: FormData) {
     };
 
     await query(`
-      INSERT INTO "externo_task_validations" ("taskId", "date", "imageUrl", "location")
+      INSERT INTO "externo_task_validations" ("taskid", "date", "imageurl", "location")
       VALUES ($1, $2, $3, $4)
     `, [newValidation.taskId, newValidation.date.toISOString(), newValidation.imageUrl, newValidation.location]);
     
@@ -309,7 +314,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   // Batch insert
   for (const task of newTasks) {
     await query(`
-      INSERT INTO "externo_tasks" ("projectId", "name", "quantity", "value", "startDate", "endDate", "status", "consumedQuantity", "dailyConsumption")
+      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
       VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7)
     `, [task.projectId, task.name, task.quantity, task.value, task.startDate.toISOString(), task.endDate.toISOString(), JSON.stringify(task.dailyConsumption)]);
   }

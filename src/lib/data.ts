@@ -1,6 +1,6 @@
 
 'use server';
-import type { Project, Task, SCurveData, AppConfig, TaskValidation } from './types';
+import type { Project, Task, SCurveData, AppConfig, TaskValidation, RawTask, RawTaskValidation } from './types';
 import fs from 'fs/promises';
 import path from 'path';
 import { eachDayOfInterval, format, startOfDay } from 'date-fns';
@@ -15,27 +15,29 @@ const toFloat = (value: string | number | null): number => {
 };
 
 // Helper function to process tasks
-function processTask(task: any): Task {
+function processTask(rawTask: RawTask): Task {
   return {
-    ...task,
-    id: parseInt(task.id, 10),
-    projectId: parseInt(task.projectId, 10),
-    quantity: toFloat(task.quantity),
-    consumedQuantity: toFloat(task.consumedQuantity),
-    value: toFloat(task.value),
-    startDate: new Date(task.startDate),
-    endDate: new Date(task.endDate),
-    dailyConsumption: (task.dailyConsumption || []).map((dc: any) => ({
+    id: parseInt(rawTask.id, 10),
+    projectId: parseInt(rawTask.projectid, 10),
+    name: rawTask.name,
+    quantity: toFloat(rawTask.quantity),
+    consumedQuantity: toFloat(rawTask.consumedquantity),
+    value: toFloat(rawTask.value),
+    startDate: new Date(rawTask.startdate),
+    endDate: new Date(rawTask.enddate),
+    status: rawTask.status,
+    dailyConsumption: (rawTask.dailyconsumption || []).map((dc: any) => ({
       ...dc,
       date: new Date(dc.date),
       plannedQuantity: toFloat(dc.plannedQuantity),
       consumedQuantity: toFloat(dc.consumedQuantity),
     })),
-    validations: (task.validations || []).map((v: any) => ({
-      ...v,
+    validations: (rawTask.validations || []).map((v: RawTaskValidation) => ({
       id: parseInt(v.id, 10),
       taskId: parseInt(v.taskid, 10),
       date: new Date(v.date),
+      imageUrl: v.imageurl,
+      location: v.location,
     })),
   };
 }
@@ -78,7 +80,7 @@ export async function getProjects(): Promise<Project[]> {
         ORDER BY pp.name
     `);
 
-    const tasks_raw = await query<Task>(`SELECT * FROM "externo_tasks"`);
+    const tasks_raw = await query<RawTask>(`SELECT * FROM "externo_tasks"`);
     
     const tasks = tasks_raw.map(processTask);
     const projects = projects_raw.map(p => ({
@@ -107,7 +109,7 @@ export async function getProjects(): Promise<Project[]> {
 }
 
 export async function getTasks(): Promise<Task[]> {
-  const tasks_raw = await query<Task>(`SELECT * FROM "externo_tasks"`);
+  const tasks_raw = await query<RawTask>(`SELECT * FROM "externo_tasks"`);
   return tasks_raw.map(processTask);
 }
 
@@ -117,16 +119,16 @@ export async function getProjectById(id: number): Promise<Project | undefined> {
 }
 
 export async function getTasksByProjectId(id: number): Promise<Task[]> {
-    const tasks_raw = await query<Task>(`
+    const tasks_raw = await query<RawTask>(`
       SELECT t.*,
         (
           SELECT json_agg(v.*)
           FROM "externo_task_validations" v
-          WHERE v."taskId" = t.id
+          WHERE v."taskid" = t.id
         ) as validations
       FROM "externo_tasks" t
-      WHERE t."projectId" = $1
-      ORDER BY t."startDate"
+      WHERE t."projectid" = $1
+      ORDER BY t."startdate"
     `, [id]);
     return tasks_raw.map(processTask);
 }
@@ -208,3 +210,4 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
       deviation: Math.round(point.deviation * 100) / 100,
     }));
 }
+

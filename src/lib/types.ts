@@ -1,9 +1,18 @@
 
+
 export type DailyConsumption = {
   date: Date;
   plannedQuantity: number;
   consumedQuantity: number;
 };
+
+export type RawTaskValidation = {
+  id: string;
+  taskid: string;
+  date: string;
+  imageurl: string;
+  location: string;
+}
 
 export type TaskValidation = {
   id: number;
@@ -22,6 +31,20 @@ export type Project = {
   consumedValue: number;
   taskCount: number;
   completedTasks: number;
+};
+
+export type RawTask = {
+  id: string;
+  projectid: string;
+  name:string;
+  quantity: string;
+  consumedquantity: string;
+  value: string;
+  startdate: string;
+  enddate: string;
+  validations?: RawTaskValidation[];
+  status: 'pendiente' | 'en-progreso' | 'completado';
+  dailyconsumption?: DailyConsumption[];
 };
 
 export type Task = {
@@ -52,3 +75,4 @@ export type SCurveData = {
 export type AppConfig = {
   endpointUrl: string;
 };
+
