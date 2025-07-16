@@ -1,3 +1,4 @@
+
 export type DailyConsumption = {
   date: Date;
   plannedQuantity: number;
@@ -6,6 +7,7 @@ export type DailyConsumption = {
 
 export type TaskValidation = {
   id: string;
+  taskId: string;
   date: Date;
   imageUrl: string;
   location: string;
@@ -13,12 +15,9 @@ export type TaskValidation = {
 
 export type Project = {
   id: string;
-  externalId?: number;
   name: string;
   company: string;
-  externalCompanyId?: number;
   client?: string;
-  externalClientId?: number;
   totalValue: number;
   consumedValue: number;
   taskCount: number;
@@ -53,8 +52,3 @@ export type SCurveData = {
 export type AppConfig = {
   endpointUrl: string;
 };
-
-export interface Database {
-  projects: Omit<Project, 'totalValue' | 'taskCount' | 'completedTasks' | 'consumedValue'>[];
-  tasks: Task[];
-}

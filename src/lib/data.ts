@@ -1,41 +1,39 @@
 
 'use server';
-import type { Project, Task, SCurveData, AppConfig } from './types';
+import type { Project, Task, SCurveData, AppConfig, TaskValidation } from './types';
 import fs from 'fs/promises';
 import path from 'path';
 import { eachDayOfInterval, format, startOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { sql } from './db';
 
-interface Database {
-  projects: Omit<Project, 'totalValue' | 'taskCount' | 'completedTasks' | 'consumedValue'>[];
-  tasks: Task[];
-}
+// Helper to convert DB numeric string types to numbers
+const toFloat = (value: string | number | null): number => {
+    if (value === null) return 0;
+    if (typeof value === 'number') return value;
+    return parseFloat(value) || 0;
+};
 
-async function readDb(): Promise<Database> {
-  const filePath = path.join(process.cwd(), 'src', 'lib', 'db.json');
-  try {
-    const jsonData = await fs.readFile(filePath, 'utf-8');
-    const data = JSON.parse(jsonData) as Database;
-    
-    data.tasks.forEach(task => {
-      task.startDate = new Date(task.startDate);
-      task.endDate = new Date(task.endDate);
-      if (task.dailyConsumption) {
-        task.dailyConsumption.forEach(dc => {
-          dc.date = new Date(dc.date);
-        });
-      }
-      if (task.validations) {
-        task.validations.forEach(v => {
-          v.date = new Date(v.date);
-        });
-      }
-    });
-    return data;
-  } catch (error) {
-    console.error("Could not read db.json", error);
-    return { projects: [], tasks: [] };
-  }
+// Helper function to process tasks
+function processTask(task: any): Task {
+  return {
+    ...task,
+    quantity: toFloat(task.quantity),
+    consumedQuantity: toFloat(task.consumedQuantity),
+    value: toFloat(task.value),
+    startDate: new Date(task.startDate),
+    endDate: new Date(task.endDate),
+    dailyConsumption: (task.dailyConsumption || []).map((dc: any) => ({
+      ...dc,
+      date: new Date(dc.date),
+      plannedQuantity: toFloat(dc.plannedQuantity),
+      consumedQuantity: toFloat(dc.consumedQuantity),
+    })),
+    validations: (task.validations || []).map((v: any) => ({
+      ...v,
+      date: new Date(v.date),
+    })),
+  };
 }
 
 export async function getAppConfig(): Promise<AppConfig> {
@@ -50,53 +48,67 @@ export async function getAppConfig(): Promise<AppConfig> {
 }
 
 export async function getProjects(): Promise<Project[]> {
-  const db = await readDb();
-  const { projects, tasks } = db;
-
-  return projects.map(project => {
-    const projectTasks = tasks.filter(task => task.projectId === project.id);
-    const completedTasks = projectTasks.filter(task => task.status === 'completado').length;
-    const taskCount = projectTasks.length;
+    // Note: The original request was to query `project_project` table.
+    // We will simulate this by reading from db.json as we cannot access external DBs.
+    const projects_raw = await sql`
+        SELECT 
+            id::text, 
+            name, 
+            company_id[2] as company, 
+            partner_id[2] as client 
+        FROM project_project
+        ORDER BY name
+    `;
+    const tasks_raw = await sql`SELECT * FROM tasks`;
     
-    const totalValue = projectTasks.reduce((sum, task) => sum + (task.quantity * task.value), 0);
-    
-    const consumedValue = projectTasks.reduce((projectSum, task) => {
-      const totalConsumedQuantity = (task.dailyConsumption || []).reduce(
-        (taskSum, consumption) => taskSum + consumption.consumedQuantity,
-        0
-      );
-      return projectSum + (totalConsumedQuantity * task.value);
-    }, 0);
+    const tasks = tasks_raw.map(processTask);
+    const projects = projects_raw.map(p => ({
+        id: String(p.id),
+        name: p.name,
+        company: p.company,
+        client: p.client || ''
+    }));
 
-    return {
-      ...project,
-      taskCount,
-      completedTasks,
-      totalValue,
-      consumedValue,
-    };
-  });
+    return projects.map(project => {
+        const projectTasks = tasks.filter(task => task.projectId === project.id);
+        const completedTasks = projectTasks.filter(task => task.status === 'completado').length;
+        const taskCount = projectTasks.length;
+        
+        const totalValue = projectTasks.reduce((sum, task) => sum + (task.quantity * task.value), 0);
+        const consumedValue = projectTasks.reduce((sum, task) => sum + (task.consumedQuantity * task.value), 0);
+
+        return {
+            ...project,
+            taskCount,
+            completedTasks,
+            totalValue,
+            consumedValue,
+        };
+    });
 }
 
 export async function getTasks(): Promise<Task[]> {
-  const db = await readDb();
-  return db.tasks.map(task => ({
-    ...task,
-    consumedQuantity: (task.dailyConsumption || []).reduce(
-      (sum, consumption) => sum + consumption.consumedQuantity,
-      0
-    ),
-  }));
+  const tasks_raw = await sql`SELECT * FROM tasks`;
+  return tasks_raw.map(processTask);
 }
 
 export async function getProjectById(id: string): Promise<Project | undefined> {
-    const projects = await getProjects();
+    const projects = await getProjects(); // This is inefficient but necessary for now
     return projects.find(p => p.id === id);
 }
 
 export async function getTasksByProjectId(id: string): Promise<Task[]> {
-    const tasks = await getTasks();
-    return tasks.filter(t => t.projectId === id);
+    const tasks_raw = await sql`
+      SELECT t.*,
+        (
+          SELECT json_agg(v.*)
+          FROM task_validations v
+          WHERE v."taskId" = t.id
+        ) as validations
+      FROM tasks t
+      WHERE t."projectId" = ${id}
+    `;
+    return tasks_raw.map(processTask);
 }
 
 export async function generateSCurveData(tasks: Task[], totalProjectValue: number): Promise<SCurveData[]> {
@@ -157,18 +169,18 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
       });
     }
   
-    // Add a starting point at 0%
-    const dayBefore = new Date(minDate.getTime() - 86400000);
-    finalCurve.unshift({
-      date: format(dayBefore, "d MMM", { locale: es }),
-      planned: 0,
-      actual: 0,
-      cumulativePlannedValue: 0,
-      cumulativeActualValue: 0,
-      deviation: 0,
-    });
+    if (minDate > new Date()) {
+       const dayBefore = new Date(minDate.getTime() - 86400000);
+        finalCurve.unshift({
+          date: format(dayBefore, "d MMM", { locale: es }),
+          planned: 0,
+          actual: 0,
+          cumulativePlannedValue: 0,
+          cumulativeActualValue: 0,
+          deviation: 0,
+        });
+    }
   
-    // Round percentages for cleaner display
     return finalCurve.map(point => ({
       ...point,
       planned: Math.round(point.planned * 100) / 100,
