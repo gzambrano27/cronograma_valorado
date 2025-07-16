@@ -56,8 +56,9 @@ const getTranslatedName = (nameField: any): string => {
     if (typeof nameField === 'string') {
         return nameField;
     }
-    if (typeof nameField === 'object' && nameField !== null && 'en_US' in nameField) {
-        return nameField.en_US || 'N/A';
+    if (typeof nameField === 'object' && nameField !== null) {
+        // Prioritize es_EC, then en_US as fallback
+        return nameField.es_EC || nameField.en_US || 'N/A';
     }
     return 'N/A';
 };
@@ -73,6 +74,7 @@ export async function getProjects(): Promise<Project[]> {
         FROM "project_project" pp
         LEFT JOIN "res_company" rc ON pp."company_id" = rc.id
         LEFT JOIN "res_partner" rp ON pp."partner_id" = rp.id
+        WHERE pp.name->>'en_US' != 'Interno' AND pp.name->>'es_EC' != 'Interno' OR pp.name->>'en_US' IS NULL
         ORDER BY pp.name
     `);
 
