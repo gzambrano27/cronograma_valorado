@@ -6,8 +6,8 @@ export type DailyConsumption = {
 };
 
 export type TaskValidation = {
-  id: string;
-  taskId: string;
+  id: number;
+  taskId: number;
   date: Date;
   imageUrl: string;
   location: string;
@@ -25,7 +25,7 @@ export type Project = {
 };
 
 export type Task = {
-  id: string;
+  id: number;
   projectId: number;
   name:string;
   quantity: number;

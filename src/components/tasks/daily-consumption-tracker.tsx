@@ -156,5 +156,3 @@ export function DailyConsumptionTracker({ task, onSuccess }: DailyConsumptionTra
     </div>
   );
 }
-
-    

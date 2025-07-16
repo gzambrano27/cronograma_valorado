@@ -32,8 +32,6 @@ export async function updateSettings(formData: FormData) {
   return { success: true };
 }
 
-// NOTE: The external project sync logic is removed as projects are now read-only from the DB.
-
 const TaskSchema = z.object({
     name: z.string().min(3, { message: 'El nombre debe tener al menos 3 caracteres.' }),
     quantity: z.coerce.number().min(0, { message: 'La cantidad no puede ser negativa.' }),
@@ -100,11 +98,10 @@ export async function createTask(projectId: number, formData: FormData) {
   }
   
   const dailyConsumption = createDailyConsumption(start, end, quantity);
-  const taskId = `task-${Date.now()}`;
 
   await sql`
-    INSERT INTO tasks (id, "projectId", name, quantity, value, "startDate", "endDate", status, "consumedQuantity", "dailyConsumption")
-    VALUES (${taskId}, ${projectId}, ${name}, ${quantity}, ${value}, ${start.toISOString()}, ${end.toISOString()}, 'pendiente', 0, ${JSON.stringify(dailyConsumption)}::jsonb)
+    INSERT INTO tasks (projectId, name, quantity, value, startDate, endDate, status, consumedQuantity, dailyConsumption)
+    VALUES (${projectId}, ${name}, ${quantity}, ${value}, ${start.toISOString()}, ${end.toISOString()}, 'pendiente', 0, ${JSON.stringify(dailyConsumption)}::jsonb)
   `;
   
   revalidatePath(`/projects/${projectId}`);
@@ -112,14 +109,14 @@ export async function createTask(projectId: number, formData: FormData) {
   return { success: true };
 }
 
-export async function deleteTask(taskId: string, projectId: number) {
+export async function deleteTask(taskId: number, projectId: number) {
     await sql`DELETE FROM tasks WHERE id = ${taskId}`;
     revalidatePath(`/projects/${projectId}`);
     revalidatePath(`/dashboard`);
     return { success: true };
 }
 
-export async function deleteMultipleTasks(taskIds: string[], projectId: number | undefined) {
+export async function deleteMultipleTasks(taskIds: number[], projectId: number | undefined) {
     if (!taskIds || taskIds.length === 0) {
         return { success: false, message: 'No task IDs provided.'};
     }
@@ -132,8 +129,10 @@ export async function deleteMultipleTasks(taskIds: string[], projectId: number |
     return { success: true };
 }
 
-export async function updateTaskConsumption(taskId: string, date: string, consumedQuantity: number) {
-    const task = (await sql`SELECT * FROM tasks WHERE id = ${taskId}`)[0] as unknown as Task;
+export async function updateTaskConsumption(taskId: number, date: string, consumedQuantity: number) {
+    const result = await sql`SELECT * FROM tasks WHERE id = ${taskId}`;
+    const task = result[0] as unknown as Task;
+
 
     if (!task) {
         throw new Error('Tarea no encontrada.');
@@ -161,8 +160,8 @@ export async function updateTaskConsumption(taskId: string, date: string, consum
     await sql`
         UPDATE tasks
         SET 
-            "dailyConsumption" = ${JSON.stringify(dailyConsumption)}::jsonb,
-            "consumedQuantity" = ${totalConsumed},
+            dailyConsumption = ${JSON.stringify(dailyConsumption)}::jsonb,
+            consumedQuantity = ${totalConsumed},
             status = ${newStatus}
         WHERE id = ${taskId}
     `;
@@ -173,7 +172,7 @@ export async function updateTaskConsumption(taskId: string, date: string, consum
 }
 
 const ValidateTaskSchema = z.object({
-  taskId: z.string(),
+  taskId: z.coerce.number(),
   projectId: z.coerce.number(),
   location: z.string(),
 });
@@ -207,12 +206,10 @@ export async function validateTask(formData: FormData) {
       location: location,
       taskId: taskId,
     };
-    
-    const validationId = `val-${Date.now()}`;
 
     await sql`
-      INSERT INTO task_validations (id, "taskId", date, "imageUrl", location)
-      VALUES (${validationId}, ${newValidation.taskId}, ${newValidation.date.toISOString()}, ${newValidation.imageUrl}, ${newValidation.location})
+      INSERT INTO task_validations (taskId, date, imageUrl, location)
+      VALUES (${newValidation.taskId}, ${newValidation.date.toISOString()}, ${newValidation.imageUrl}, ${newValidation.location})
     `;
     
     revalidatePath(`/projects/${projectId}`);
@@ -309,10 +306,9 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   // Batch insert
   await sql.begin(async sql => {
     for (const task of newTasks) {
-      const taskId = `task-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
       await sql`
-        INSERT INTO tasks (id, "projectId", name, quantity, value, "startDate", "endDate", status, "consumedQuantity", "dailyConsumption")
-        VALUES (${taskId}, ${task.projectId}, ${task.name}, ${task.quantity}, ${task.value}, ${task.startDate.toISOString()}, ${task.endDate.toISOString()}, 'pendiente', 0, ${JSON.stringify(task.dailyConsumption)}::jsonb)
+        INSERT INTO tasks (projectId, name, quantity, value, startDate, endDate, status, consumedQuantity, dailyConsumption)
+        VALUES (${task.projectId}, ${task.name}, ${task.quantity}, ${task.value}, ${task.startDate.toISOString()}, ${task.endDate.toISOString()}, 'pendiente', 0, ${JSON.stringify(task.dailyConsumption)}::jsonb)
       `;
     }
   });

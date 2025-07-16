@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -16,8 +17,8 @@ import { useTransition } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 interface DeleteTaskDialogProps {
-  taskId: string;
-  projectId: string;
+  taskId: number;
+  projectId: number;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;

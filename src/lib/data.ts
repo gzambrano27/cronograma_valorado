@@ -18,13 +18,14 @@ const toFloat = (value: string | number | null): number => {
 function processTask(task: any): Task {
   return {
     ...task,
-    projectId: parseInt(task.projectId, 10),
+    id: parseInt(task.id, 10),
+    projectId: parseInt(task.projectid, 10), // postgres returns lowercase
     quantity: toFloat(task.quantity),
-    consumedQuantity: toFloat(task.consumedQuantity),
+    consumedQuantity: toFloat(task.consumedquantity), // postgres returns lowercase
     value: toFloat(task.value),
-    startDate: new Date(task.startDate),
-    endDate: new Date(task.endDate),
-    dailyConsumption: (task.dailyConsumption || []).map((dc: any) => ({
+    startDate: new Date(task.startdate), // postgres returns lowercase
+    endDate: new Date(task.enddate), // postgres returns lowercase
+    dailyConsumption: (task.dailyconsumption || []).map((dc: any) => ({ // postgres returns lowercase
       ...dc,
       date: new Date(dc.date),
       plannedQuantity: toFloat(dc.plannedQuantity),
@@ -32,6 +33,8 @@ function processTask(task: any): Task {
     })),
     validations: (task.validations || []).map((v: any) => ({
       ...v,
+      id: parseInt(v.id, 10),
+      taskId: parseInt(v.taskid, 10),
       date: new Date(v.date),
     })),
   };
@@ -105,11 +108,11 @@ export async function getTasksByProjectId(id: number): Promise<Task[]> {
         (
           SELECT json_agg(v.*)
           FROM task_validations v
-          WHERE v."taskId" = t.id
+          WHERE v.taskId = t.id
         ) as validations
       FROM tasks t
-      WHERE t."projectId" = ${id}
-      ORDER BY t."startDate"
+      WHERE t.projectId = ${id}
+      ORDER BY t.startDate
     `;
     return tasks_raw.map(processTask);
 }
