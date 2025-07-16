@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/select";
 import { LayoutGrid, List } from "lucide-react";
 import ProjectList from "./project-list";
-import { CreateProjectDialog } from "./create-project-dialog";
 import { TooltipProvider } from "../ui/tooltip";
 
 export function ProjectView({ projects, onSuccess }: { projects: Project[], onSuccess: () => void }) {
@@ -99,7 +98,6 @@ export function ProjectView({ projects, onSuccess }: { projects: Project[], onSu
               <span className="sr-only">List View</span>
             </Button>
           </div>
-          <CreateProjectDialog onSuccess={onSuccess} />
         </div>
       </div>
 
@@ -169,4 +167,3 @@ export function ProjectView({ projects, onSuccess }: { projects: Project[], onSu
     </div>
   );
 }
-
