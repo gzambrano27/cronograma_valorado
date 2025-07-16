@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Building2, Cog, Briefcase, GanttChartSquare } from "lucide-react";
+import { Building2, Cog, Briefcase, GanttChartSquare, PanelLeft } from "lucide-react";
 import React from "react";
 
 import type { Project } from "@/lib/types";
@@ -15,8 +15,8 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarTrigger,
   SidebarMain,
+  useSidebar
 } from "@/components/ui/sidebar";
 import { Button } from "../ui/button";
 import { Breadcrumb } from "./breadcrumb";
@@ -28,7 +28,22 @@ import {
   TooltipProvider,
 } from "../ui/tooltip";
 
-const SIDEBAR_COOKIE_NAME = "sidebar_state";
+
+function MobileSidebarTrigger() {
+    const { toggleSidebar } = useSidebar();
+    return (
+        <Button
+            data-sidebar="trigger"
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={() => toggleSidebar()}
+        >
+            <PanelLeft className="h-5 w-5" />
+            <span className="sr-only">Toggle Sidebar</span>
+      </Button>
+    )
+}
 
 export default function AppShell({
   children,
@@ -40,33 +55,18 @@ export default function AppShell({
   title: string;
 }) {
   const pathname = usePathname();
-  const [sidebarOpen, setSidebarOpen] = React.useState(true);
   
-  React.useEffect(() => {
-    try {
-      const sidebarCookie = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith(`${SIDEBAR_COOKIE_NAME}=`))
-        ?.split("=")[1];
-      if (sidebarCookie) {
-        setSidebarOpen(sidebarCookie === "true");
-      }
-    } catch (error) {
-      console.error("Failed to parse sidebar cookie", error);
-    }
-  }, []);
-
   const isHomePage = pathname === "/";
 
   return (
     <TooltipProvider>
-      <SidebarProvider title={title} defaultOpen={sidebarOpen} onOpenChange={setSidebarOpen}>
+      <SidebarProvider title={title}>
         <Sidebar>
           <SidebarHeader>
             <div className="flex items-center group-data-[state=expanded]/sidebar:justify-between group-data-[state=collapsed]/sidebar:justify-center p-2">
               <div className="flex items-center gap-2">
                 <Building2 className="w-8 h-8 text-primary" />
-                <h2 className="text-lg font-bold font-headline tracking-tight h-7 group-data-[state=collapsed]/sidebar:hidden">
+                <h2 className="text-lg font-bold font-headline tracking-tight h-7">
                   {title}
                 </h2>
               </div>
@@ -84,7 +84,7 @@ export default function AppShell({
                   >
                     <Link href={`/dashboard`}>
                       <GanttChartSquare className="h-4 w-4 shrink-0" />
-                      <span className="truncate group-data-[state=collapsed]/sidebar:hidden">
+                      <span className="truncate">
                         Cronograma Valorado
                       </span>
                     </Link>
@@ -109,7 +109,7 @@ export default function AppShell({
                                   {index + 1}
                                 </span>
                               </div>
-                              <span className="group-data-[state=collapsed]/sidebar:hidden">
+                              <span>
                                 {project.name}
                               </span>
                             </Link>
@@ -127,7 +127,7 @@ export default function AppShell({
                   ))}
                   {projects.length === 0 && (
                     <SidebarMenuItem>
-                      <span className="flex items-center gap-2 p-2 text-sm text-sidebar-foreground/70 group-data-[state=collapsed]/sidebar:hidden">
+                      <span className="flex items-center gap-2 p-2 text-sm text-sidebar-foreground/70">
                         No hay proyectos.
                       </span>
                     </SidebarMenuItem>
@@ -139,7 +139,7 @@ export default function AppShell({
         </Sidebar>
         <SidebarMain>
           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-            <SidebarTrigger />
+            <MobileSidebarTrigger />
             <Breadcrumb projects={projects} />
             <div className="flex-1" />
             <ThemeToggle />
