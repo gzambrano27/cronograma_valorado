@@ -15,6 +15,8 @@ import {
 import { LayoutGrid, List } from "lucide-react";
 import ProjectList from "./project-list";
 import { TooltipProvider } from "../ui/tooltip";
+import { Switch } from "../ui/switch";
+import { Label } from "../ui/label";
 
 export function ProjectView({ projects, onSuccess }: { projects: Project[], onSuccess: () => void }) {
   const [view, setView] = useState<"grid" | "list">("grid");
@@ -22,6 +24,7 @@ export function ProjectView({ projects, onSuccess }: { projects: Project[], onSu
   const [selectedCompany, setSelectedCompany] = useState("all");
   const [selectedClient, setSelectedClient] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [showAll, setShowAll] = useState(false);
 
   const ITEMS_PER_PAGE = view === 'grid' ? 6 : 10;
 
@@ -62,10 +65,13 @@ export function ProjectView({ projects, onSuccess }: { projects: Project[], onSu
   }, [currentPage, totalPages]);
 
   const paginatedProjects = useMemo(() => {
+    if (showAll) {
+      return filteredProjects;
+    }
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
     return filteredProjects.slice(startIndex, endIndex);
-  }, [filteredProjects, currentPage, ITEMS_PER_PAGE]);
+  }, [filteredProjects, currentPage, ITEMS_PER_PAGE, showAll]);
 
   const handleViewChange = (newView: "grid" | "list") => {
     setView(newView);
@@ -140,29 +146,41 @@ export function ProjectView({ projects, onSuccess }: { projects: Project[], onSu
 
       {totalPages > 1 && (
         <div className="flex items-center justify-end py-4 space-x-4">
-          <span className="text-sm text-muted-foreground">
-            Página {currentPage} de {totalPages}
-          </span>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              Anterior
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-            >
-              Siguiente
-            </Button>
-          </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="show-all"
+                checked={showAll}
+                onCheckedChange={setShowAll}
+              />
+              <Label htmlFor="show-all" className="text-sm">Ver todo</Label>
+            </div>
+          {!showAll && (
+            <>
+              <span className="text-sm text-muted-foreground">
+                Página {currentPage} de {totalPages}
+              </span>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  Anterior
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                >
+                  Siguiente
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>
