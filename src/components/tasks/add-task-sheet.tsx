@@ -33,7 +33,7 @@ function SubmitButton() {
     );
 }
 
-export function AddTaskSheet({ projectId, onSuccess }: { projectId: string, onSuccess: () => void }) {
+export function AddTaskSheet({ projectId, onSuccess }: { projectId: number, onSuccess: () => void }) {
   const [open, setOpen] = React.useState(false)
   const { toast } = useToast()
   const formRef = useRef<HTMLFormElement>(null);

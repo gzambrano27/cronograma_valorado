@@ -77,7 +77,7 @@ function createDailyConsumption(startDate: Date, endDate: Date, totalQuantity: n
 }
 
 
-export async function createTask(projectId: string, formData: FormData) {
+export async function createTask(projectId: number, formData: FormData) {
   const validatedFields = TaskSchema.safeParse({
     name: formData.get('name'),
     quantity: formData.get('quantity'),
@@ -112,16 +112,19 @@ export async function createTask(projectId: string, formData: FormData) {
   return { success: true };
 }
 
-export async function deleteTask(taskId: string, projectId: string) {
+export async function deleteTask(taskId: string, projectId: number) {
     await sql`DELETE FROM tasks WHERE id = ${taskId}`;
     revalidatePath(`/projects/${projectId}`);
     revalidatePath(`/dashboard`);
     return { success: true };
 }
 
-export async function deleteMultipleTasks(taskIds: string[], projectId: string) {
+export async function deleteMultipleTasks(taskIds: string[], projectId: number | undefined) {
     if (!taskIds || taskIds.length === 0) {
         return { success: false, message: 'No task IDs provided.'};
+    }
+    if (projectId === undefined) {
+        return { success: false, message: 'Project ID is missing.' };
     }
     await sql`DELETE FROM tasks WHERE id IN ${sql(taskIds)}`;
     revalidatePath(`/projects/${projectId}`);
@@ -171,7 +174,7 @@ export async function updateTaskConsumption(taskId: string, date: string, consum
 
 const ValidateTaskSchema = z.object({
   taskId: z.string(),
-  projectId: z.string(),
+  projectId: z.coerce.number(),
   location: z.string(),
 });
 
@@ -216,7 +219,7 @@ export async function validateTask(formData: FormData) {
     return { success: true };
 }
 
-export async function importTasksFromXML(projectId: string, formData: FormData) {
+export async function importTasksFromXML(projectId: number, formData: FormData) {
   const { XMLParser } = await import('fast-xml-parser');
   
   const file = formData.get('xmlFile') as File | null;

@@ -14,7 +14,7 @@ export type TaskValidation = {
 };
 
 export type Project = {
-  id: string;
+  id: number;
   name: string;
   company: string;
   client?: string;
@@ -26,7 +26,7 @@ export type Project = {
 
 export type Task = {
   id: string;
-  projectId: string;
+  projectId: number;
   name:string;
   quantity: number;
   consumedQuantity: number;

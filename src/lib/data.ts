@@ -18,6 +18,7 @@ const toFloat = (value: string | number | null): number => {
 function processTask(task: any): Task {
   return {
     ...task,
+    projectId: parseInt(task.projectId, 10),
     quantity: toFloat(task.quantity),
     consumedQuantity: toFloat(task.consumedQuantity),
     value: toFloat(task.value),
@@ -50,7 +51,7 @@ export async function getAppConfig(): Promise<AppConfig> {
 export async function getProjects(): Promise<Project[]> {
     const projects_raw = await sql`
         SELECT 
-            pp.id::text, 
+            pp.id, 
             pp.name, 
             rc.name as company, 
             rp.name as client
@@ -64,7 +65,7 @@ export async function getProjects(): Promise<Project[]> {
     
     const tasks = tasks_raw.map(processTask);
     const projects = projects_raw.map(p => ({
-        id: String(p.id),
+        id: p.id,
         name: p.name,
         company: p.company || 'N/A',
         client: p.client || ''
@@ -93,12 +94,12 @@ export async function getTasks(): Promise<Task[]> {
   return tasks_raw.map(processTask);
 }
 
-export async function getProjectById(id: string): Promise<Project | undefined> {
+export async function getProjectById(id: number): Promise<Project | undefined> {
     const projects = await getProjects(); // This is inefficient but necessary for now
     return projects.find(p => p.id === id);
 }
 
-export async function getTasksByProjectId(id: string): Promise<Task[]> {
+export async function getTasksByProjectId(id: number): Promise<Task[]> {
     const tasks_raw = await sql`
       SELECT t.*,
         (

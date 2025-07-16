@@ -16,12 +16,16 @@ import type { Project, Task, SCurveData } from '@/lib/types';
 
 export default function ProjectPage() {
   const params = useParams();
-  const id = params.id as string;
+  const id = parseInt(params.id as string, 10);
   const [project, setProject] = useState<Project | null>(null);
   const [projectTasks, setProjectTasks] = useState<Task[]>([]);
   const [sCurve, setSCurve] = useState<SCurveData[]>([]);
 
   const reloadData = useCallback(async () => {
+    if (isNaN(id)) {
+        notFound();
+        return;
+    }
     try {
         const fetchedProject = await getProjectById(id);
         if (!fetchedProject) {

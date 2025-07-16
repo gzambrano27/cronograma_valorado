@@ -7,7 +7,7 @@ import { Upload, Loader2 } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
 import { importTasksFromXML } from '@/lib/actions';
 
-export function XmlImport({ projectId, onSuccess }: { projectId: string, onSuccess: () => void }) {
+export function XmlImport({ projectId, onSuccess }: { projectId: number, onSuccess: () => void }) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
     const { toast } = useToast();

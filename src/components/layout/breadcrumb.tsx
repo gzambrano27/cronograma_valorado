@@ -24,9 +24,9 @@ export function Breadcrumb({ projects }: BreadcrumbProps) {
 
   const segments = pathname.split('/').filter(Boolean);
 
-  const getProjectName = (id: string): string => {
+  const getProjectName = (id: number): string => {
     const project = projects.find((p) => p.id === id);
-    return project?.name || id;
+    return project?.name || String(id);
   };
   
   const buildBreadcrumbs = () => {
@@ -41,12 +41,14 @@ export function Breadcrumb({ projects }: BreadcrumbProps) {
     }
 
     if (pathname.startsWith('/projects/')) {
-        const projectId = segments[1];
-        crumbs.push({
-            name: getProjectName(projectId),
-            href: `/projects/${projectId}`,
-            isLast: true
-        });
+        const projectId = parseInt(segments[1], 10);
+        if (!isNaN(projectId)) {
+            crumbs.push({
+                name: getProjectName(projectId),
+                href: `/projects/${projectId}`,
+                isLast: true
+            });
+        }
     }
     
     if (pathname.startsWith('/settings')) {
