@@ -100,7 +100,7 @@ export async function createTask(projectId: number, formData: FormData) {
   const dailyConsumption = createDailyConsumption(start, end, quantity);
 
   await sql`
-    INSERT INTO tasks (projectId, name, quantity, value, startDate, endDate, status, consumedQuantity, dailyConsumption)
+    INSERT INTO externo_tasks (projectId, name, quantity, value, startDate, endDate, status, consumedQuantity, dailyConsumption)
     VALUES (${projectId}, ${name}, ${quantity}, ${value}, ${start.toISOString()}, ${end.toISOString()}, 'pendiente', 0, ${JSON.stringify(dailyConsumption)}::jsonb)
   `;
   
@@ -110,7 +110,7 @@ export async function createTask(projectId: number, formData: FormData) {
 }
 
 export async function deleteTask(taskId: number, projectId: number) {
-    await sql`DELETE FROM tasks WHERE id = ${taskId}`;
+    await sql`DELETE FROM externo_tasks WHERE id = ${taskId}`;
     revalidatePath(`/projects/${projectId}`);
     revalidatePath(`/dashboard`);
     return { success: true };
@@ -123,14 +123,14 @@ export async function deleteMultipleTasks(taskIds: number[], projectId: number |
     if (projectId === undefined) {
         return { success: false, message: 'Project ID is missing.' };
     }
-    await sql`DELETE FROM tasks WHERE id IN ${sql(taskIds)}`;
+    await sql`DELETE FROM externo_tasks WHERE id IN ${sql(taskIds)}`;
     revalidatePath(`/projects/${projectId}`);
     revalidatePath(`/dashboard`);
     return { success: true };
 }
 
 export async function updateTaskConsumption(taskId: number, date: string, consumedQuantity: number) {
-    const result = await sql`SELECT * FROM tasks WHERE id = ${taskId}`;
+    const result = await sql`SELECT * FROM externo_tasks WHERE id = ${taskId}`;
     const task = result[0] as unknown as Task;
 
 
@@ -158,7 +158,7 @@ export async function updateTaskConsumption(taskId: number, date: string, consum
     const newStatus = totalConsumed >= task.quantity ? 'completado' : (totalConsumed > 0 ? 'en-progreso' : 'pendiente');
 
     await sql`
-        UPDATE tasks
+        UPDATE externo_tasks
         SET 
             dailyConsumption = ${JSON.stringify(dailyConsumption)}::jsonb,
             consumedQuantity = ${totalConsumed},
@@ -208,7 +208,7 @@ export async function validateTask(formData: FormData) {
     };
 
     await sql`
-      INSERT INTO task_validations (taskId, date, imageUrl, location)
+      INSERT INTO externo_task_validations (taskId, date, imageUrl, location)
       VALUES (${newValidation.taskId}, ${newValidation.date.toISOString()}, ${newValidation.imageUrl}, ${newValidation.location})
     `;
     
@@ -307,7 +307,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   await sql.begin(async sql => {
     for (const task of newTasks) {
       await sql`
-        INSERT INTO tasks (projectId, name, quantity, value, startDate, endDate, status, consumedQuantity, dailyConsumption)
+        INSERT INTO externo_tasks (projectId, name, quantity, value, startDate, endDate, status, consumedQuantity, dailyConsumption)
         VALUES (${task.projectId}, ${task.name}, ${task.quantity}, ${task.value}, ${task.startDate.toISOString()}, ${task.endDate.toISOString()}, 'pendiente', 0, ${JSON.stringify(task.dailyConsumption)}::jsonb)
       `;
     }

@@ -19,13 +19,13 @@ function processTask(task: any): Task {
   return {
     ...task,
     id: parseInt(task.id, 10),
-    projectId: parseInt(task.projectid, 10), // postgres returns lowercase
+    projectId: parseInt(task.projectid, 10),
     quantity: toFloat(task.quantity),
-    consumedQuantity: toFloat(task.consumedquantity), // postgres returns lowercase
+    consumedQuantity: toFloat(task.consumedquantity),
     value: toFloat(task.value),
-    startDate: new Date(task.startdate), // postgres returns lowercase
-    endDate: new Date(task.enddate), // postgres returns lowercase
-    dailyConsumption: (task.dailyconsumption || []).map((dc: any) => ({ // postgres returns lowercase
+    startDate: new Date(task.startdate),
+    endDate: new Date(task.enddate),
+    dailyConsumption: (task.dailyconsumption || []).map((dc: any) => ({
       ...dc,
       date: new Date(dc.date),
       plannedQuantity: toFloat(dc.plannedQuantity),
@@ -64,7 +64,7 @@ export async function getProjects(): Promise<Project[]> {
         ORDER BY pp.name
     `;
 
-    const tasks_raw = await sql`SELECT * FROM tasks`;
+    const tasks_raw = await sql`SELECT * FROM externo_tasks`;
     
     const tasks = tasks_raw.map(processTask);
     const projects = projects_raw.map(p => ({
@@ -93,7 +93,7 @@ export async function getProjects(): Promise<Project[]> {
 }
 
 export async function getTasks(): Promise<Task[]> {
-  const tasks_raw = await sql`SELECT * FROM tasks`;
+  const tasks_raw = await sql`SELECT * FROM externo_tasks`;
   return tasks_raw.map(processTask);
 }
 
@@ -107,10 +107,10 @@ export async function getTasksByProjectId(id: number): Promise<Task[]> {
       SELECT t.*,
         (
           SELECT json_agg(v.*)
-          FROM task_validations v
+          FROM externo_task_validations v
           WHERE v.taskId = t.id
         ) as validations
-      FROM tasks t
+      FROM externo_tasks t
       WHERE t.projectId = ${id}
       ORDER BY t.startDate
     `;
