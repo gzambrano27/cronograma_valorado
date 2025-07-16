@@ -6,7 +6,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { z } from 'zod';
 import { getAppConfig } from './data';
-import { eachDayOfInterval } from 'date-fns';
+import { eachDayOfInterval, format } from 'date-fns';
 import { sql } from './db';
 import { revalidatePath } from 'next/cache';
 
@@ -136,11 +136,17 @@ export async function updateTaskConsumption(taskId: string, date: string, consum
         throw new Error('Tarea no encontrada.');
     }
 
-    const dailyConsumption = (task.dailyConsumption || []) as DailyConsumption[];
+    const dailyConsumption = (task.dailyConsumption || []).map(dc => ({
+      ...dc,
+      date: new Date(dc.date)
+    })) as DailyConsumption[];
     
-    const consumptionIndex = dailyConsumption.findIndex(
-        c => format(new Date(c.date), 'yyyy-MM-dd') === date
-    );
+    const consumptionIndex = dailyConsumption.findIndex(c => {
+        const d = new Date(c.date);
+        const userTimezoneOffset = d.getTimezoneOffset() * 60000;
+        const adjustedDate = new Date(d.getTime() + userTimezoneOffset);
+        return format(adjustedDate, 'yyyy-MM-dd') === date;
+    });
     
     if (consumptionIndex > -1) {
         dailyConsumption[consumptionIndex].consumedQuantity = consumedQuantity;

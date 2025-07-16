@@ -48,24 +48,25 @@ export async function getAppConfig(): Promise<AppConfig> {
 }
 
 export async function getProjects(): Promise<Project[]> {
-    // Note: The original request was to query `project_project` table.
-    // We will simulate this by reading from db.json as we cannot access external DBs.
     const projects_raw = await sql`
         SELECT 
-            id::text, 
-            name, 
-            company_id[2] as company, 
-            partner_id[2] as client 
-        FROM project_project
-        ORDER BY name
+            pp.id::text, 
+            pp.name, 
+            rc.name as company, 
+            rp.name as client
+        FROM project_project pp
+        LEFT JOIN res_company rc ON pp.company_id = rc.id
+        LEFT JOIN res_partner rp ON pp.partner_id = rp.id
+        ORDER BY pp.name
     `;
+
     const tasks_raw = await sql`SELECT * FROM tasks`;
     
     const tasks = tasks_raw.map(processTask);
     const projects = projects_raw.map(p => ({
         id: String(p.id),
         name: p.name,
-        company: p.company,
+        company: p.company || 'N/A',
         client: p.client || ''
     }));
 
@@ -107,6 +108,7 @@ export async function getTasksByProjectId(id: string): Promise<Task[]> {
         ) as validations
       FROM tasks t
       WHERE t."projectId" = ${id}
+      ORDER BY t."startDate"
     `;
     return tasks_raw.map(processTask);
 }
