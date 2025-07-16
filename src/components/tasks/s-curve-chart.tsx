@@ -95,8 +95,8 @@ export function SCurveChart({ data }: SCurveChartProps) {
   const yAxisTicks = Array.from({ length: 21 }, (_, i) => i * 5); // 0, 5, ..., 100
 
   return (
-    <ChartContainer config={chartConfig} className="min-h-[250px] w-full">
-      <ResponsiveContainer width="100%" height={300}>
+    <ChartContainer config={chartConfig} className="min-h-[250px] w-full h-full">
+      <ResponsiveContainer width="100%" height="100%">
         <AreaChart
           accessibilityLayer
           data={data}

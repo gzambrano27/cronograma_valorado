@@ -50,7 +50,7 @@ export function SCurveCard({ data }: SCurveCardProps) {
           </DialogContent>
         </Dialog>
       </CardHeader>
-      <CardContent className="pl-2">
+      <CardContent className="pl-2 h-[300px]">
         <SCurveChart data={data} />
       </CardContent>
     </Card>
