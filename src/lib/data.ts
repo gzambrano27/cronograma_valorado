@@ -39,7 +39,7 @@ function processTask(rawTask: RawTask): Task {
       imageUrl: v.imageurl,
       location: v.location,
     })),
-    displayOrder: rawTask.displayorder,
+    displayorder: rawTask.displayorder,
   };
 }
 
@@ -60,7 +60,6 @@ const getTranslatedName = (nameField: any): string => {
         return nameField;
     }
     if (typeof nameField === 'object' && nameField !== null) {
-        // Prioritize es_EC, then en_US as fallback
         return nameField.es_EC || nameField.en_US || 'N/A';
     }
     return 'N/A';

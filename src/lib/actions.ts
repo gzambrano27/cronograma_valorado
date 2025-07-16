@@ -99,7 +99,6 @@ export async function createTask(projectId: number, formData: FormData) {
   
   const dailyConsumption = createDailyConsumption(start, end, quantity);
 
-  // Get the max display order for the project and add 1
   const maxOrderResult = await query<{ max: number | null }>(`SELECT MAX("displayorder") as max FROM "externo_tasks" WHERE "projectid" = $1`, [projectId]);
   const newDisplayOrder = (maxOrderResult[0]?.max || 0) + 1;
 
@@ -127,8 +126,6 @@ export async function deleteMultipleTasks(taskIds: number[], projectId: number |
     if (projectId === undefined) {
         return { success: false, message: 'Project ID is missing.' };
     }
-    // pg driver doesn't support array binding like node-postgres did.
-    // We create the numbered placeholders dynamically.
     const placeholders = taskIds.map((_, i) => `$${i + 1}`).join(',');
     await query(`DELETE FROM "externo_tasks" WHERE id IN (${placeholders})`, taskIds);
     revalidatePath(`/projects/${projectId}`);
@@ -264,9 +261,8 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   const cantidadAttrDef = extendedAttrDefs.find((attr: any) => attr.Alias?.toLowerCase() === 'cantidades');
   const cantidadFieldId = cantidadAttrDef?.FieldID;
 
-  const newTasks: Omit<Task, 'id' | 'consumedQuantity'>[] = [];
+  const newTasks: Omit<Task, 'id' | 'consumedQuantity' | 'displayorder'>[] = [];
   const tasks = projectData.Tasks.Task;
-  let displayOrder = 0;
 
   for (const task of tasks) {
     try {
@@ -294,14 +290,12 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
             }
         }
         
-        // Filter out tasks with zero cost or zero quantity
         if (totalTaskValue === 0 || quantity === 0) {
             continue;
         }
 
         const value = quantity > 0 ? totalTaskValue / quantity : 0;
         const dailyConsumption = createDailyConsumption(startDate, endDate, quantity);
-        displayOrder++;
         
         newTasks.push({
             projectId,
@@ -312,7 +306,6 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
             endDate,
             status: 'pendiente',
             dailyConsumption,
-            displayOrder
         });
     } catch (e) {
         console.error("Error procesando tarea del XML:", task?.Name, e);
@@ -323,12 +316,15 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
     throw new Error('No se encontraron tareas válidas para importar (verifique que tengan costo y cantidad).');
   }
 
-  // Batch insert
+  const maxOrderResult = await query<{ max: number | null }>(`SELECT MAX("displayorder") as max FROM "externo_tasks" WHERE "projectid" = $1`, [projectId]);
+  let currentDisplayOrder = (maxOrderResult[0]?.max || 0);
+
   for (const task of newTasks) {
+    currentDisplayOrder++;
     await query(`
       INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption", "displayorder")
       VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7, $8)
-    `, [task.projectId, task.name, task.quantity, task.value, task.startDate.toISOString(), task.endDate.toISOString(), JSON.stringify(task.dailyConsumption), task.displayOrder]);
+    `, [task.projectId, task.name, task.quantity, task.value, task.startDate.toISOString(), task.endDate.toISOString(), JSON.stringify(task.dailyConsumption), currentDisplayOrder]);
   }
 
   revalidatePath(`/projects/${projectId}`);

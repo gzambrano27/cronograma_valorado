@@ -60,7 +60,7 @@ export type Task = {
   validations?: TaskValidation[];
   status: 'pendiente' | 'en-progreso' | 'completado';
   dailyConsumption?: DailyConsumption[];
-  displayOrder: number;
+  displayorder: number;
 };
 
 export type SCurveData = {
