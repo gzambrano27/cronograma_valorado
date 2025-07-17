@@ -20,16 +20,20 @@ async function verifyPassword(password: string, hashedPasswordString: string): P
   const parts = hashedPasswordString.split('$');
   // Handle plaintext password for old/test users
   if (parts.length !== 4 || parts[0] !== 'pbkdf2-sha512') {
+    // This is not a standard Odoo hash, compare directly (for old test data)
     return password === hashedPasswordString;
   }
   
+  // Odoo hash format: $<algorithm>$<iterations>$<salt_base64>$<hash_base64>
   const iterations = parseInt(parts[1], 10);
-  const salt = Buffer.from(parts[2], 'hex');
-  const storedHash = Buffer.from(parts[3], 'hex');
+  const salt = Buffer.from(parts[2], 'base64'); // Corrected from 'hex' to 'base64'
+  const storedHash = Buffer.from(parts[3], 'base64'); // Corrected from 'hex' to 'base64'
 
+  // Odoo uses a 64-byte derived key for SHA-512
   const derivedKey = pbkdf2Sync(password, salt, iterations, 64, 'sha512');
   
   if (derivedKey.length !== storedHash.length) {
+    // This should not happen if the algorithm is the same, but it's a good safeguard.
     return false;
   }
 
