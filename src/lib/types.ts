@@ -1,4 +1,9 @@
 
+export type SessionUser = {
+  id: number;
+  name: string;
+  email: string;
+};
 
 export type DailyConsumption = {
   date: Date;

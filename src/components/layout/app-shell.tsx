@@ -3,10 +3,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Building2, Cog, Briefcase, GanttChartSquare, PanelLeft } from "lucide-react";
+import { Building2, Cog, Briefcase, GanttChartSquare, PanelLeft, LogOut } from "lucide-react";
 import React from "react";
 
-import type { Project } from "@/lib/types";
+import type { Project, SessionUser } from "@/lib/types";
 import {
   SidebarProvider,
   Sidebar,
@@ -27,6 +27,8 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from "../ui/tooltip";
+import { logout } from "@/lib/auth-actions";
+import { Avatar, AvatarFallback } from "../ui/avatar";
 
 
 function MobileSidebarTrigger() {
@@ -49,10 +51,12 @@ export default function AppShell({
   children,
   projects,
   title,
+  user,
 }: {
   children: React.ReactNode;
   projects: Project[];
   title: string;
+  user?: SessionUser;
 }) {
   const pathname = usePathname();
   
@@ -151,6 +155,36 @@ export default function AppShell({
             <Link href="/dashboard" passHref>
               <Button variant="outline">Panel Principal</Button>
             </Link>
+            {user && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                       <AvatarFallback>{user.name?.[0].toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{user.name}</p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <form action={logout}>
+                    <DropdownMenuItem asChild>
+                       <button type="submit" className="w-full">
+                          <LogOut className="mr-2 h-4 w-4" />
+                          Cerrar sesión
+                       </button>
+                    </DropdownMenuItem>
+                  </form>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </header>
           {children}
         </SidebarMain>
@@ -158,3 +192,12 @@ export default function AppShell({
     </TooltipProvider>
   );
 }
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";

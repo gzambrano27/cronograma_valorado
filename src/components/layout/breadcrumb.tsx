@@ -18,7 +18,7 @@ const translations: Record<string, string> = {
 export function Breadcrumb({ projects }: BreadcrumbProps) {
   const pathname = usePathname();
   
-  if (pathname === '/') {
+  if (pathname === '/' || pathname === '/login') {
     return null;
   }
 
@@ -69,7 +69,7 @@ export function Breadcrumb({ projects }: BreadcrumbProps) {
     <nav aria-label="Breadcrumb">
       <ol className="flex items-center gap-1.5 text-sm text-muted-foreground">
         <li>
-          <Link href="/" className="transition-colors hover:text-foreground">
+          <Link href="/dashboard" className="transition-colors hover:text-foreground">
             <Home className="h-4 w-4" />
             <span className="sr-only">Menú Principal</span>
           </Link>

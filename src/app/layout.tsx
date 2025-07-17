@@ -2,12 +2,13 @@
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import AppShell from '@/components/layout/app-shell';
-import { getProjects } from '@/lib/data';
 import { ThemeProvider } from '@/components/layout/theme-provider';
 import React from 'react';
 import type { Project } from '@/lib/types';
 import { checkDbConnection } from '@/lib/db';
 import { ConnectionError } from '@/components/layout/connection-error';
+import { getSession } from './lib/session';
+import { getProjects } from './lib/data';
 
 export default async function RootLayout({
   children,
@@ -15,16 +16,21 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const isDbConnected = await checkDbConnection();
+  const session = await getSession();
 
   let projects: Project[] = [];
-  if (isDbConnected) {
-    projects = await getProjects();
+  if (isDbConnected && session.isLoggedIn) {
+    try {
+      projects = await getProjects();
+    } catch (error) {
+      console.error("Failed to fetch projects:", error);
+    }
   }
   
   const title = "Menú";
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -41,9 +47,13 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           {isDbConnected ? (
-            <AppShell projects={projects} title={title}>
-              {children}
-            </AppShell>
+             session.isLoggedIn ? (
+                <AppShell projects={projects} title={title} user={session.user}>
+                  {children}
+                </AppShell>
+              ) : (
+                children
+              )
           ) : (
             <ConnectionError />
           )}
