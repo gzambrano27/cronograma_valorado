@@ -29,7 +29,7 @@ async function verifyPassword(password: string, hashedPasswordString: string): P
   }
   
   try {
-    // Odoo hash format: $<algorithm>$<iterations>$<salt_base64>$<hash_base64>
+    // Odoo hash format: $pbkdf2-sha512$<iterations>$<salt_base64>$<hash_base64>
     const iterations = parseInt(parts[1], 10);
     const salt = Buffer.from(parts[2], 'base64');
     const storedHash = Buffer.from(parts[3], 'base64');
@@ -39,6 +39,12 @@ async function verifyPassword(password: string, hashedPasswordString: string): P
 
     const derivedKey = pbkdf2Sync(password, salt, iterations, keylen, 'sha512');
     
+    // Log for debugging
+    console.log("--- DEBUG PASSWORD VERIFICATION ---");
+    console.log("Derived Key (Base64):", derivedKey.toString('base64'));
+    console.log("Stored Hash (Base64):", storedHash.toString('base64'));
+    console.log("-----------------------------------");
+
     if (derivedKey.length !== storedHash.length) {
       return false; // Key lengths must match for timingSafeEqual
     }
