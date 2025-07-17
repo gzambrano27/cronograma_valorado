@@ -87,7 +87,12 @@ export async function getProjects(): Promise<Project[]> {
         COALESCE(ptm.total_value, 0) as "totalValue",
         COALESCE(ptm.consumed_value, 0) as "consumedValue",
         COALESCE(ptm.task_count, 0) as "taskCount",
-        COALESCE(ptm.completed_tasks, 0) as "completedTasks"
+        COALESCE(ptm.completed_tasks, 0) as "completedTasks",
+        CASE 
+            WHEN COALESCE(ptm.task_count, 0) > 0 
+            THEN (COALESCE(ptm.completed_tasks, 0) * 100.0) / COALESCE(ptm.task_count, 1)
+            ELSE 0 
+        END as progress
       FROM
         project_project pp
       LEFT JOIN
@@ -112,6 +117,7 @@ export async function getProjects(): Promise<Project[]> {
         consumedValue: toFloat(p.consumedValue),
         taskCount: parseInt(p.taskCount, 10),
         completedTasks: parseInt(p.completedTasks, 10),
+        progress: toFloat(p.progress),
     }));
 }
 

@@ -31,6 +31,7 @@ export type RawProject = {
   consumedValue: string;
   taskCount: string;
   completedTasks: string;
+  progress: string;
 }
 
 export type Project = {
@@ -42,6 +43,7 @@ export type Project = {
   consumedValue: number;
   taskCount: number;
   completedTasks: number;
+  progress: number;
 };
 
 export type RawTask = {

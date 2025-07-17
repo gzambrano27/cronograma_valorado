@@ -62,7 +62,7 @@ export default function ProjectPage() {
     );
   }
 
-  const progressPercentage = project.taskCount > 0 ? (project.completedTasks / project.taskCount) * 100 : 0;
+  const progressPercentage = project.progress;
   const tasksInProgress = projectTasks.filter(t => t.status === 'en-progreso').length;
   const tasksPending = projectTasks.filter(t => t.status === 'pendiente').length;
 
@@ -105,7 +105,7 @@ export default function ProjectPage() {
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold">{progressPercentage.toFixed(1)}%</div>
+            <div className="text-xl font-bold">{progressPercentage.toFixed(2)}%</div>
             <p className="text-xs text-muted-foreground">{project.completedTasks} de {project.taskCount} tareas completadas</p>
           </CardContent>
         </Card>

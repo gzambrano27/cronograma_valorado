@@ -69,15 +69,16 @@ export default function ProjectList({ projects, view, onSuccess }: ProjectListPr
             },
         },
         {
+            accessorKey: "progress",
             header: "Progreso",
             cell: ({ row }) => {
                 const project = row.original;
-                const progress = project.taskCount > 0 ? (project.completedTasks / project.taskCount) * 100 : 0;
+                const progress = project.progress;
                 return (
                     <div className="flex flex-col gap-1.5 w-32 sm:w-40">
                         <div className="flex justify-between items-center text-xs text-muted-foreground">
                             <span>{project.completedTasks} / {project.taskCount} tareas</span>
-                            <span>{`${Math.round(progress)}%`}</span>
+                            <span>{`${progress.toFixed(2)}%`}</span>
                         </div>
                         <Progress value={progress} className="h-2" />
                     </div>
@@ -114,7 +115,7 @@ export default function ProjectList({ projects, view, onSuccess }: ProjectListPr
     return (
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {projects.map((project) => {
-          const progressPercentage = project.taskCount > 0 ? (project.completedTasks / project.taskCount) * 100 : 0;
+          const progressPercentage = project.progress;
           return (
             <Link href={`/projects/${project.id}`} key={project.id} className="focus:outline-none focus:ring-2 focus:ring-ring rounded-lg">
               <Card className="flex flex-col transition-all duration-300 group hover:shadow-xl border h-full">
@@ -139,7 +140,7 @@ export default function ProjectList({ projects, view, onSuccess }: ProjectListPr
                      <div>
                         <div className="flex justify-between items-center mb-1 text-sm text-muted-foreground">
                             <span>Progreso</span>
-                            <span>{`${Math.round(progressPercentage)}%`}</span>
+                            <span>{`${progressPercentage.toFixed(2)}%`}</span>
                         </div>
                         <Progress value={progressPercentage} className="h-2" />
                         <div className="text-right text-xs text-muted-foreground mt-1">
