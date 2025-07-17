@@ -113,53 +113,56 @@ export default function ProjectList({ projects, view, onSuccess }: ProjectListPr
   if (view === "grid") {
     return (
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {projects.map((project) => (
-          <Link href={`/projects/${project.id}`} key={project.id} className="focus:outline-none focus:ring-2 focus:ring-ring rounded-lg">
-            <Card className="flex flex-col transition-all duration-300 group hover:shadow-xl border h-full">
-              <CardHeader className="p-4 pb-2 relative">
-                  <CardTitle className="font-headline mb-1 group-hover:text-primary transition-colors text-lg line-clamp-2 h-14">{project.name}</CardTitle>
-                  <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <Building2 className="h-4 w-4 flex-shrink-0" />
-                      <p className="truncate">{project.company}</p>
-                    </div>
-                    {project.client && (
+        {projects.map((project) => {
+          const progressPercentage = project.taskCount > 0 ? (project.completedTasks / project.taskCount) * 100 : 0;
+          return (
+            <Link href={`/projects/${project.id}`} key={project.id} className="focus:outline-none focus:ring-2 focus:ring-ring rounded-lg">
+              <Card className="flex flex-col transition-all duration-300 group hover:shadow-xl border h-full">
+                <CardHeader className="p-4 pb-2 relative">
+                    <CardTitle className="font-headline mb-1 group-hover:text-primary transition-colors text-lg line-clamp-2 h-14">{project.name}</CardTitle>
+                    <div className="flex flex-col gap-2 text-sm text-muted-foreground">
                       <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 flex-shrink-0" />
-                        <p className="truncate">{project.client}</p>
+                        <Building2 className="h-4 w-4 flex-shrink-0" />
+                        <p className="truncate">{project.company}</p>
                       </div>
-                    )}
+                      {project.client && (
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4 flex-shrink-0" />
+                          <p className="truncate">{project.client}</p>
+                        </div>
+                      )}
+                    </div>
+                </CardHeader>
+
+                <CardContent className="flex flex-1 flex-col p-4 pt-4">
+                  <div className="mt-auto space-y-3">
+                     <div>
+                        <div className="flex justify-between items-center mb-1 text-sm text-muted-foreground">
+                            <span>Progreso</span>
+                            <span>{`${Math.round(progressPercentage)}%`}</span>
+                        </div>
+                        <Progress value={progressPercentage} className="h-2" />
+                        <div className="text-right text-xs text-muted-foreground mt-1">
+                            {project.completedTasks} / {project.taskCount} tareas
+                        </div>
+                     </div>
                   </div>
-              </CardHeader>
+                </CardContent>
 
-              <CardContent className="flex flex-1 flex-col p-4 pt-4">
-                <div className="mt-auto space-y-3">
-                   <div>
-                      <div className="flex justify-between items-center mb-1 text-sm text-muted-foreground">
-                          <span>Progreso</span>
-                          <span>{`${Math.round(project.taskCount > 0 ? (project.completedTasks / project.taskCount) * 100 : 0)}%`}</span>
-                      </div>
-                      <Progress value={project.taskCount > 0 ? (project.completedTasks / project.taskCount) * 100 : 0} className="h-2" />
-                      <div className="text-right text-xs text-muted-foreground mt-1">
-                          {project.completedTasks} / {project.taskCount} tareas
-                      </div>
-                   </div>
-                </div>
-              </CardContent>
-
-              <CardFooter className="flex flex-col gap-2 bg-muted/40 p-4 border-t">
-                <div className="flex justify-between items-baseline w-full">
-                  <p className="text-xs text-muted-foreground">Valor Consumido</p>
-                  <p className="font-bold text-base">{formatCurrency(project.consumedValue, 2)}</p>
-                </div>
-                <div className="flex justify-between items-baseline w-full">
-                  <p className="text-xs text-muted-foreground">Valor Total</p>
-                  <p className="font-bold text-base">{formatCurrency(project.totalValue, 2)}</p>
-                </div>
-              </CardFooter>
-            </Card>
-          </Link>
-        ))}
+                <CardFooter className="flex flex-col gap-2 bg-muted/40 p-4 border-t">
+                  <div className="flex justify-between items-baseline w-full">
+                    <p className="text-xs text-muted-foreground">Valor Consumido</p>
+                    <p className="font-bold text-base">{formatCurrency(project.consumedValue, 2)}</p>
+                  </div>
+                  <div className="flex justify-between items-baseline w-full">
+                    <p className="text-xs text-muted-foreground">Valor Total</p>
+                    <p className="font-bold text-base">{formatCurrency(project.totalValue, 2)}</p>
+                  </div>
+                </CardFooter>
+              </Card>
+            </Link>
+          )
+        })}
       </div>
     );
   }
