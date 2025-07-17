@@ -15,9 +15,11 @@ const LoginSchema = z.object({
 });
 
 async function verifyPassword(password: string, hashedPasswordString: string): Promise<boolean> {
+  if (!hashedPasswordString) return false;
+
   const parts = hashedPasswordString.split('$');
+  // Handle plaintext password for old/test users
   if (parts.length !== 4 || parts[0] !== 'pbkdf2-sha512') {
-    // Fallback for plain text passwords if needed for testing, NOT recommended for production
     return password === hashedPasswordString;
   }
   
@@ -34,6 +36,16 @@ async function verifyPassword(password: string, hashedPasswordString: string): P
   return timingSafeEqual(derivedKey, storedHash);
 }
 
+const getTranslatedName = (nameField: any): string => {
+    if (typeof nameField === 'string') {
+        return nameField;
+    }
+    if (typeof nameField === 'object' && nameField !== null) {
+        return nameField.es_EC || nameField.en_US || 'N/A';
+    }
+    return 'N/A';
+};
+
 export async function login(prevState: { error: string } | undefined, formData: FormData) {
   const validatedFields = LoginSchema.safeParse(Object.fromEntries(formData.entries()));
 
@@ -44,28 +56,36 @@ export async function login(prevState: { error: string } | undefined, formData: 
   const { email, password } = validatedFields.data;
 
   try {
-    const users = await query<{ id: number; name: string; login: string; password?: string }>(
-      'SELECT id, name, login, password FROM res_users WHERE login = $1 AND active = TRUE LIMIT 1',
+    const users = await query<{ id: number; login: string; password?: string; partner_id: number }>(
+      'SELECT id, login, password, partner_id FROM res_users WHERE login = $1 AND active = TRUE LIMIT 1',
       [email]
     );
 
     const user = users[0];
 
-    if (!user || !user.password) {
+    if (!user) {
       return { error: 'Credenciales inválidas.' };
     }
     
-    const isPasswordValid = await verifyPassword(password, user.password);
+    const isPasswordValid = await verifyPassword(password, user.password || '');
 
     if (!isPasswordValid) {
       return { error: 'Credenciales inválidas.' };
     }
 
+    // Get user's name from res_partner
+    const partners = await query<{ name: any }>(
+        'SELECT name FROM res_partner WHERE id = $1 LIMIT 1',
+        [user.partner_id]
+    );
+
+    const userName = partners.length > 0 ? getTranslatedName(partners[0].name) : user.login;
+
     const session = await getSession();
     session.isLoggedIn = true;
     session.user = {
       id: user.id,
-      name: user.name,
+      name: userName,
       email: user.login,
     };
     await session.save();
