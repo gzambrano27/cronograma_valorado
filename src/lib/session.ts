@@ -15,7 +15,7 @@ if (!password) {
   );
 }
 
-export const sessionOptions = {
+const sessionOptions = {
   password,
   cookieName: 'project-valuator-session',
   cookieOptions: {

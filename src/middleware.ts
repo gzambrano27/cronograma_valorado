@@ -2,10 +2,28 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getIronSession } from 'iron-session';
-import { sessionOptions, type SessionData } from '@/lib/session';
+import type { SessionData } from '@/lib/session';
+
+const password = process.env.SECRET_COOKIE_PASSWORD;
+
+if (!password) {
+  throw new Error(
+    'Missing SECRET_COOKIE_PASSWORD environment variable in middleware scope.'
+  );
+}
+
+const sessionOptions = {
+  password,
+  cookieName: 'project-valuator-session',
+  cookieOptions: {
+    secure: process.env.NODE_ENV === 'production',
+  },
+};
 
 export const middleware = async (req: NextRequest) => {
   const res = NextResponse.next();
+  // The 'cookies' object from 'next/headers' is not available in middleware.
+  // Instead, getIronSession can work directly with the request and response objects.
   const session = await getIronSession<SessionData>(req, res, sessionOptions);
 
   const { isLoggedIn } = session;
