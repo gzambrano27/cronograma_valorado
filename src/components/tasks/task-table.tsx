@@ -92,6 +92,7 @@ const getColumns = (onSuccess: () => void): ColumnDef<Task>[] => [
       ),
       enableSorting: false,
       enableHiding: false,
+      size: 40,
   },
   {
     id: 'expander',
@@ -116,6 +117,7 @@ const getColumns = (onSuccess: () => void): ColumnDef<Task>[] => [
       )
     },
     enableHiding: false,
+    size: 40,
   },
   {
     accessorKey: "name",
@@ -131,6 +133,7 @@ const getColumns = (onSuccess: () => void): ColumnDef<Task>[] => [
       )
     },
     cell: ({ row }) => <div className="capitalize font-medium">{row.getValue("name")}</div>,
+    size: 350,
   },
   {
     accessorKey: "status",
@@ -219,8 +222,9 @@ const getColumns = (onSuccess: () => void): ColumnDef<Task>[] => [
   },
   {
     id: "actions",
-    header: () => <div className="text-right">Acciones</div>,
+    header: () => <div className="text-right pr-4">Acciones</div>,
     cell: ({ row }) => <TaskActions task={row.original} onSuccess={onSuccess} />,
+    size: 80,
   },
 ]
 
@@ -401,7 +405,7 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} style={{ width: header.getSize() !== 150 ? undefined : header.getSize() }}>
+                    <TableHead key={header.id} style={{ width: header.getSize() !== table.options.defaultColumn?.size ? header.getSize() : undefined }}>
                       {header.isPlaceholder
                         ? null
                         : flexRender(
