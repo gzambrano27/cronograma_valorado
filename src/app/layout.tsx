@@ -7,8 +7,8 @@ import React from 'react';
 import type { Project } from '@/lib/types';
 import { checkDbConnection } from '@/lib/db';
 import { ConnectionError } from '@/components/layout/connection-error';
-import { getSession } from './lib/session';
-import { getProjects } from './lib/data';
+import { getSession } from '@/lib/session';
+import { getProjects } from '@/lib/data';
 
 export default async function RootLayout({
   children,
