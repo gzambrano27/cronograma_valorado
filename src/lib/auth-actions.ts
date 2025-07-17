@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { query } from './db';
 import { redirect } from 'next/navigation';
 import { getSession } from './session';
-import { SessionUser } from './types';
+import type { SessionUser } from './types';
 import { pbkdf2Sync, timingSafeEqual } from 'crypto';
 
 const LoginSchema = z.object({
@@ -17,10 +17,15 @@ const LoginSchema = z.object({
 async function verifyPassword(password: string, hashedPasswordString: string): Promise<boolean> {
   if (!hashedPasswordString) return false;
 
-  const parts = hashedPasswordString.split('$');
-  // Handle plaintext password for old/test users
-  if (parts.length !== 4 || parts[0] !== 'pbkdf2-sha512') {
+  // Handle plaintext passwords for legacy/test users
+  if (!hashedPasswordString.startsWith('$pbkdf2-sha512$')) {
     return password === hashedPasswordString;
+  }
+  
+  const parts = hashedPasswordString.split('$');
+  if (parts.length !== 4) {
+    // Invalid hash format
+    return false;
   }
   
   try {
@@ -29,11 +34,13 @@ async function verifyPassword(password: string, hashedPasswordString: string): P
     const salt = Buffer.from(parts[2], 'base64');
     const storedHash = Buffer.from(parts[3], 'base64');
 
-    // Odoo uses a 64-byte derived key for SHA-512 (as per passlib's pbkdf2_sha512)
-    const derivedKey = pbkdf2Sync(password, salt, iterations, 64, 'sha512');
+    // The keylen parameter is crucial. Passlib's pbkdf2_sha512 defaults to 64 bytes (512 bits).
+    const keylen = 64; 
+
+    const derivedKey = pbkdf2Sync(password, salt, iterations, keylen, 'sha512');
     
     if (derivedKey.length !== storedHash.length) {
-      return false; // Key lengths must match
+      return false; // Key lengths must match for timingSafeEqual
     }
 
     return timingSafeEqual(derivedKey, storedHash);
