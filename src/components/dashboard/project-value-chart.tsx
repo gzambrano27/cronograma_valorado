@@ -46,7 +46,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
               <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
               Progreso:
             </span>
-             <span className="font-mono font-semibold">{`${data.progress.toFixed(1)}%`}</span>
+             <span className="font-mono font-semibold">{`${data.progress.toFixed(2)}%`}</span>
           </div>
           <Progress value={data.progress} className="h-2" />
         </div>
