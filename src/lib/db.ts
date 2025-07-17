@@ -1,5 +1,4 @@
 import { Pool, types } from 'pg';
-import 'dotenv/config';
 
 // Ensure environment variables are loaded
 if (!process.env.db_host) {
