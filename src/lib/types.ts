@@ -22,6 +22,17 @@ export type TaskValidation = {
   location: string;
 };
 
+export type RawProject = {
+  id: number;
+  name: any;
+  company: any;
+  client?: any;
+  totalValue: string;
+  consumedValue: string;
+  taskCount: string;
+  completedTasks: string;
+}
+
 export type Project = {
   id: number;
   name: string;

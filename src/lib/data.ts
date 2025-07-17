@@ -1,6 +1,6 @@
 
 'use server';
-import type { Project, Task, SCurveData, AppConfig, TaskValidation, RawTask, RawTaskValidation } from './types';
+import type { Project, Task, SCurveData, AppConfig, TaskValidation, RawTask, RawTaskValidation, RawProject } from './types';
 import fs from 'fs/promises';
 import path from 'path';
 import { eachDayOfInterval, format, startOfDay } from 'date-fns';
@@ -66,45 +66,53 @@ const getTranslatedName = (nameField: any): string => {
 
 
 export async function getProjects(): Promise<Project[]> {
-    const projects_raw = await query<any>(`
-        SELECT 
-            pp.id, 
-            pp.name, 
-            rc.name as company, 
-            rp.name as client
-        FROM "project_project" pp
-        LEFT JOIN "res_company" rc ON pp."company_id" = rc.id
-        LEFT JOIN "res_partner" rp ON pp."partner_id" = rp.id
-        WHERE (pp.name->>'en_US' != 'Interno' AND pp.name->>'es_EC' != 'Interno') OR pp.name->>'en_US' IS NULL
-        ORDER BY pp.name
-    `);
+    const sqlQuery = `
+      WITH ProjectTaskMetrics AS (
+        SELECT
+          projectid,
+          SUM(quantity * value) AS total_value,
+          SUM(consumedquantity * value) AS consumed_value,
+          COUNT(id) AS task_count,
+          COUNT(id) FILTER (WHERE status = 'completado') AS completed_tasks
+        FROM
+          externo_tasks
+        GROUP BY
+          projectid
+      )
+      SELECT
+        pp.id,
+        pp.name,
+        rc.name as company,
+        rp.name as client,
+        COALESCE(ptm.total_value, 0) as "totalValue",
+        COALESCE(ptm.consumed_value, 0) as "consumedValue",
+        COALESCE(ptm.task_count, 0) as "taskCount",
+        COALESCE(ptm.completed_tasks, 0) as "completedTasks"
+      FROM
+        project_project pp
+      LEFT JOIN
+        ProjectTaskMetrics ptm ON pp.id = ptm.projectid
+      LEFT JOIN
+        res_company rc ON pp.company_id = rc.id
+      LEFT JOIN
+        res_partner rp ON pp.partner_id = rp.id
+      WHERE (pp.name->>'en_US' != 'Interno' AND pp.name->>'es_EC' != 'Interno') OR pp.name->>'en_US' IS NULL
+      ORDER BY
+        pp.name;
+    `;
 
-    const tasks_raw = await query<RawTask>(`SELECT * FROM "externo_tasks"`);
-    
-    const tasks = tasks_raw.map(processTask);
-    const projects = projects_raw.map(p => ({
+    const rawProjects = await query<RawProject>(sqlQuery);
+
+    return rawProjects.map(p => ({
         id: p.id,
         name: getTranslatedName(p.name),
         company: getTranslatedName(p.company),
-        client: p.client ? getTranslatedName(p.client) : ''
+        client: p.client ? getTranslatedName(p.client) : '',
+        totalValue: toFloat(p.totalValue),
+        consumedValue: toFloat(p.consumedValue),
+        taskCount: parseInt(p.taskCount, 10),
+        completedTasks: parseInt(p.completedTasks, 10),
     }));
-
-    return projects.map(project => {
-        const projectTasks = tasks.filter(task => task.projectId === project.id);
-        const completedTasks = projectTasks.filter(task => task.status === 'completado').length;
-        const taskCount = projectTasks.length;
-        
-        const totalValue = projectTasks.reduce((sum, task) => sum + (task.quantity * task.value), 0);
-        const consumedValue = projectTasks.reduce((sum, task) => sum + (task.consumedQuantity * task.value), 0);
-
-        return {
-            ...project,
-            taskCount,
-            completedTasks,
-            totalValue,
-            consumedValue,
-        };
-    });
 }
 
 export async function getTasks(): Promise<Task[]> {
@@ -113,7 +121,7 @@ export async function getTasks(): Promise<Task[]> {
 }
 
 export async function getProjectById(id: number): Promise<Project | undefined> {
-    const projects = await getProjects(); // This is inefficient but necessary for now
+    const projects = await getProjects();
     return projects.find(p => p.id === id);
 }
 
@@ -123,11 +131,11 @@ export async function getTasksByProjectId(id: number): Promise<Task[]> {
         (
           SELECT json_agg(v.*)
           FROM "externo_task_validations" v
-          WHERE v."taskid" = t.id
+          WHERE v.taskid = t.id
         ) as validations
       FROM "externo_tasks" t
-      WHERE t."projectid" = $1
-      ORDER BY t."startdate", t.id
+      WHERE t.projectid = $1
+      ORDER BY t.startdate, t.id
     `, [id]);
     return tasks_raw.map(processTask);
 }
