@@ -2,7 +2,7 @@
 "use client"
 
 import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
+import { Check, ChevronsUpDown, Building, Star } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -31,7 +31,7 @@ export function CompanySwitcher({ user, onCompanyChange }: CompanySwitcherProps)
   const [open, setOpen] = React.useState(false)
   const allowedCompanies = user.allowedCompanies || [];
   const [selectedCompanies, setSelectedCompanies] = React.useState<Company[]>(allowedCompanies)
-  const currentCompany = user.company;
+  const currentCompanyId = user.company?.id;
 
   React.useEffect(() => {
     onCompanyChange(selectedCompanies);
@@ -41,12 +41,28 @@ export function CompanySwitcher({ user, onCompanyChange }: CompanySwitcherProps)
     setSelectedCompanies(prev => {
         const isSelected = prev.some(c => c.id === company.id);
         if (isSelected) {
-            return prev.filter(c => c.id !== company.id);
+            // Unselect, but ensure at least one company is always selected
+            if (prev.length > 1) {
+                return prev.filter(c => c.id !== company.id);
+            }
+            return prev;
         } else {
             return [...prev, company];
         }
     })
   }
+  
+  const selectAll = () => setSelectedCompanies(allowedCompanies);
+  const deselectAll = () => {
+      // Keep at least the current company selected
+      if (currentCompanyId) {
+          const current = allowedCompanies.find(c => c.id === currentCompanyId);
+          if (current) {
+              setSelectedCompanies([current]);
+          }
+      }
+  };
+
 
   const companyLabel = selectedCompanies.length === 1 
     ? selectedCompanies[0].name 
@@ -75,26 +91,6 @@ export function CompanySwitcher({ user, onCompanyChange }: CompanySwitcherProps)
           <CommandList>
             <CommandInput placeholder="Buscar compañía..." />
             <CommandEmpty>No se encontró la compañía.</CommandEmpty>
-            {currentCompany && (
-                 <CommandGroup heading="Compañía Actual">
-                 <CommandItem
-                    key={currentCompany.id}
-                    onSelect={() => handleSelect(currentCompany)}
-                    className="text-sm"
-                 >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        selectedCompanies.some(c => c.id === currentCompany.id)
-                          ? "opacity-100"
-                          : "opacity-0"
-                      )}
-                    />
-                    {currentCompany.name}
-                </CommandItem>
-            </CommandGroup>
-            )}
-            <CommandSeparator />
             <CommandGroup heading="Compañías Permitidas">
               {allowedCompanies.map((company) => (
                 <CommandItem
@@ -110,11 +106,20 @@ export function CompanySwitcher({ user, onCompanyChange }: CompanySwitcherProps)
                         : "opacity-0"
                     )}
                   />
-                  {company.name}
+                  <Building className="mr-2 h-4 w-4 text-muted-foreground" />
+                  <span className="flex-1 truncate">{company.name}</span>
+                  {company.id === currentCompanyId && (
+                     <Star className="ml-auto h-4 w-4 text-yellow-400 fill-current" />
+                  )}
                 </CommandItem>
               ))}
             </CommandGroup>
           </CommandList>
+          <CommandSeparator />
+          <div className="p-2 flex justify-between">
+              <Button variant="link" size="sm" className="px-2" onClick={selectAll}>Seleccionar Todo</Button>
+              <Button variant="link" size="sm" className="px-2" onClick={deselectAll}>Quitar Selección</Button>
+          </div>
         </Command>
       </PopoverContent>
     </Popover>
