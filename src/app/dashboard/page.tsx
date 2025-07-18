@@ -8,7 +8,7 @@ import { ProjectValueChart } from "@/components/dashboard/project-value-chart";
 import { TaskStatusChart } from "@/components/dashboard/task-status-chart";
 import type { ChartConfig } from "@/components/ui/chart";
 import { formatCurrency } from "@/lib/utils";
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { Company, Project, Task } from '@/lib/types';
 
 const taskStatusConfig = {
@@ -41,7 +41,14 @@ export default function DashboardPage({ selectedCompanies = [] }: { selectedComp
     reloadData();
   }, [reloadData]);
   
-  const filteredProjects = projects.filter(p => selectedCompanies.length === 0 || selectedCompanies.some(c => c.id === p.companyId));
+  const filteredProjects = useMemo(() => {
+    const selectedCompanyIds = new Set(selectedCompanies.map(c => c.id));
+    if (selectedCompanyIds.size === 0) {
+      // If nothing is selected (e.g. during initial load), show nothing to avoid flash of all projects
+      return []; 
+    }
+    return projects.filter(p => selectedCompanyIds.has(p.companyId));
+  }, [projects, selectedCompanies]);
   
   const totalProjects = filteredProjects.length;
   const totalValue = filteredProjects.reduce((sum, p) => sum + p.totalValue, 0);
@@ -148,7 +155,7 @@ export default function DashboardPage({ selectedCompanies = [] }: { selectedComp
         </Card>
       </div>
 
-      <ProjectView projects={projects} onSuccess={reloadData} selectedCompanies={selectedCompanies} />
+      <ProjectView projects={filteredProjects} onSuccess={reloadData} />
     </div>
   );
 }

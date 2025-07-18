@@ -119,14 +119,13 @@ export default function AppShell({
   }, [selectedCompanies, isInitialLoad]);
 
   const childrenWithProps = React.Children.map(children, child => {
+    // Don't render children until the initial state is loaded to prevent mismatches
+    if (isInitialLoad && user) {
+        return null; 
+    }
     if (React.isValidElement(child)) {
-      // Don't render children until the initial state is loaded to prevent mismatches
-      if (isInitialLoad && user) {
-          return null; 
-      }
       return React.cloneElement(child as React.ReactElement<any>, { 
         selectedCompanies, 
-        setSelectedCompanies 
       });
     }
     return child;
