@@ -20,6 +20,7 @@ export const middleware = async (req: NextRequest) => {
   // redirect them to the login page.
   if (!sessionCookie && !isPublicRoute) {
     const loginUrl = new URL('/login', req.url);
+    loginUrl.searchParams.set('from', pathname);
     return NextResponse.redirect(loginUrl);
   }
   
