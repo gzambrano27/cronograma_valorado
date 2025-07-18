@@ -10,7 +10,6 @@ import type { ChartConfig } from "@/components/ui/chart";
 import { formatCurrency } from "@/lib/utils";
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Company, Project, Task } from '@/lib/types';
-import { useSession } from "@/hooks/use-session";
 
 const taskStatusConfig = {
   completado: {
@@ -28,13 +27,10 @@ const taskStatusConfig = {
 } satisfies ChartConfig;
 
 
-export default function DashboardPage() {
+export default function DashboardPage({ selectedCompanies }: { selectedCompanies: Company[] }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const { session } = useSession();
   
-  const [selectedCompanies, setSelectedCompanies] = useState<Company[]>(session?.user?.allowedCompanies || []);
-
   const reloadData = useCallback(async () => {
     const [fetchedProjects, fetchedTasks] = await Promise.all([getProjects(), getTasks()]);
     setProjects(fetchedProjects);
@@ -44,13 +40,6 @@ export default function DashboardPage() {
   useEffect(() => {
     reloadData();
   }, [reloadData]);
-
-  useEffect(() => {
-    if (session?.user?.allowedCompanies) {
-      // Initialize with all companies selected, or based on a saved preference
-      setSelectedCompanies(session.user.allowedCompanies);
-    }
-  }, [session?.user?.allowedCompanies]);
   
   const filteredProjects = projects.filter(p => selectedCompanies.some(c => c.id === p.companyId));
   
@@ -158,7 +147,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <ProjectView projects={projects} onSuccess={reloadData} />
+      <ProjectView projects={projects} onSuccess={reloadData} selectedCompanies={selectedCompanies} />
     </div>
   );
 }
