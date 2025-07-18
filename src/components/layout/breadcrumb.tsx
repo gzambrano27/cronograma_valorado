@@ -12,7 +12,8 @@ interface BreadcrumbProps {
 }
 
 const translations: Record<string, string> = {
-  dashboard: 'Cronograma Valorado',
+  dashboard: 'Panel Principal',
+  projects: 'Proyectos',
   settings: 'Configuración',
 };
 
@@ -32,43 +33,42 @@ export function Breadcrumb({}: BreadcrumbProps) {
   };
   
   const buildBreadcrumbs = () => {
-    const crumbs = [];
-
-    if (pathname.startsWith('/dashboard') || pathname.startsWith('/projects')) {
-        crumbs.push({
-            name: 'Cronograma Valorado',
-            href: '/dashboard',
-            isLast: pathname === '/dashboard',
-        });
-    }
-
-    if (pathname.startsWith('/projects/')) {
-        const projectId = parseInt(segments[1], 10);
-        if (!isNaN(projectId)) {
-            crumbs.push({
-                name: getProjectName(projectId),
-                href: `/projects/${projectId}`,
-                isLast: true
-            });
+    let path = '';
+    const crumbs = segments.map((segment, index) => {
+        path += `/${segment}`;
+        const isLast = index === segments.length - 1;
+        
+        if (segment === 'projects' && segments[index + 1]) {
+            const projectId = parseInt(segments[index + 1], 10);
+            return {
+                name: translations[segment] || segment,
+                href: path,
+                isLast: false,
+            };
         }
-    }
-    
-    if (pathname.startsWith('/settings')) {
-        crumbs.push({
-            name: translations['settings'],
-            href: '/settings',
-            isLast: true
-        });
-    }
+        
+        if (!isNaN(parseInt(segment)) && segments[index - 1] === 'projects') {
+             return {
+                name: getProjectName(parseInt(segment, 10)),
+                href: path,
+                isLast: isLast,
+            };
+        }
+        
+        return {
+            name: translations[segment] || segment,
+            href: path,
+            isLast: isLast,
+        };
+    });
 
     return crumbs;
   }
 
   const breadcrumbs = buildBreadcrumbs();
 
-
   return (
-    <nav aria-label="Breadcrumb" className='mb-6'>
+    <nav aria-label="Breadcrumb" className=''>
       <ol className="flex items-center gap-1.5 text-sm text-muted-foreground">
         <li>
           <Link href="/dashboard" className="transition-colors hover:text-foreground">

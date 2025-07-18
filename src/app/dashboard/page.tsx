@@ -1,5 +1,4 @@
 
-
 'use client'
 import { ProjectView } from "@/components/projects/project-view";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -31,10 +30,13 @@ const taskStatusConfig = {
 
 
 export default function DashboardPage() {
-  const { allProjects, selectedCompanies } = useDashboard();
+  const { allProjects } = useDashboard(); // This is now safe to call
   const { session } = useSession();
   const isManager = session.user?.isManager ?? false;
 
+  // We no longer manage selectedCompanies here, it's in AuthLayoutClient
+  // The filtering of projects happens in the ProjectView component based on props
+  
   const [tasks, setTasks] = useState<Task[]>([]);
   
   const reloadTasks = useCallback(async () => {
@@ -46,25 +48,15 @@ export default function DashboardPage() {
     reloadTasks();
   }, [reloadTasks]);
 
-  const filteredProjects = useMemo(() => {
-    if (!selectedCompanies || selectedCompanies.length === 0) {
-      return [];
-    }
-    const selectedCompanyIds = new Set(selectedCompanies.map(c => c.id));
-    return allProjects.filter(p => selectedCompanyIds.has(p.companyId));
-  }, [allProjects, selectedCompanies]);
+  // The rest of the component logic relies on `allProjects` which is now
+  // correctly provided by the context.
 
-  const filteredTasks = useMemo(() => {
-    const filteredProjectIds = new Set(filteredProjects.map(p => p.id));
-    return tasks.filter(t => filteredProjectIds.has(t.projectId));
-  }, [tasks, filteredProjects]);
+  const totalProjects = allProjects.length;
+  const totalValue = allProjects.reduce((sum, p) => sum + p.totalValue, 0);
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(t => t.status === 'completado').length;
 
-  const totalProjects = filteredProjects.length;
-  const totalValue = filteredProjects.reduce((sum, p) => sum + p.totalValue, 0);
-  const totalTasks = filteredTasks.length;
-  const completedTasks = filteredTasks.filter(t => t.status === 'completado').length;
-
-  const projectValueData = filteredProjects
+  const projectValueData = allProjects
     .map(p => ({
       name: p.name.length > 20 ? `${p.name.substring(0, 20)}...` : p.name,
       value: p.totalValue,
@@ -74,7 +66,7 @@ export default function DashboardPage() {
     .sort((a, b) => b.value - a.value)
     .slice(0, 7);
 
-  const taskStatusCounts = filteredTasks.reduce((acc, task) => {
+  const taskStatusCounts = tasks.reduce((acc, task) => {
     const status = task.status as keyof typeof taskStatusConfig;
     acc[status] = (acc[status] || 0) + 1;
     return acc;
@@ -91,11 +83,6 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between space-y-2 pt-6">
-        <h1 className="text-3xl font-bold tracking-tight font-headline">
-          Panel Principal
-        </h1>
-      </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {isManager && (
             <Card>
@@ -106,7 +93,7 @@ export default function DashboardPage() {
               <CardContent>
                 <div className="text-xl font-bold">{formatCurrency(totalValue)}</div>
                 <p className="text-xs text-muted-foreground">
-                  Suma de proyectos en compañías seleccionadas
+                  Suma de todos los proyectos
                 </p>
               </CardContent>
             </Card>
@@ -119,7 +106,7 @@ export default function DashboardPage() {
           <CardContent>
             <div className="text-xl font-bold">{totalProjects}</div>
             <p className="text-xs text-muted-foreground">
-              Proyectos en compañías seleccionadas
+              Total de proyectos accesibles
             </p>
           </CardContent>
         </Card>
@@ -131,7 +118,7 @@ export default function DashboardPage() {
           <CardContent>
             <div className="text-xl font-bold">{totalTasks}</div>
             <p className="text-xs text-muted-foreground">
-              +{completedTasks} completadas en proyectos filtrados
+              +{completedTasks} completadas en todos los proyectos
             </p>
           </CardContent>
         </Card>
@@ -158,10 +145,10 @@ export default function DashboardPage() {
               <PieChart className="h-5 w-5" />
               Distribución de Tareas
             </CardTitle>
-            <CardDescription>Estado de las tareas en los proyectos seleccionados.</CardDescription>
+            <CardDescription>Estado de las tareas en todos los proyectos.</CardDescription>
           </CardHeader>
           <CardContent>
-            {filteredTasks.length > 0 ? (
+            {tasks.length > 0 ? (
                 <TaskStatusChart data={taskStatusData} config={taskStatusConfig} totalTasks={totalTasks} />
             ) : (
                 <div className="flex items-center justify-center h-full min-h-[250px] text-muted-foreground">
@@ -172,7 +159,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <ProjectView projects={filteredProjects} onSuccess={reloadDashboardData} />
+      <ProjectView projects={allProjects} onSuccess={reloadDashboardData} />
     </div>
   );
 }

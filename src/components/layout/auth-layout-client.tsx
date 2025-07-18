@@ -1,7 +1,7 @@
 
 'use client';
 import AppShell from '@/components/layout/app-shell';
-import { DashboardProvider } from '@/hooks/use-dashboard-context';
+import { useDashboard } from '@/hooks/use-dashboard-context';
 import type { Company, Project, SessionData } from '@/lib/types';
 import React from 'react';
 
@@ -9,14 +9,14 @@ const LOCAL_STORAGE_KEY = 'selectedCompanies';
 
 export default function AuthLayoutClient({
   children,
-  session,
-  allProjects
+  session
 }: Readonly<{
   children: React.ReactNode;
   session: SessionData;
-  allProjects: Project[];
+  allProjects: Project[]; // This prop is now passed to DashboardProvider in the layout
 }>) {
   const user = session?.user;
+  const { allProjects } = useDashboard(); // Consume from provider
   
   const [selectedCompanies, setSelectedCompanies] = React.useState<Company[]>([]);
   const [isInitialLoad, setIsInitialLoad] = React.useState(true);
@@ -65,13 +65,12 @@ export default function AuthLayoutClient({
   }
 
   return (
-    <DashboardProvider allProjects={allProjects} selectedCompanies={selectedCompanies}>
-        <AppShell 
-            selectedCompanies={selectedCompanies}
-            onCompanyChange={setSelectedCompanies}
-        >
-            {children}
-        </AppShell>
-    </DashboardProvider>
+    <AppShell 
+        allProjects={allProjects}
+        selectedCompanies={selectedCompanies}
+        onCompanyChange={setSelectedCompanies}
+    >
+        {children}
+    </AppShell>
   );
 }

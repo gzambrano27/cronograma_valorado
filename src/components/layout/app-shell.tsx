@@ -39,7 +39,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useDashboard } from "@/hooks/use-dashboard-context";
 
 
 function MobileSidebarTrigger() {
@@ -60,19 +59,19 @@ function MobileSidebarTrigger() {
 
 interface AppShellProps {
     children: React.ReactNode;
+    allProjects: Project[];
     selectedCompanies: Company[];
     onCompanyChange: (companies: Company[]) => void;
 }
 
-export default function AppShell({ children, selectedCompanies, onCompanyChange }: AppShellProps) {
+export default function AppShell({ children, allProjects, selectedCompanies, onCompanyChange }: AppShellProps) {
   const pathname = usePathname();
   const { session } = useSession();
-  const { allProjects } = useDashboard();
   
   const user = session?.user;
 
   const isDashboardPage = pathname.startsWith("/dashboard");
-  const title = "Centro de Aplicaciones";
+  const title = "ProjectValuator";
 
   const filteredProjectsForSidebar = React.useMemo(() => {
     if (!selectedCompanies || selectedCompanies.length === 0) {
@@ -160,6 +159,7 @@ export default function AppShell({ children, selectedCompanies, onCompanyChange 
         <SidebarMain>
           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
             <MobileSidebarTrigger />
+            <Breadcrumb />
             <div className="flex-1" />
             {user && <CompanySwitcher user={user} selectedCompanies={selectedCompanies} onCompanyChange={onCompanyChange} />}
             <ThemeToggle />
@@ -200,7 +200,6 @@ export default function AppShell({ children, selectedCompanies, onCompanyChange 
             )}
           </header>
           <div className="p-4 sm:p-6 md:p-8">
-            <Breadcrumb />
             {children}
           </div>
         </SidebarMain>
