@@ -145,7 +145,7 @@ export default function DashboardPage() {
               Distribución de Tareas (Global)
             </CardTitle>
             <CardDescription>Estado general de las tareas en todos los proyectos.</CardDescription>
-          </Header>
+          </CardHeader>
           <CardContent>
             {tasks.length > 0 ? (
                 <TaskStatusChart data={taskStatusData} config={taskStatusConfig} totalTasks={totalTasks} />
