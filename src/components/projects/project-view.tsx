@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import type { Project } from "@/lib/types";
+import type { Company, Project } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,45 +18,44 @@ import { TooltipProvider } from "../ui/tooltip";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
 
-export function ProjectView({ projects, onSuccess }: { projects: Project[], onSuccess: () => void }) {
+export function ProjectView({ projects, onSuccess, selectedCompanies: extSelectedCompanies }: { projects: Project[], onSuccess: () => void, selectedCompanies?: Company[] }) {
   const [view, setView] = useState<"grid" | "list">("grid");
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCompany, setSelectedCompany] = useState("all");
   const [selectedClient, setSelectedClient] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [showAll, setShowAll] = useState(false);
 
   const ITEMS_PER_PAGE = view === 'grid' ? 6 : 10;
-
-  const { companies, clients } = useMemo(() => {
-    const allCompanies = [...new Set(projects.map((p) => p.company))].sort();
+  
+  const { clients } = useMemo(() => {
     const allClients = [...new Set(projects.map((p) => p.client).filter(Boolean) as string[])].sort();
     return {
-      companies: ["all", ...allCompanies],
       clients: ["all", ...allClients],
     };
   }, [projects]);
 
+
   const filteredProjects = useMemo(() => {
+    const selectedCompanyIds = new Set(extSelectedCompanies?.map(c => c.id) || []);
+
     return projects
       .filter((project) =>
         project.name.toLowerCase().includes(searchTerm.toLowerCase())
       )
       .filter(
-        (project) =>
-          selectedCompany === "all" || project.company === selectedCompany
+        (project) => selectedCompanyIds.size === 0 || selectedCompanyIds.has(project.companyId)
       )
       .filter(
         (project) =>
           selectedClient === "all" || project.client === selectedClient
       );
-  }, [projects, searchTerm, selectedCompany, selectedClient]);
+  }, [projects, searchTerm, extSelectedCompanies, selectedClient]);
   
   const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedCompany, selectedClient, view]);
+  }, [searchTerm, selectedClient, view, extSelectedCompanies]);
 
   useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) {
@@ -114,18 +113,6 @@ export function ProjectView({ projects, onSuccess }: { projects: Project[], onSu
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full md:max-w-xs"
         />
-        <Select value={selectedCompany} onValueChange={setSelectedCompany}>
-          <SelectTrigger className="w-full md:w-[240px]">
-            <SelectValue placeholder="Filtrar por compañía" />
-          </SelectTrigger>
-          <SelectContent>
-            {companies.map((company) => (
-              <SelectItem key={company} value={company}>
-                {company === "all" ? "Todas las Compañías" : company}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
         <Select value={selectedClient} onValueChange={setSelectedClient}>
           <SelectTrigger className="w-full md:w-[240px]">
             <SelectValue placeholder="Filtrar por cliente" />

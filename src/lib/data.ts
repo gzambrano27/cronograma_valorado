@@ -82,6 +82,7 @@ export async function getProjects(): Promise<Project[]> {
       SELECT
         pp.id,
         pp.name,
+        rc.id as "companyId",
         rc.name as company,
         rp.name as client,
         COALESCE(ptm.total_value, 0) as "totalValue",
@@ -111,6 +112,7 @@ export async function getProjects(): Promise<Project[]> {
     return rawProjects.map(p => ({
         id: p.id,
         name: getTranslatedName(p.name),
+        companyId: p.companyId,
         company: getTranslatedName(p.company),
         client: p.client ? getTranslatedName(p.client) : '',
         totalValue: toFloat(p.totalValue),

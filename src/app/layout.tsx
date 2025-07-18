@@ -9,6 +9,7 @@ import { checkDbConnection } from '@/lib/db';
 import { ConnectionError } from '@/components/layout/connection-error';
 import { getSession } from '@/lib/session';
 import { getProjects } from '@/lib/data';
+import { SessionProvider } from '@/hooks/use-session';
 
 export default async function RootLayout({
   children,
@@ -46,18 +47,20 @@ export default async function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          {isDbConnected ? (
-             session.isLoggedIn ? (
-                <AppShell projects={projects} title={title} user={session.user}>
-                  {children}
-                </AppShell>
-              ) : (
-                children
-              )
-          ) : (
-            <ConnectionError />
-          )}
-          <Toaster />
+          <SessionProvider value={{ session }}>
+            {isDbConnected ? (
+              session.isLoggedIn ? (
+                  <AppShell projects={projects} title={title}>
+                    {children}
+                  </AppShell>
+                ) : (
+                  children
+                )
+            ) : (
+              <ConnectionError />
+            )}
+            <Toaster />
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>

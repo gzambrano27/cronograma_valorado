@@ -111,6 +111,16 @@ export default function ProjectList({ projects, view, onSuccess }: ProjectListPr
         getCoreRowModel: getCoreRowModel(),
     });
 
+  if (projects.length === 0) {
+    return (
+        <div className="flex flex-col items-center justify-center h-64 text-center rounded-lg border-2 border-dashed">
+            <Building2 className="w-12 h-12 text-muted-foreground mb-4" />
+            <h3 className="text-xl font-semibold">No se encontraron proyectos</h3>
+            <p className="text-muted-foreground mt-1">Intenta seleccionar otras compañías o ajustar los filtros.</p>
+        </div>
+    )
+  }
+
   if (view === "grid") {
     return (
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

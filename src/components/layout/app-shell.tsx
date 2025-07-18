@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { Building2, Cog, Briefcase, GanttChartSquare, PanelLeft, LogOut } from "lucide-react";
 import React from "react";
 
-import type { Project, SessionUser } from "@/lib/types";
+import type { Company, Project, SessionUser } from "@/lib/types";
 import {
   SidebarProvider,
   Sidebar,
@@ -29,6 +29,8 @@ import {
 } from "../ui/tooltip";
 import { logout } from "@/lib/auth-actions";
 import { Avatar, AvatarFallback } from "../ui/avatar";
+import { CompanySwitcher } from "./company-switcher";
+import { useSession } from "@/hooks/use-session";
 
 
 function MobileSidebarTrigger() {
@@ -51,16 +53,35 @@ export default function AppShell({
   children,
   projects,
   title,
-  user,
 }: {
   children: React.ReactNode;
   projects: Project[];
   title: string;
-  user?: SessionUser;
 }) {
   const pathname = usePathname();
+  const { session } = useSession();
+  const user = session?.user;
   
   const isHomePage = pathname === "/";
+  const [currentCompany, setCurrentCompany] = React.useState<Company | undefined>(user?.allowedCompanies?.[0]);
+  const [selectedCompanies, setSelectedCompanies] = React.useState<Company[]>(user?.allowedCompanies || []);
+
+  React.useEffect(() => {
+    if (user?.allowedCompanies) {
+      setCurrentCompany(user.allowedCompanies[0]);
+      setSelectedCompanies(user.allowedCompanies);
+    }
+  }, [user?.allowedCompanies]);
+
+  const childrenWithProps = React.Children.map(children, child => {
+    if (React.isValidElement(child)) {
+      return React.cloneElement(child as React.ReactElement<any>, { 
+        selectedCompanies, 
+        setSelectedCompanies 
+      });
+    }
+    return child;
+  });
 
   return (
     <TooltipProvider>
@@ -146,6 +167,7 @@ export default function AppShell({
             <MobileSidebarTrigger />
             <Breadcrumb projects={projects} />
             <div className="flex-1" />
+            {user && <CompanySwitcher user={user} />}
             <ThemeToggle />
             <Link href="/settings" passHref>
               <Button variant="ghost" size="icon" aria-label="Configuración">
@@ -186,7 +208,7 @@ export default function AppShell({
               </DropdownMenu>
             )}
           </header>
-          {children}
+          {childrenWithProps}
         </SidebarMain>
       </SidebarProvider>
     </TooltipProvider>

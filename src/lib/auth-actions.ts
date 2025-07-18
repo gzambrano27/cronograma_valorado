@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { redirect } from 'next/navigation';
 import { getSession } from './session';
 import { getOdooClient } from './odoo-client';
+import type { Company } from './types';
 
 const LoginSchema = z.object({
   email: z.string().email('Por favor ingrese un correo válido.'),
@@ -40,8 +41,8 @@ export async function login(prevState: { error: string } | undefined, formData: 
     }
 
     const userDetails = await odooClient.executeKw<any[]>('res.users', 'search_read',
-        [[['id', '=', uid]]], // domain
-        { fields: ['name', 'login', 'partner_id'] } // kwargs
+        [[['id', '=', uid]]], 
+        { fields: ['name', 'login', 'partner_id', 'company_id', 'company_ids'] }
     );
 
 
@@ -51,12 +52,23 @@ export async function login(prevState: { error: string } | undefined, formData: 
     
     const user = userDetails[0];
 
+    const allowedCompanyIds = user.company_ids;
+    const companiesData = await odooClient.executeKw<any[]>('res.company', 'search_read',
+        [[['id', 'in', allowedCompanyIds]]],
+        { fields: ['name'] }
+    );
+    
+    const allowedCompanies: Company[] = companiesData.map(c => ({ id: c.id, name: getTranslatedName(c.name) }));
+    const currentCompany: Company = { id: user.company_id[0], name: getTranslatedName(user.company_id[1]) };
+
     const session = await getSession();
     session.isLoggedIn = true;
     session.user = {
       id: user.id,
       name: getTranslatedName(user.name),
       email: user.login,
+      company: currentCompany,
+      allowedCompanies: allowedCompanies,
     };
     session.uid = uid;
     session.password = password;

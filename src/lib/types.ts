@@ -1,8 +1,15 @@
 
+export type Company = {
+  id: number;
+  name: string;
+};
+
 export type SessionUser = {
   id: number;
   name: string;
   email: string;
+  company: Company;
+  allowedCompanies: Company[];
 };
 
 export type DailyConsumption = {
@@ -30,6 +37,7 @@ export type TaskValidation = {
 export type RawProject = {
   id: number;
   name: any;
+  companyId: number;
   company: any;
   client?: any;
   totalValue: string;
@@ -42,6 +50,7 @@ export type RawProject = {
 export type Project = {
   id: number;
   name: string;
+  companyId: number;
   company: string;
   client?: string;
   totalValue: number;

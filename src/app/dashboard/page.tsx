@@ -9,7 +9,8 @@ import { TaskStatusChart } from "@/components/dashboard/task-status-chart";
 import type { ChartConfig } from "@/components/ui/chart";
 import { formatCurrency } from "@/lib/utils";
 import React, { useState, useEffect, useCallback } from 'react';
-import type { Project, Task } from '@/lib/types';
+import type { Company, Project, Task } from '@/lib/types';
+import { useSession } from "@/hooks/use-session";
 
 const taskStatusConfig = {
   completado: {
@@ -30,6 +31,9 @@ const taskStatusConfig = {
 export default function DashboardPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const { session } = useSession();
+  
+  const [selectedCompanies, setSelectedCompanies] = useState<Company[]>(session?.user?.allowedCompanies || []);
 
   const reloadData = useCallback(async () => {
     const [fetchedProjects, fetchedTasks] = await Promise.all([getProjects(), getTasks()]);
@@ -40,13 +44,22 @@ export default function DashboardPage() {
   useEffect(() => {
     reloadData();
   }, [reloadData]);
+
+  useEffect(() => {
+    if (session?.user?.allowedCompanies) {
+      // Initialize with all companies selected, or based on a saved preference
+      setSelectedCompanies(session.user.allowedCompanies);
+    }
+  }, [session?.user?.allowedCompanies]);
   
-  const totalProjects = projects.length;
-  const totalValue = projects.reduce((sum, p) => sum + p.totalValue, 0);
-  const totalTasks = tasks.length;
+  const filteredProjects = projects.filter(p => selectedCompanies.some(c => c.id === p.companyId));
+  
+  const totalProjects = filteredProjects.length;
+  const totalValue = filteredProjects.reduce((sum, p) => sum + p.totalValue, 0);
+  const totalTasks = tasks.length; // This could be filtered too if desired
   const completedTasks = tasks.filter(t => t.status === 'completado').length;
 
-  const projectValueData = projects
+  const projectValueData = filteredProjects
     .map(p => ({
       name: p.name.length > 20 ? `${p.name.substring(0, 20)}...` : p.name,
       value: p.totalValue,
@@ -82,7 +95,7 @@ export default function DashboardPage() {
           <CardContent>
             <div className="text-xl font-bold">{formatCurrency(totalValue)}</div>
             <p className="text-xs text-muted-foreground">
-              Valor combinado de todos los proyectos
+              Valor de proyectos en compañías seleccionadas
             </p>
           </CardContent>
         </Card>
@@ -94,19 +107,19 @@ export default function DashboardPage() {
           <CardContent>
             <div className="text-xl font-bold">{totalProjects}</div>
             <p className="text-xs text-muted-foreground">
-              Total de proyectos gestionados
+              Proyectos en compañías seleccionadas
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tareas Totales</CardTitle>
+            <CardTitle className="text-sm font-medium">Tareas Totales (Global)</CardTitle>
             <ListChecks className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-xl font-bold">{totalTasks}</div>
             <p className="text-xs text-muted-foreground">
-              +{completedTasks} completadas
+              +{completedTasks} completadas en todos los proyectos
             </p>
           </CardContent>
         </Card>
@@ -129,7 +142,7 @@ export default function DashboardPage() {
           <CardHeader>
             <CardTitle className="font-headline flex items-center gap-2">
               <PieChart className="h-5 w-5" />
-              Distribución de Tareas
+              Distribución de Tareas (Global)
             </CardTitle>
             <CardDescription>Estado general de las tareas en todos los proyectos.</CardDescription>
           </CardHeader>
