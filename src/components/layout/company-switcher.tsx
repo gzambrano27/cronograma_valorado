@@ -64,13 +64,13 @@ export function CompanySwitcher({ user, onCompanyChange }: CompanySwitcherProps)
           role="combobox"
           aria-expanded={open}
           aria-label="Seleccionar compañía"
-          className="w-[200px] justify-between"
+          className="w-[250px] justify-between"
         >
           <span className="truncate">{companyLabel}</span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[250px] p-0">
+      <PopoverContent className="w-[300px] p-0">
         <Command>
           <CommandList>
             <CommandInput placeholder="Buscar compañía..." />
