@@ -45,8 +45,8 @@ export default function DashboardPage({ selectedCompanies = [] }: { selectedComp
   
   const totalProjects = filteredProjects.length;
   const totalValue = filteredProjects.reduce((sum, p) => sum + p.totalValue, 0);
-  const totalTasks = tasks.length; // This could be filtered too if desired
-  const completedTasks = tasks.filter(t => t.status === 'completado').length;
+  const totalTasks = tasks.length; // This is intentionally global for a full overview
+  const completedTasks = tasks.filter(t => t.status === 'completado').length; // Also global
 
   const projectValueData = filteredProjects
     .map(p => ({
@@ -58,6 +58,7 @@ export default function DashboardPage({ selectedCompanies = [] }: { selectedComp
     .sort((a, b) => b.value - a.value)
     .slice(0, 7); 
 
+  // Task status chart remains global as requested
   const taskStatusCounts = tasks.reduce((acc, task) => {
     acc[task.status] = (acc[task.status] || 0) + 1;
     return acc;
@@ -78,7 +79,7 @@ export default function DashboardPage({ selectedCompanies = [] }: { selectedComp
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Valor Total</CardTitle>
+            <CardTitle className="text-sm font-medium">Valor Total (Filtro)</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -90,7 +91,7 @@ export default function DashboardPage({ selectedCompanies = [] }: { selectedComp
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Proyectos Totales</CardTitle>
+            <CardTitle className="text-sm font-medium">Proyectos (Filtro)</CardTitle>
             <Briefcase className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -119,9 +120,9 @@ export default function DashboardPage({ selectedCompanies = [] }: { selectedComp
           <CardHeader>
             <CardTitle className="font-headline flex items-center gap-2">
               <BarChart className="h-5 w-5" />
-              Valor por Proyecto
+              Valor por Proyecto (Filtro)
             </CardTitle>
-            <CardDescription>Visualización del valor de los proyectos principales.</CardDescription>
+            <CardDescription>Visualización del valor de los proyectos principales según filtro.</CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
             <ProjectValueChart data={projectValueData} />

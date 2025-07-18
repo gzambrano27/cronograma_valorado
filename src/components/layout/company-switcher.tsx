@@ -41,7 +41,7 @@ export function CompanySwitcher({ user, selectedCompanies, onCompanyChange }: Co
             if (prev.length > 1) {
                 return prev.filter(c => c.id !== company.id);
             }
-            return prev;
+            return prev; // Don't unselect if it's the last one
         } else {
             return [...prev, company];
         }
@@ -55,10 +55,11 @@ export function CompanySwitcher({ user, selectedCompanies, onCompanyChange }: Co
           const current = allowedCompanies.find(c => c.id === currentCompanyId);
           if (current) {
               onCompanyChange([current]);
-          } else if (allowedCompanies.length > 0) {
-              onCompanyChange([allowedCompanies[0]]);
+              return;
           }
-      } else if (allowedCompanies.length > 0) {
+      }
+      // Fallback if current company is not in the list or doesn't exist
+      if (allowedCompanies.length > 0) {
           onCompanyChange([allowedCompanies[0]]);
       }
   };
@@ -69,7 +70,7 @@ export function CompanySwitcher({ user, selectedCompanies, onCompanyChange }: Co
     : selectedCompanies.length === allowedCompanies.length
     ? "Todas las Compañías"
     : selectedCompanies.length > 1
-    ? `${selectedCompanies.length} compañías`
+    ? `${selectedCompanies.length} compañías seleccionadas`
     : "Seleccionar compañía...";
 
   return (

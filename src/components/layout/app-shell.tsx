@@ -77,9 +77,9 @@ export default function AppShell({
   const [selectedCompanies, setSelectedCompanies] = React.useState<Company[]>([]);
   const [isInitialLoad, setIsInitialLoad] = React.useState(true);
   
-  // Effect to initialize selectedCompanies from localStorage or user's allowed companies
+  // Effect to initialize selectedCompanies from localStorage or user's default company
   React.useEffect(() => {
-    if (user?.allowedCompanies && isInitialLoad) {
+    if (user?.allowedCompanies && user.company && isInitialLoad) {
       try {
         const storedCompanies = localStorage.getItem(LOCAL_STORAGE_KEY);
         if (storedCompanies) {
@@ -91,18 +91,20 @@ export default function AppShell({
           if (validStoredCompanies.length > 0) {
             setSelectedCompanies(validStoredCompanies);
           } else {
-             setSelectedCompanies(user.allowedCompanies);
+             // If stored is invalid, default to user's main company
+             setSelectedCompanies([user.company]);
           }
         } else {
-          setSelectedCompanies(user.allowedCompanies);
+          // If nothing is stored, default to user's main company
+          setSelectedCompanies([user.company]);
         }
       } catch (error) {
-        console.error("Failed to parse selected companies from localStorage", error);
-        setSelectedCompanies(user.allowedCompanies);
+        console.error("Failed to process selected companies from localStorage", error);
+        setSelectedCompanies([user.company]);
       }
       setIsInitialLoad(false);
     }
-  }, [user?.allowedCompanies, isInitialLoad]);
+  }, [user, isInitialLoad]);
 
 
   // Effect to save selectedCompanies to localStorage whenever they change
