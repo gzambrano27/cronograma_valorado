@@ -30,33 +30,30 @@ const taskStatusConfig = {
 export default function DashboardPage({ selectedCompanies = [] }: { selectedCompanies?: Company[] }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
-  
+  const selectedCompanyIds = useMemo(() => selectedCompanies.map(c => c.id), [selectedCompanies]);
+
   const reloadData = useCallback(async () => {
-    const [fetchedProjects, fetchedTasks] = await Promise.all([getProjects(), getTasks()]);
-    setProjects(fetchedProjects);
-    setTasks(fetchedTasks);
-  }, []);
+    // Only fetch data if companies are selected to avoid unnecessary calls
+    if (selectedCompanyIds.length > 0) {
+      const [fetchedProjects, fetchedTasks] = await Promise.all([getProjects(selectedCompanyIds), getTasks()]);
+      setProjects(fetchedProjects);
+      setTasks(fetchedTasks);
+    } else {
+      // Clear projects if no companies are selected
+      setProjects([]);
+    }
+  }, [selectedCompanyIds]);
 
   useEffect(() => {
     reloadData();
   }, [reloadData]);
   
-  const filteredProjects = useMemo(() => {
-    const selectedCompanyIds = new Set(selectedCompanies.map(c => c.id));
-    if (selectedCompanyIds.size === 0) {
-      // While loading or if no companies are selected, show all as a safe default.
-      // In practice, at least one company is always selected.
-      return projects; 
-    }
-    return projects.filter(p => selectedCompanyIds.has(p.companyId));
-  }, [projects, selectedCompanies]);
-  
-  const totalProjects = filteredProjects.length;
-  const totalValue = filteredProjects.reduce((sum, p) => sum + p.totalValue, 0);
-  const totalTasks = tasks.length; // This is intentionally global for a full overview
-  const completedTasks = tasks.filter(t => t.status === 'completado').length; // Also global
+  const totalProjects = projects.length;
+  const totalValue = projects.reduce((sum, p) => sum + p.totalValue, 0);
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(t => t.status === 'completado').length;
 
-  const projectValueData = filteredProjects
+  const projectValueData = projects
     .map(p => ({
       name: p.name.length > 20 ? `${p.name.substring(0, 20)}...` : p.name,
       value: p.totalValue,
@@ -66,7 +63,6 @@ export default function DashboardPage({ selectedCompanies = [] }: { selectedComp
     .sort((a, b) => b.value - a.value)
     .slice(0, 7); 
 
-  // Task status chart remains global as requested
   const taskStatusCounts = tasks.reduce((acc, task) => {
     acc[task.status] = (acc[task.status] || 0) + 1;
     return acc;
@@ -156,7 +152,7 @@ export default function DashboardPage({ selectedCompanies = [] }: { selectedComp
         </Card>
       </div>
 
-      <ProjectView projects={filteredProjects} onSuccess={reloadData} />
+      <ProjectView projects={projects} onSuccess={reloadData} />
     </div>
   );
 }

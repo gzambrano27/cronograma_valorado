@@ -65,7 +65,16 @@ const getTranslatedName = (nameField: any): string => {
 };
 
 
-export async function getProjects(): Promise<Project[]> {
+export async function getProjects(companyIds?: number[]): Promise<Project[]> {
+    let whereClause = `WHERE (pp.name->>'en_US' != 'Interno' AND pp.name->>'es_EC' != 'Interno') OR pp.name->>'en_US' IS NULL`;
+    const queryParams: number[] = [];
+
+    if (companyIds && companyIds.length > 0) {
+        const placeholders = companyIds.map((_, i) => `$${i + 1}`).join(',');
+        whereClause += ` AND pp.company_id IN (${placeholders})`;
+        queryParams.push(...companyIds);
+    }
+    
     const sqlQuery = `
       WITH ProjectTaskMetrics AS (
         SELECT
@@ -102,12 +111,12 @@ export async function getProjects(): Promise<Project[]> {
         res_company rc ON pp.company_id = rc.id
       LEFT JOIN
         res_partner rp ON pp.partner_id = rp.id
-      WHERE (pp.name->>'en_US' != 'Interno' AND pp.name->>'es_EC' != 'Interno') OR pp.name->>'en_US' IS NULL
+      ${whereClause}
       ORDER BY
         pp.name;
     `;
 
-    const rawProjects = await query<RawProject>(sqlQuery);
+    const rawProjects = await query<RawProject>(sqlQuery, queryParams);
 
     return rawProjects.map(p => ({
         id: p.id,
@@ -129,7 +138,7 @@ export async function getTasks(): Promise<Task[]> {
 }
 
 export async function getProjectById(id: number): Promise<Project | undefined> {
-    const projects = await getProjects();
+    const projects = await getProjects(); // Note: This gets all projects, might need filtering
     return projects.find(p => p.id === id);
 }
 
