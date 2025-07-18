@@ -17,8 +17,12 @@ const getTranslatedName = (nameField: any): string => {
     if (typeof nameField === 'string') {
         return nameField;
     }
-    if (typeof nameField === 'object' && nameField !== null) {
+    if (typeof nameField === 'object' && nameField !== null && !Array.isArray(nameField)) {
         return nameField.es_EC || nameField.en_US || 'N/A';
+    }
+    // Handle cases where name is like [id, "Name"]
+    if (Array.isArray(nameField) && nameField.length > 1) {
+        return getTranslatedName(nameField[1]);
     }
     return 'N/A';
 };
@@ -45,20 +49,22 @@ export async function login(prevState: { error: string } | undefined, formData: 
         { fields: ['name', 'login', 'partner_id', 'company_id', 'company_ids'] }
     );
 
-
     if (!userDetails || userDetails.length === 0) {
         return { error: 'No se pudo encontrar la información del usuario.' };
     }
     
     const user = userDetails[0];
 
-    const allowedCompanyIds = user.company_ids;
-    const companiesData = await odooClient.executeKw<any[]>('res.company', 'search_read',
-        [[['id', 'in', allowedCompanyIds]]],
-        { fields: ['name'] }
-    );
+    const allowedCompanyIds = user.company_ids || [];
+    let allowedCompanies: Company[] = [];
+    if (allowedCompanyIds.length > 0) {
+        const companiesData = await odooClient.executeKw<any[]>('res.company', 'search_read',
+            [[['id', 'in', allowedCompanyIds]]],
+            { fields: ['name'] }
+        );
+        allowedCompanies = companiesData.map(c => ({ id: c.id, name: getTranslatedName(c.name) }));
+    }
     
-    const allowedCompanies: Company[] = companiesData.map(c => ({ id: c.id, name: getTranslatedName(c.name) }));
     const currentCompany: Company = { id: user.company_id[0], name: getTranslatedName(user.company_id[1]) };
 
     const session = await getSession();
@@ -79,9 +85,12 @@ export async function login(prevState: { error: string } | undefined, formData: 
     if (error.message && error.message.includes('AccessDenied')) {
         return { error: 'Credenciales inválidas.' };
     }
+    const odooUrl = process.env.ODOO_URL || 'URL no configurada';
     if (error.message && error.message.includes('ECONNREFUSED')) {
-        const odooUrl = process.env.ODOO_URL || 'URL no configurada';
         return { error: `No se pudo conectar al servidor de Odoo en ${odooUrl}. Por favor, verifique la URL y que el servidor esté en ejecución.` };
+    }
+    if (error.faultString) {
+      return { error: `Error de Odoo: ${error.faultString}` };
     }
     return { error: 'Ocurrió un error inesperado al conectar con Odoo.' };
   }
