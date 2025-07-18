@@ -4,10 +4,12 @@
 import 'server-only';
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
-import { getIronSessionInstance } from './session';
 import { getOdooClient } from './odoo-client';
 import type { Company, SessionUser, UserGroupInfo } from './types';
 import { query } from './db';
+import { getIronSession } from 'iron-session';
+import { sessionOptions, type SessionData } from './session-config';
+import { cookies } from 'next/headers';
 
 const LoginSchema = z.object({
   email: z.string().min(1, 'Por favor ingrese su usuario.'),
@@ -48,7 +50,7 @@ async function checkUserIsManager(userId: number): Promise<boolean> {
             ru.id = $1;
     `, [userId]);
 
-    const isManager = userGroups.some(group => 
+    const isManager = userGroups.some(group =>
         getTranslatedName(group.nombre_categoria) === 'Apus' &&
         getTranslatedName(group.nombre_grupo) === 'Gerente'
     );
@@ -74,14 +76,14 @@ export async function login(prevState: { error: string } | undefined, formData: 
     }
 
     const userDetails = await odooClient.executeKw<any[]>('res.users', 'search_read',
-        [[['id', '=', uid]]], 
+        [[['id', '=', uid]]],
         { fields: ['name', 'login', 'partner_id', 'company_id', 'company_ids'] }
     );
 
     if (!userDetails || userDetails.length === 0) {
         return { error: 'No se pudo encontrar la información del usuario.' };
     }
-    
+
     const user = userDetails[0];
     const isManager = await checkUserIsManager(user.id);
 
@@ -94,10 +96,12 @@ export async function login(prevState: { error: string } | undefined, formData: 
         );
         allowedCompanies = companiesData.map(c => ({ id: c.id, name: getTranslatedName(c.name) }));
     }
-    
-    const currentCompany: Company = { id: user.company_id[0], name: getTranslatedName(user.company_id[1]) };
 
-    const session = await getIronSessionInstance();
+    const currentCompany: Company = { id: user.company_id[0], name: getTranslatedName(user.company_id[1]) };
+    
+    // Get session directly inside the action
+    const session = await getIronSession<SessionData>(cookies(), sessionOptions);
+
     session.isLoggedIn = true;
     session.user = {
       id: user.id,
@@ -109,8 +113,10 @@ export async function login(prevState: { error: string } | undefined, formData: 
     };
     session.uid = uid;
     session.password = password;
-    await session.save();
     
+    // Save session inside the action
+    await session.save();
+
   } catch (error: any) {
     console.error(`Error en el inicio de sesión para ${email}:`, error);
     if (error.message && error.message.includes('AccessDenied')) {
@@ -125,26 +131,26 @@ export async function login(prevState: { error: string } | undefined, formData: 
     }
     return { error: 'Ocurrió un error inesperado al conectar con Odoo.' };
   }
-  
+
   redirect('/dashboard');
 }
 
 export async function logout() {
-  const session = await getIronSessionInstance();
+  const session = await getIronSession<SessionData>(cookies(), sessionOptions);
   session.destroy();
   redirect('/login');
 }
 
 
 export async function revalidateSessionUser(): Promise<SessionUser | null> {
-    const session = await getIronSessionInstance();
+    const session = await getIronSession<SessionData>(cookies(), sessionOptions);
     if (!session.isLoggedIn || !session.uid || !session.password) {
         return null;
     }
 
     try {
         const odooClient = getOdooClient(session.uid, session.password);
-        
+
         const userDetails = await odooClient.executeKw<any[]>('res.users', 'search_read',
             [[['id', '=', session.uid]]],
             { fields: ['name', 'login', 'company_id', 'company_ids'] }
@@ -153,7 +159,7 @@ export async function revalidateSessionUser(): Promise<SessionUser | null> {
         if (!userDetails || userDetails.length === 0) {
             throw new Error("User not found in Odoo during revalidation.");
         }
-        
+
         const user = userDetails[0];
         const isManager = await checkUserIsManager(user.id);
 
@@ -181,14 +187,13 @@ export async function revalidateSessionUser(): Promise<SessionUser | null> {
         // Update the session with the latest user data
         session.user = updatedUser;
         await session.save();
-        
+
         return updatedUser;
 
     } catch (error) {
         console.error("Failed to revalidate session, logging out:", error);
         // If revalidation fails (e.g., user deactivated in Odoo), destroy session
-        await session.destroy();
-        redirect('/login');
+        await logout();
         return null;
     }
 }
