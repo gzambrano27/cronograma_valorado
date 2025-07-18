@@ -27,7 +27,7 @@ const taskStatusConfig = {
 } satisfies ChartConfig;
 
 
-export default function DashboardPage({ selectedCompanies }: { selectedCompanies: Company[] }) {
+export default function DashboardPage({ selectedCompanies = [] }: { selectedCompanies?: Company[] }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   
