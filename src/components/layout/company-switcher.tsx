@@ -2,7 +2,7 @@
 "use client"
 
 import * as React from "react"
-import { Check, ChevronsUpDown, Building, Star, CheckCheck, X } from "lucide-react"
+import { ChevronsUpDown, Building, Star } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/popover"
 import type { Company, SessionUser } from "@/lib/types"
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
+import { Checkbox } from "../ui/checkbox"
 
 interface CompanySwitcherProps {
   user: SessionUser;
@@ -47,32 +48,45 @@ export function CompanySwitcher({ user, selectedCompanies, onCompanyChange }: Co
             return [...prev, company];
         }
     })
+    // Do not close the popover to allow multi-selection
+    setOpen(true);
   }
   
-  const selectAll = () => onCompanyChange(allowedCompanies);
+  const selectAll = () => {
+      onCompanyChange(allowedCompanies);
+      setOpen(true);
+  }
   const deselectAll = () => {
       // Keep at least the current company selected
       if (currentCompanyId) {
           const current = allowedCompanies.find(c => c.id === currentCompanyId);
           if (current) {
               onCompanyChange([current]);
+              setOpen(true);
               return;
           }
       }
       // Fallback if current company is not in the list or doesn't exist
       if (allowedCompanies.length > 0) {
           onCompanyChange([allowedCompanies[0]]);
+          setOpen(true);
       }
   };
+  
+  const getCompanyLabel = () => {
+    if (selectedCompanies.length === 1) {
+        return selectedCompanies[0].name;
+    }
+    if (selectedCompanies.length === allowedCompanies.length) {
+        return "Todas las Compañías";
+    }
+    if (selectedCompanies.length > 1) {
+       const names = selectedCompanies.map(c => c.name).slice(0, 2).join(', ');
+       return selectedCompanies.length > 2 ? `${names}, +${selectedCompanies.length - 2}`: names;
+    }
+    return "Seleccionar...";
+  }
 
-
-  const companyLabel = selectedCompanies.length === 1 
-    ? selectedCompanies[0].name 
-    : selectedCompanies.length === allowedCompanies.length
-    ? "Todas las Compañías"
-    : selectedCompanies.length > 1
-    ? `${selectedCompanies.length} compañías`
-    : "Seleccionar...";
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -85,7 +99,7 @@ export function CompanySwitcher({ user, selectedCompanies, onCompanyChange }: Co
           className="w-[240px] justify-between"
         >
           <Building className="mr-2 h-4 w-4 shrink-0" />
-          <span className="truncate">{companyLabel}</span>
+          <span className="truncate">{getCompanyLabel()}</span>
           <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -95,55 +109,46 @@ export function CompanySwitcher({ user, selectedCompanies, onCompanyChange }: Co
             <CommandInput placeholder="Buscar compañía..." />
             <CommandEmpty>No se encontró la compañía.</CommandEmpty>
             <CommandGroup>
-              {allowedCompanies.map((company) => (
-                <CommandItem
-                  key={company.id}
-                  onSelect={() => handleSelect(company)}
-                  className="text-sm"
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      selectedCompanies.some(c => c.id === company.id)
-                        ? "opacity-100"
-                        : "opacity-0"
-                    )}
-                  />
-                  <span className="flex-1 truncate">{company.name}</span>
-                  {company.id === currentCompanyId && (
-                     <Star className="ml-auto h-4 w-4 text-yellow-400 fill-current" />
-                  )}
-                </CommandItem>
-              ))}
+              {allowedCompanies.map((company) => {
+                const isSelected = selectedCompanies.some(c => c.id === company.id);
+                return (
+                    <CommandItem
+                        key={company.id}
+                        onSelect={() => handleSelect(company)}
+                        className="text-sm flex items-center gap-2"
+                    >
+                         <Checkbox
+                            id={`company-${company.id}`}
+                            checked={isSelected}
+                            aria-label={`Seleccionar ${company.name}`}
+                         />
+                        <label htmlFor={`company-${company.id}`} className="flex-1 truncate cursor-pointer">{company.name}</label>
+                        {company.id === currentCompanyId && (
+                            <Tooltip>
+                               <TooltipTrigger asChild>
+                                    <Star className="ml-auto h-4 w-4 text-yellow-400 fill-current" />
+                               </TooltipTrigger>
+                               <TooltipContent>
+                                    <p>Compañía Principal</p>
+                               </TooltipContent>
+                           </Tooltip>
+                        )}
+                    </CommandItem>
+                )
+              })}
             </CommandGroup>
           </CommandList>
-          <CommandSeparator />
-          <CommandList>
-              <CommandGroup>
-                 <div className="grid grid-cols-2 gap-1 p-1">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                         <CommandItem onSelect={selectAll} className="justify-center">
-                            <CheckCheck className="h-4 w-4" />
-                         </CommandItem>
-                      </TooltipTrigger>
-                       <TooltipContent>
-                          <p>Seleccionar Todo</p>
-                       </TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                       <TooltipTrigger asChild>
-                          <CommandItem onSelect={deselectAll} className="justify-center">
-                              <X className="h-4 w-4" />
-                          </CommandItem>
-                       </TooltipTrigger>
-                       <TooltipContent>
-                          <p>Quitar Selección</p>
-                       </TooltipContent>
-                    </Tooltip>
-                 </div>
-              </CommandGroup>
-          </CommandList>
+          {allowedCompanies.length > 1 && (
+            <>
+                <CommandSeparator />
+                <CommandGroup>
+                    <div className="flex items-center justify-between p-1">
+                        <Button variant="link" size="sm" onClick={selectAll}>Seleccionar Todo</Button>
+                        <Button variant="link" size="sm" onClick={deselectAll}>Limpiar</Button>
+                    </div>
+                </CommandGroup>
+            </>
+          )}
         </Command>
       </PopoverContent>
     </Popover>
