@@ -39,10 +39,11 @@ export async function login(prevState: { error: string } | undefined, formData: 
       return { error: 'Credenciales inválidas.' };
     }
 
-    const userDetails = await odooClient.executeKw<any[]>('res.users', 'search_read', [
-        [['id', '=', uid]],
-        { fields: ['name', 'login', 'partner_id'] }
-    ]);
+    const userDetails = await odooClient.executeKw<any[]>('res.users', 'search_read',
+        [[['id', '=', uid]]], // domain
+        { fields: ['name', 'login', 'partner_id'] } // kwargs
+    );
+
 
     if (!userDetails || userDetails.length === 0) {
         return { error: 'No se pudo encontrar la información del usuario.' };
