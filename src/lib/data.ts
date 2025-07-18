@@ -54,7 +54,7 @@ export async function getAppConfig(): Promise<AppConfig> {
 }
 
 export async function getProjects(): Promise<Project[]> {
-    // Helper function to extract translated names from Odoo's JSONB format, moved here.
+    // Helper function to extract translated names from Odoo's JSONB format
     const getTranslatedName = (nameField: any): string => {
         if (typeof nameField === 'string') {
             return nameField;
@@ -158,17 +158,19 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
     tasks.forEach(task => {
       if (task.dailyConsumption) {
         task.dailyConsumption.forEach(dc => {
-          const day = startOfDay(new Date(dc.date)).getTime();
-          if (!valuesByDate.has(day)) {
-            valuesByDate.set(day, { planned: 0, actual: 0 });
+          const day = startOfDay(new Date(dc.date));
+          const dayTimestamp = day.getTime();
+
+          if (!valuesByDate.has(dayTimestamp)) {
+            valuesByDate.set(dayTimestamp, { planned: 0, actual: 0 });
           }
   
-          const currentValues = valuesByDate.get(day)!;
+          const currentValues = valuesByDate.get(dayTimestamp)!;
           currentValues.planned += dc.plannedQuantity * task.value;
           currentValues.actual += dc.consumedQuantity * task.value;
   
-          if (!minDate || day < minDate.getTime()) minDate = new Date(day);
-          if (!maxDate || day > maxDate.getTime()) maxDate = new Date(day);
+          if (!minDate || day < minDate) minDate = day;
+          if (!maxDate || day > maxDate) maxDate = day;
         });
       }
     });

@@ -21,16 +21,15 @@ export const middleware = async (req: NextRequest) => {
   // If user does not have a session cookie and is trying to access a protected route,
   // redirect them to the login page.
   if (!sessionCookie && !isPublicRoute) {
-    return NextResponse.redirect(new URL('/login', 'http://localhost:9002'));
+    // Construct an absolute URL for redirection
+    const loginUrl = new URL('/login', req.url);
+    return NextResponse.redirect(loginUrl);
   }
 
   // Special case for the root path
   if (pathname === '/') {
-    if (sessionCookie) {
-        return NextResponse.redirect(new URL('/dashboard', req.url));
-    } else {
-        return NextResponse.redirect(new URL('/login', 'http://localhost:9002'));
-    }
+    const targetUrl = new URL(sessionCookie ? '/dashboard' : '/login', req.url);
+    return NextResponse.redirect(targetUrl);
   }
 
   return NextResponse.next();
