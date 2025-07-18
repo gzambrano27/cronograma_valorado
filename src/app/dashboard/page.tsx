@@ -2,7 +2,7 @@
 'use client'
 import { ProjectView } from "@/components/projects/project-view";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { getProjects, getTasks } from "@/lib/data";
+import { getTasks } from "@/lib/data";
 import { DollarSign, ListChecks, Briefcase, BarChart, PieChart } from "lucide-react";
 import { ProjectValueChart } from "@/components/dashboard/project-value-chart";
 import { TaskStatusChart } from "@/components/dashboard/task-status-chart";
@@ -27,40 +27,32 @@ const taskStatusConfig = {
 } satisfies ChartConfig;
 
 
-export default function DashboardPage({ selectedCompanies = [] }: { selectedCompanies?: Company[] }) {
-  const [projects, setProjects] = useState<Project[]>([]);
+export default function DashboardPage({ projects = [], selectedCompanies = [] }: { projects: Project[], selectedCompanies?: Company[] }) {
   const [tasks, setTasks] = useState<Task[]>([]);
-
-  // Create a stable, primitive dependency from the selectedCompanies prop
-  const selectedCompanyIds = useMemo(() => selectedCompanies.map(c => c.id), [selectedCompanies]);
-
-  const reloadData = useCallback(async () => {
-    // Fetch data only if companies are selected to avoid unnecessary calls
-    if (selectedCompanyIds.length > 0) {
-      const [fetchedProjects, fetchedTasks] = await Promise.all([
-        getProjects(selectedCompanyIds),
-        getTasks()
-      ]);
-      setProjects(fetchedProjects);
-      setTasks(fetchedTasks);
-    } else {
-      // Clear projects if no companies are selected
-      setProjects([]);
-      const fetchedTasks = await getTasks();
-      setTasks(fetchedTasks);
-    }
-  }, [selectedCompanyIds]);
+  
+  const reloadTasks = useCallback(async () => {
+    const fetchedTasks = await getTasks();
+    setTasks(fetchedTasks);
+  }, []);
 
   useEffect(() => {
-    reloadData();
-  }, [reloadData]);
+    reloadTasks();
+  }, [reloadTasks]);
 
-  const totalProjects = projects.length;
-  const totalValue = projects.reduce((sum, p) => sum + p.totalValue, 0);
+  const filteredProjects = useMemo(() => {
+    if (!selectedCompanies || selectedCompanies.length === 0) {
+      return projects;
+    }
+    const selectedCompanyIds = new Set(selectedCompanies.map(c => c.id));
+    return projects.filter(p => selectedCompanyIds.has(p.companyId));
+  }, [projects, selectedCompanies]);
+
+  const totalProjects = filteredProjects.length;
+  const totalValue = filteredProjects.reduce((sum, p) => sum + p.totalValue, 0);
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(t => t.status === 'completado').length;
 
-  const projectValueData = projects
+  const projectValueData = filteredProjects
     .map(p => ({
       name: p.name.length > 20 ? `${p.name.substring(0, 20)}...` : p.name,
       value: p.totalValue,
@@ -71,7 +63,6 @@ export default function DashboardPage({ selectedCompanies = [] }: { selectedComp
     .slice(0, 7);
 
   const taskStatusCounts = tasks.reduce((acc, task) => {
-    // Assuming task status is one of the keys in taskStatusConfig
     const status = task.status as keyof typeof taskStatusConfig;
     acc[status] = (acc[status] || 0) + 1;
     return acc;
@@ -81,6 +72,13 @@ export default function DashboardPage({ selectedCompanies = [] }: { selectedComp
     status,
     tasks: count,
   })).filter(item => item.tasks > 0);
+  
+  // Create a function to reload all data for child components
+  const reloadDashboardData = useCallback(() => {
+      // In a real app, you might re-fetch projects here, but since they are passed as props,
+      // we only need to re-fetch tasks. The parent component would handle re-fetching projects.
+      reloadTasks();
+  }, [reloadTasks]);
 
   return (
     <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
@@ -161,7 +159,7 @@ export default function DashboardPage({ selectedCompanies = [] }: { selectedComp
         </Card>
       </div>
 
-      <ProjectView projects={projects} onSuccess={reloadData} />
+      <ProjectView projects={filteredProjects} onSuccess={reloadDashboardData} />
     </div>
   );
 }

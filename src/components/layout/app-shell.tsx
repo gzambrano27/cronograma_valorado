@@ -125,6 +125,7 @@ export default function AppShell({
     }
     if (React.isValidElement(child)) {
       return React.cloneElement(child as React.ReactElement<any>, { 
+        projects,
         selectedCompanies, 
       });
     }

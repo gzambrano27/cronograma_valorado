@@ -28,6 +28,7 @@ export default async function RootLayout({
   let projects: Project[] = [];
   if (isDbConnected && session.isLoggedIn) {
     try {
+      // Fetch all projects for the user. Filtering will happen on the client side.
       projects = await getProjects();
     } catch (error) {
       console.error("Failed to fetch projects:", error);
