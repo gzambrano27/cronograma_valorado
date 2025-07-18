@@ -1,10 +1,9 @@
+'use server'
 
-'use server';
-
-import { getIronSession } from 'iron-session';
-import { cookies } from 'next/headers';
-import { sessionOptions, type SessionData } from './session-config';
-import { cache } from 'react';
+import { getIronSession } from 'iron-session'
+import { cookies } from 'next/headers'
+import { sessionOptions, type SessionData } from './session-config'
+import { cache } from 'react'
 
 // Using React's `cache` function to memoize the session data for the duration of a single request.
 // This ensures that `cookies()` is only called once per request, resolving the Next.js dynamic usage error.

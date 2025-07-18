@@ -1,4 +1,3 @@
-
 'use server';
 
 import 'server-only';
@@ -18,45 +17,42 @@ const LoginSchema = z.object({
 });
 
 const getTranslatedName = (nameField: any): string => {
-    if (typeof nameField === 'string') {
-        return nameField;
-    }
-    if (typeof nameField === 'object' && nameField !== null && !Array.isArray(nameField)) {
-        return nameField.es_EC || nameField.en_US || 'N/A';
-    }
-    // Handle cases where name is like [id, "Name"]
-    if (Array.isArray(nameField) && nameField.length > 1) {
-        return getTranslatedName(nameField[1]);
-    }
-    return 'N/A';
+  if (typeof nameField === 'string') {
+    return nameField;
+  }
+  if (typeof nameField === 'object' && nameField !== null && !Array.isArray(nameField)) {
+    return nameField.es_EC || nameField.en_US || 'N/A';
+  }
+  if (Array.isArray(nameField) && nameField.length > 1) {
+    return getTranslatedName(nameField[1]);
+  }
+  return 'N/A';
 };
 
 async function checkUserIsManager(userId: number): Promise<boolean> {
-    const userGroups = await query<UserGroupInfo>(`
-        SELECT
-            ru.login AS usuario,
-            rg.category_id AS categoria_id,
-            rgc.name AS nombre_categoria,
-            rg.id AS grupo_id,
-            rg.name AS nombre_grupo
-        FROM
-            res_users ru
-        JOIN
-            res_groups_users_rel rel ON ru.id = rel.uid
-        JOIN
-            res_groups rg ON rg.id = rel.gid
-        LEFT JOIN
-            ir_module_category rgc ON rg.category_id = rgc.id
-        WHERE
-            ru.id = $1;
-    `, [userId]);
+  const userGroups = await query<UserGroupInfo>(`
+    SELECT
+      ru.login AS usuario,
+      rg.category_id AS categoria_id,
+      rgc.name AS nombre_categoria,
+      rg.id AS grupo_id,
+      rg.name AS nombre_grupo
+    FROM
+      res_users ru
+    JOIN
+      res_groups_users_rel rel ON ru.id = rel.uid
+    JOIN
+      res_groups rg ON rg.id = rel.gid
+    LEFT JOIN
+      ir_module_category rgc ON rg.category_id = rgc.id
+    WHERE
+      ru.id = $1;
+  `, [userId]);
 
-    const isManager = userGroups.some(group =>
-        getTranslatedName(group.nombre_categoria) === 'Apus' &&
-        getTranslatedName(group.nombre_grupo) === 'Gerente'
-    );
-
-    return isManager;
+  return userGroups.some(group =>
+    getTranslatedName(group.nombre_categoria) === 'Apus' &&
+    getTranslatedName(group.nombre_grupo) === 'Gerente'
+  );
 }
 
 export async function login(prevState: { error: string } | undefined, formData: FormData) {
@@ -77,12 +73,12 @@ export async function login(prevState: { error: string } | undefined, formData: 
     }
 
     const userDetails = await odooClient.executeKw<any[]>('res.users', 'search_read',
-        [[['id', '=', uid]]],
-        { fields: ['name', 'login', 'partner_id', 'company_id', 'company_ids'] }
+      [[['id', '=', uid]]],
+      { fields: ['name', 'login', 'partner_id', 'company_id', 'company_ids'] }
     );
 
     if (!userDetails || userDetails.length === 0) {
-        return { error: 'No se pudo encontrar la información del usuario.' };
+      return { error: 'No se pudo encontrar la información del usuario.' };
     }
 
     const user = userDetails[0];
@@ -91,16 +87,21 @@ export async function login(prevState: { error: string } | undefined, formData: 
     const allowedCompanyIds = user.company_ids || [];
     let allowedCompanies: Company[] = [];
     if (allowedCompanyIds.length > 0) {
-        const companiesData = await odooClient.executeKw<any[]>('res.company', 'search_read',
-            [[['id', 'in', allowedCompanyIds]]],
-            { fields: ['name'] }
-        );
-        allowedCompanies = companiesData.map(c => ({ id: c.id, name: getTranslatedName(c.name) }));
+      const companiesData = await odooClient.executeKw<any[]>('res.company', 'search_read',
+        [[['id', 'in', allowedCompanyIds]]],
+        { fields: ['name'] }
+      );
+      allowedCompanies = companiesData.map(c => ({
+        id: c.id,
+        name: getTranslatedName(c.name),
+      }));
     }
 
-    const currentCompany: Company = { id: user.company_id[0], name: getTranslatedName(user.company_id[1]) };
-    
-    // Get session directly inside the action
+    const currentCompany: Company = {
+      id: user.company_id[0],
+      name: getTranslatedName(user.company_id[1]),
+    };
+
     const session = await getIronSession<SessionData>(cookies(), sessionOptions);
 
     session.isLoggedIn = true;
@@ -114,26 +115,24 @@ export async function login(prevState: { error: string } | undefined, formData: 
     };
     session.uid = uid;
     session.password = password;
-    
-    // Save session inside the action
+
     await session.save();
 
   } catch (error: any) {
     console.error(`Error en el inicio de sesión para ${email}:`, error);
     if (error.message && error.message.includes('AccessDenied')) {
-        return { error: 'Credenciales inválidas.' };
+      return { error: 'Credenciales inválidas.' };
     }
     const odooUrl = process.env.ODOO_URL || 'URL no configurada';
     if (error.message && error.message.includes('ECONNREFUSED')) {
-        return { error: `No se pudo conectar al servidor de Odoo en ${odooUrl}. Por favor, verifique la URL y que el servidor esté en ejecución.` };
+      return { error: `No se pudo conectar al servidor de Odoo en ${odooUrl}. Verifique la URL o el servidor.` };
     }
     if (error.faultString) {
       return { error: `Error de Odoo: ${error.faultString}` };
     }
     return { error: 'Ocurrió un error inesperado al conectar con Odoo.' };
   }
-  
-  // Revalidate the root path to update the layout with the new session.
+
   revalidatePath('/', 'layout');
   redirect('/dashboard');
 }
@@ -141,7 +140,6 @@ export async function login(prevState: { error: string } | undefined, formData: 
 export async function logout() {
   const session = await getIronSession<SessionData>(cookies(), sessionOptions);
   session.destroy();
-  // Revalidate the root path to ensure the layout reflects the logged-out state.
   revalidatePath('/', 'layout');
   redirect('/login');
 }
