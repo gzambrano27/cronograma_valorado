@@ -53,22 +53,21 @@ export async function getAppConfig(): Promise<AppConfig> {
   }
 }
 
-// Helper function to extract translated names from Odoo's JSONB format
-const getTranslatedName = (nameField: any): string => {
-    if (typeof nameField === 'string') {
-        return nameField;
-    }
-    if (typeof nameField === 'object' && nameField !== null && !Array.isArray(nameField)) {
-        return nameField.es_EC || nameField.en_US || 'N/A';
-    }
-     if (Array.isArray(nameField) && nameField.length > 1) {
-        return getTranslatedName(nameField[1]);
-    }
-    return 'N/A';
-};
-
-
 export async function getProjects(): Promise<Project[]> {
+    // Helper function to extract translated names from Odoo's JSONB format, moved here.
+    const getTranslatedName = (nameField: any): string => {
+        if (typeof nameField === 'string') {
+            return nameField;
+        }
+        if (typeof nameField === 'object' && nameField !== null && !Array.isArray(nameField)) {
+            return nameField.es_EC || nameField.en_US || 'N/A';
+        }
+        if (Array.isArray(nameField) && nameField.length > 1) {
+            return getTranslatedName(nameField[1]);
+        }
+        return 'N/A';
+    };
+
     const sqlQuery = `
       WITH ProjectTaskMetrics AS (
         SELECT
@@ -129,11 +128,6 @@ export async function getProjects(): Promise<Project[]> {
 export async function getTasks(): Promise<Task[]> {
   const tasks_raw = await query<RawTask>(`SELECT * FROM "externo_tasks"`);
   return tasks_raw.map(processTask);
-}
-
-export async function getProjectById(id: number): Promise<Project | undefined> {
-    const projects = await getProjects(); // This fetches all projects every time, which can be inefficient
-    return projects.find(p => p.id === id);
 }
 
 export async function getTasksByProjectId(id: number): Promise<Task[]> {

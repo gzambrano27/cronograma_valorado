@@ -1,10 +1,8 @@
-
 'use server';
 import 'server-only';
 
-import {getIronSession} from 'iron-session';
-import type {IronSession, IronSessionData} from 'iron-session';
-import {cookies} from 'next/headers';
+import { getIronSession, type IronSession, type IronSessionData } from 'iron-session';
+import { cookies } from 'next/headers';
 import type { SessionUser } from './types';
 
 const password = process.env.SECRET_COOKIE_PASSWORD;
@@ -15,7 +13,7 @@ if (!password) {
   );
 }
 
-const sessionOptions = {
+export const sessionOptions = {
   password,
   cookieName: 'project-valuator-session',
   cookieOptions: {
@@ -30,12 +28,27 @@ export interface SessionData extends IronSessionData {
   password?: string;
 }
 
-export async function getSession(): Promise<IronSession<SessionData>> {
-  const cookieStore = cookies();
-  const session = await getIronSession<SessionData>(cookieStore, sessionOptions);
+// This function gets the raw session object. Use it only in server actions to modify the session.
+export async function getIronSessionInstance(): Promise<IronSession<SessionData>> {
+    const cookieStore = cookies();
+    const session = await getIronSession<SessionData>(cookieStore, sessionOptions);
+
+    if (!session.isLoggedIn) {
+        session.isLoggedIn = false;
+    }
+    return session;
+}
+
+
+// This function gets a plain, serializable session data object. Use this in layouts and pages.
+export async function getSession(): Promise<SessionData> {
+  const session = await getIronSessionInstance();
   
-  if (!session.isLoggedIn) {
-    session.isLoggedIn = false;
-  }
-  return session;
+  // Return a plain object, not the session instance
+  return {
+    isLoggedIn: session.isLoggedIn,
+    user: session.user,
+    uid: session.uid,
+    password: session.password,
+  };
 }

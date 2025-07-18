@@ -2,22 +2,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getIronSession } from 'iron-session';
-import type { SessionData } from '@/lib/session';
-
-const password = process.env.SECRET_COOKIE_PASSWORD;
-
-if (!password) {
-  // This should not happen in middleware if session.ts already checked, but it's good practice
-  throw new Error('Missing SECRET_COOKIE_PASSWORD for middleware session.');
-}
-
-export const sessionOptions = {
-  password,
-  cookieName: 'project-valuator-session',
-  cookieOptions: {
-    secure: process.env.NODE_ENV === 'production',
-  },
-};
+import { sessionOptions, type SessionData } from '@/lib/session';
 
 
 export const middleware = async (req: NextRequest) => {

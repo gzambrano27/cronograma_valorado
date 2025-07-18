@@ -29,7 +29,7 @@ export default async function RootLayout({
     }
   }
   
-  const title = "Menú";
+  const title = "Centro de Aplicaciones";
 
   return (
     <html lang="es" suppressHydrationWarning>

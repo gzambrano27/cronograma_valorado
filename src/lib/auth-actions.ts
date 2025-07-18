@@ -4,7 +4,7 @@
 import 'server-only';
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
-import { getSession } from './session';
+import { getIronSessionInstance } from './session';
 import { getOdooClient } from './odoo-client';
 import type { Company, SessionUser, UserGroupInfo } from './types';
 import { query } from './db';
@@ -97,7 +97,7 @@ export async function login(prevState: { error: string } | undefined, formData: 
     
     const currentCompany: Company = { id: user.company_id[0], name: getTranslatedName(user.company_id[1]) };
 
-    const session = await getSession();
+    const session = await getIronSessionInstance();
     session.isLoggedIn = true;
     session.user = {
       id: user.id,
@@ -130,14 +130,14 @@ export async function login(prevState: { error: string } | undefined, formData: 
 }
 
 export async function logout() {
-  const session = await getSession();
+  const session = await getIronSessionInstance();
   session.destroy();
   redirect('/login');
 }
 
 
 export async function revalidateSessionUser(): Promise<SessionUser | null> {
-    const session = await getSession();
+    const session = await getIronSessionInstance();
     if (!session.isLoggedIn || !session.uid || !session.password) {
         return null;
     }
