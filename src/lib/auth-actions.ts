@@ -3,78 +3,14 @@
 
 import 'server-only';
 import { z } from 'zod';
-import { query } from './db';
 import { redirect } from 'next/navigation';
 import { getSession } from './session';
-import type { SessionUser } from './types';
-import { pbkdf2Sync, timingSafeEqual } from 'crypto';
+import { OdooClient, getOdooClient } from './odoo-client';
 
 const LoginSchema = z.object({
   email: z.string().email('Por favor ingrese un correo válido.'),
   password: z.string().min(1, 'La contraseña es requerida.'),
 });
-
-/**
- * Normalizes a passlib-style base64 string to standard base64.
- * Passlib uses a URL-safe alphabet, replacing '+' with '.' and omitting padding.
- * Node.js's Buffer.from(..., 'base64') expects standard base64.
- * @param passlibB64 The base64 string from a passlib hash.
- * @returns A standard base64 string.
- */
-function normalizePasslibBase64(passlibB64: string): string {
-    let standardB64 = passlibB64.replace(/\./g, '+').replace(/_/g, '/');
-    // Add padding if it's missing
-    while (standardB64.length % 4) {
-        standardB64 += '=';
-    }
-    return standardB64;
-}
-
-async function verifyPassword(password: string, hashedPasswordString: string): Promise<boolean> {
-  if (!hashedPasswordString) return false;
-
-  // Handle plaintext passwords for legacy/test users
-  if (!hashedPasswordString.startsWith('$pbkdf2-sha512$')) {
-    return password === hashedPasswordString;
-  }
-  
-  const parts = hashedPasswordString.split('$');
-  if (parts.length !== 4) {
-    // Invalid hash format
-    return false;
-  }
-  
-  try {
-    // Odoo hash format: $pbkdf2-sha512$<iterations>$<salt_base64>$<hash_base64>
-    const iterations = parseInt(parts[1], 10);
-    // The salt from passlib is not standard base64, it's URL-safe. We must normalize it.
-    const saltBase64 = normalizePasslibBase64(parts[2]);
-    const salt = Buffer.from(saltBase64, 'base64');
-    
-    const storedHashBase64 = normalizePasslibBase64(parts[3]);
-    const storedHash = Buffer.from(storedHashBase64, 'base64');
-
-    // The keylen parameter is crucial. Passlib's pbkdf2_sha512 defaults to 64 bytes (512 bits).
-    const keylen = 64; 
-
-    const derivedKey = pbkdf2Sync(password, salt, iterations, keylen, 'sha512');
-    
-    // Log for debugging
-    console.log("--- DEBUG PASSWORD VERIFICATION ---");
-    console.log("Derived Key (Base64):", derivedKey.toString('base64'));
-    console.log("Stored Hash (Base64):", storedHash.toString('base64'));
-    console.log("-----------------------------------");
-
-    if (derivedKey.length !== storedHash.length) {
-      return false; // Key lengths must match for timingSafeEqual
-    }
-
-    return timingSafeEqual(derivedKey, storedHash);
-  } catch (error) {
-    console.error("Error during password verification:", error);
-    return false; // Error during parsing/hashing means failure
-  }
-}
 
 const getTranslatedName = (nameField: any): string => {
     if (typeof nameField === 'string') {
@@ -96,43 +32,43 @@ export async function login(prevState: { error: string } | undefined, formData: 
   const { email, password } = validatedFields.data;
 
   try {
-    const users = await query<{ id: number; login: string; password?: string; partner_id: number }>(
-      'SELECT id, login, password, partner_id FROM res_users WHERE login = $1 AND active = TRUE LIMIT 1',
-      [email]
-    );
+    const odooClient = getOdooClient();
+    const uid = await odooClient.authenticate(email, password);
 
-    const user = users[0];
-
-    if (!user) {
+    if (!uid) {
       return { error: 'Credenciales inválidas.' };
+    }
+
+    // Authenticated successfully, now get user details
+    const userDetails = await odooClient.executeKw<any[]>('res.users', 'search_read', [
+        [['id', '=', uid]],
+        { fields: ['name', 'login', 'partner_id'] }
+    ]);
+
+    if (!userDetails || userDetails.length === 0) {
+        return { error: 'No se pudo encontrar la información del usuario.' };
     }
     
-    const isPasswordValid = await verifyPassword(password, user.password || '');
-
-    if (!isPasswordValid) {
-      return { error: 'Credenciales inválidas.' };
-    }
-
-    // Get user's name from res_partner
-    const partners = await query<{ name: any }>(
-        'SELECT name FROM res_partner WHERE id = $1 LIMIT 1',
-        [user.partner_id]
-    );
-
-    const userName = partners.length > 0 ? getTranslatedName(partners[0].name) : user.login;
+    const user = userDetails[0];
 
     const session = await getSession();
     session.isLoggedIn = true;
     session.user = {
       id: user.id,
-      name: userName,
+      name: getTranslatedName(user.name),
       email: user.login,
     };
+    session.uid = uid;
+    session.password = password; // Store password for subsequent requests
     await session.save();
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('Login error:', error);
-    return { error: 'Ocurrió un error inesperado. Por favor, intente de nuevo.' };
+    // Provide a more user-friendly error message
+    if (error.message && error.message.includes('AccessDenied')) {
+        return { error: 'Credenciales inválidas.' };
+    }
+    return { error: 'Ocurrió un error inesperado al conectar con Odoo. Por favor, verifique la URL y la base de datos en la configuración.' };
   }
   
   redirect('/dashboard');

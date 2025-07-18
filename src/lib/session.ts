@@ -26,6 +26,8 @@ const sessionOptions = {
 export interface SessionData extends IronSessionData {
   isLoggedIn: boolean;
   user?: SessionUser;
+  uid?: number;
+  password?: string;
 }
 
 export async function getSession(): Promise<IronSession<SessionData>> {
