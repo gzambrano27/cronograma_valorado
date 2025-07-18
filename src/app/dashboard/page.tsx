@@ -41,7 +41,7 @@ export default function DashboardPage({ selectedCompanies = [] }: { selectedComp
     reloadData();
   }, [reloadData]);
   
-  const filteredProjects = projects.filter(p => selectedCompanies.some(c => c.id === p.companyId));
+  const filteredProjects = projects.filter(p => selectedCompanies.length === 0 || selectedCompanies.some(c => c.id === p.companyId));
   
   const totalProjects = filteredProjects.length;
   const totalValue = filteredProjects.reduce((sum, p) => sum + p.totalValue, 0);

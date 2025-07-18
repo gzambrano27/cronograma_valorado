@@ -24,21 +24,17 @@ import type { Company, SessionUser } from "@/lib/types"
 
 interface CompanySwitcherProps {
   user: SessionUser;
+  selectedCompanies: Company[];
   onCompanyChange: (companies: Company[]) => void;
 }
 
-export function CompanySwitcher({ user, onCompanyChange }: CompanySwitcherProps) {
+export function CompanySwitcher({ user, selectedCompanies, onCompanyChange }: CompanySwitcherProps) {
   const [open, setOpen] = React.useState(false)
   const allowedCompanies = user.allowedCompanies || [];
-  const [selectedCompanies, setSelectedCompanies] = React.useState<Company[]>(allowedCompanies)
   const currentCompanyId = user.company?.id;
 
-  React.useEffect(() => {
-    onCompanyChange(selectedCompanies);
-  }, [selectedCompanies, onCompanyChange]);
-
   const handleSelect = (company: Company) => {
-    setSelectedCompanies(prev => {
+    onCompanyChange(prev => {
         const isSelected = prev.some(c => c.id === company.id);
         if (isSelected) {
             // Unselect, but ensure at least one company is always selected
@@ -52,14 +48,18 @@ export function CompanySwitcher({ user, onCompanyChange }: CompanySwitcherProps)
     })
   }
   
-  const selectAll = () => setSelectedCompanies(allowedCompanies);
+  const selectAll = () => onCompanyChange(allowedCompanies);
   const deselectAll = () => {
       // Keep at least the current company selected
       if (currentCompanyId) {
           const current = allowedCompanies.find(c => c.id === currentCompanyId);
           if (current) {
-              setSelectedCompanies([current]);
+              onCompanyChange([current]);
+          } else if (allowedCompanies.length > 0) {
+              onCompanyChange([allowedCompanies[0]]);
           }
+      } else if (allowedCompanies.length > 0) {
+          onCompanyChange([allowedCompanies[0]]);
       }
   };
 

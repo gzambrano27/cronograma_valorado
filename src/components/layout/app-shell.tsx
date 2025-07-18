@@ -57,6 +57,8 @@ function MobileSidebarTrigger() {
     )
 }
 
+const LOCAL_STORAGE_KEY = 'selectedCompanies';
+
 export default function AppShell({
   children,
   projects,
@@ -71,16 +73,55 @@ export default function AppShell({
   const user = session?.user;
   
   const isHomePage = pathname === "/";
-  const [selectedCompanies, setSelectedCompanies] = React.useState<Company[]>(user?.allowedCompanies || []);
 
+  const [selectedCompanies, setSelectedCompanies] = React.useState<Company[]>([]);
+  const [isInitialLoad, setIsInitialLoad] = React.useState(true);
+  
+  // Effect to initialize selectedCompanies from localStorage or user's allowed companies
   React.useEffect(() => {
-    if (user?.allowedCompanies) {
-       setSelectedCompanies(user.allowedCompanies);
+    if (user?.allowedCompanies && isInitialLoad) {
+      try {
+        const storedCompanies = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (storedCompanies) {
+          const parsedCompanies = JSON.parse(storedCompanies);
+          // Validate that stored companies are a subset of allowed companies
+          const validStoredCompanies = parsedCompanies.filter((sc: Company) => 
+            user.allowedCompanies.some(ac => ac.id === sc.id)
+          );
+          if (validStoredCompanies.length > 0) {
+            setSelectedCompanies(validStoredCompanies);
+          } else {
+             setSelectedCompanies(user.allowedCompanies);
+          }
+        } else {
+          setSelectedCompanies(user.allowedCompanies);
+        }
+      } catch (error) {
+        console.error("Failed to parse selected companies from localStorage", error);
+        setSelectedCompanies(user.allowedCompanies);
+      }
+      setIsInitialLoad(false);
     }
-  }, [user?.allowedCompanies]);
+  }, [user?.allowedCompanies, isInitialLoad]);
+
+
+  // Effect to save selectedCompanies to localStorage whenever they change
+  React.useEffect(() => {
+    if (!isInitialLoad) {
+      try {
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(selectedCompanies));
+      } catch (error) {
+          console.error("Failed to save selected companies to localStorage", error);
+      }
+    }
+  }, [selectedCompanies, isInitialLoad]);
 
   const childrenWithProps = React.Children.map(children, child => {
     if (React.isValidElement(child)) {
+      // Don't render children until the initial state is loaded to prevent mismatches
+      if (isInitialLoad && user) {
+          return null; 
+      }
       return React.cloneElement(child as React.ReactElement<any>, { 
         selectedCompanies, 
         setSelectedCompanies 
@@ -173,7 +214,7 @@ export default function AppShell({
             <MobileSidebarTrigger />
             <Breadcrumb projects={projects} />
             <div className="flex-1" />
-            {user && <CompanySwitcher user={user} onCompanyChange={setSelectedCompanies} />}
+            {user && <CompanySwitcher user={user} selectedCompanies={selectedCompanies} onCompanyChange={setSelectedCompanies} />}
             <ThemeToggle />
             <Link href="/settings" passHref>
               <Button variant="ghost" size="icon" aria-label="Configuración">
