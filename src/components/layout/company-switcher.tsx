@@ -96,7 +96,7 @@ export function CompanySwitcher({ user, selectedCompanies, onCompanyChange }: Co
           role="combobox"
           aria-expanded={open}
           aria-label="Seleccionar compañía"
-          className="w-[240px] justify-between"
+          className="w-[440px] justify-between"
         >
           <Building className="mr-2 h-4 w-4 shrink-0" />
           <span className="truncate">{getCompanyLabel()}</span>

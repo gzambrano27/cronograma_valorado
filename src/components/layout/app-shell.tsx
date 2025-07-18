@@ -27,7 +27,7 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from "../ui/tooltip";
-import { logout } from "@/lib/auth-actions";
+import { logout, revalidateSessionUser } from "@/lib/auth-actions";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { CompanySwitcher } from "./company-switcher";
 import { useSession } from "@/hooks/use-session";
@@ -71,12 +71,28 @@ export default function AppShell({
 }) {
   const pathname = usePathname();
   const { session } = useSession();
-  const user = session?.user;
   
-  const isDashboardPage = pathname.startsWith("/dashboard");
-
+  const [user, setUser] = React.useState(session?.user);
   const [selectedCompanies, setSelectedCompanies] = React.useState<Company[]>([]);
   const [isInitialLoad, setIsInitialLoad] = React.useState(true);
+
+  React.useEffect(() => {
+    const revalidate = async () => {
+        try {
+            const updatedUser = await revalidateSessionUser();
+            if (updatedUser) {
+              setUser(updatedUser);
+            }
+        } catch (error) {
+            console.error("Session revalidation failed, logging out.", error);
+            // Optional: force logout if revalidation fails
+            // logout();
+        }
+    };
+    revalidate();
+  }, []);
+  
+  const isDashboardPage = pathname.startsWith("/dashboard");
   
   // Effect to initialize selectedCompanies from localStorage or user's default company
   React.useEffect(() => {

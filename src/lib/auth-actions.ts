@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { redirect } from 'next/navigation';
 import { getSession } from './session';
 import { getOdooClient } from './odoo-client';
-import type { Company } from './types';
+import type { Company, SessionUser } from './types';
 
 const LoginSchema = z.object({
   email: z.string().email('Por favor ingrese un correo válido.'),
@@ -102,4 +102,59 @@ export async function logout() {
   const session = await getSession();
   session.destroy();
   redirect('/login');
+}
+
+
+export async function revalidateSessionUser(): Promise<SessionUser | null> {
+    const session = await getSession();
+    if (!session.isLoggedIn || !session.uid || !session.password) {
+        return null;
+    }
+
+    try {
+        const odooClient = getOdooClient(session.uid, session.password);
+        
+        const userDetails = await odooClient.executeKw<any[]>('res.users', 'search_read',
+            [[['id', '=', session.uid]]],
+            { fields: ['name', 'login', 'company_id', 'company_ids'] }
+        );
+
+        if (!userDetails || userDetails.length === 0) {
+            throw new Error("User not found in Odoo during revalidation.");
+        }
+        
+        const user = userDetails[0];
+
+        const allowedCompanyIds = user.company_ids || [];
+        let allowedCompanies: Company[] = [];
+        if (allowedCompanyIds.length > 0) {
+            const companiesData = await odooClient.executeKw<any[]>('res.company', 'search_read',
+                [[['id', 'in', allowedCompanyIds]]],
+                { fields: ['name'] }
+            );
+            allowedCompanies = companiesData.map(c => ({ id: c.id, name: getTranslatedName(c.name) }));
+        }
+
+        const currentCompany: Company = { id: user.company_id[0], name: getTranslatedName(user.company_id[1]) };
+
+        const updatedUser: SessionUser = {
+            id: user.id,
+            name: getTranslatedName(user.name),
+            email: user.login,
+            company: currentCompany,
+            allowedCompanies: allowedCompanies,
+        };
+
+        // Update the session with the latest user data
+        session.user = updatedUser;
+        await session.save();
+        
+        return updatedUser;
+
+    } catch (error) {
+        console.error("Failed to revalidate session, logging out:", error);
+        // If revalidation fails (e.g., user deactivated in Odoo), destroy session
+        await session.destroy();
+        redirect('/login');
+    }
 }
