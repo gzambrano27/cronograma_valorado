@@ -21,18 +21,18 @@ export default function LoginPage() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
             <Building2 className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="font-headline text-2xl">Bienvenido a ProjectValuator</CardTitle>
-          <CardDescription>Inicia sesión para continuar en tu cuenta.</CardDescription>
+          <CardTitle className="font-headline text-2xl">Centro de Aplicaciones</CardTitle>
+          <CardDescription>Inicia sesión para acceder.</CardDescription>
         </CardHeader>
         <CardContent>
           <form action={formAction} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Correo Electrónico</Label>
+              <Label htmlFor="email">Usuario / Correo</Label>
               <Input
                 id="email"
                 name="email"
-                type="email"
-                placeholder="tu@correo.com"
+                type="text"
+                placeholder="tu-usuario"
                 required
               />
             </div>

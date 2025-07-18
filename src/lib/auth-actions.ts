@@ -10,7 +10,7 @@ import type { Company, SessionUser, UserGroupInfo } from './types';
 import { query } from './db';
 
 const LoginSchema = z.object({
-  email: z.string().email('Por favor ingrese un correo válido.'),
+  email: z.string().min(1, 'Por favor ingrese su usuario.'),
   password: z.string().min(1, 'La contraseña es requerida.'),
 });
 
