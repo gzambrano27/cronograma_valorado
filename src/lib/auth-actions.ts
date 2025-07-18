@@ -14,6 +14,22 @@ const LoginSchema = z.object({
   password: z.string().min(1, 'La contraseña es requerida.'),
 });
 
+/**
+ * Normalizes a passlib-style base64 string to standard base64.
+ * Passlib uses a URL-safe alphabet, replacing '+' with '.' and omitting padding.
+ * Node.js's Buffer.from(..., 'base64') expects standard base64.
+ * @param passlibB64 The base64 string from a passlib hash.
+ * @returns A standard base64 string.
+ */
+function normalizePasslibBase64(passlibB64: string): string {
+    let standardB64 = passlibB64.replace(/\./g, '+').replace(/_/g, '/');
+    // Add padding if it's missing
+    while (standardB64.length % 4) {
+        standardB64 += '=';
+    }
+    return standardB64;
+}
+
 async function verifyPassword(password: string, hashedPasswordString: string): Promise<boolean> {
   if (!hashedPasswordString) return false;
 
@@ -31,8 +47,12 @@ async function verifyPassword(password: string, hashedPasswordString: string): P
   try {
     // Odoo hash format: $pbkdf2-sha512$<iterations>$<salt_base64>$<hash_base64>
     const iterations = parseInt(parts[1], 10);
-    const salt = Buffer.from(parts[2], 'base64');
-    const storedHash = Buffer.from(parts[3], 'base64');
+    // The salt from passlib is not standard base64, it's URL-safe. We must normalize it.
+    const saltBase64 = normalizePasslibBase64(parts[2]);
+    const salt = Buffer.from(saltBase64, 'base64');
+    
+    const storedHashBase64 = normalizePasslibBase64(parts[3]);
+    const storedHash = Buffer.from(storedHashBase64, 'base64');
 
     // The keylen parameter is crucial. Passlib's pbkdf2_sha512 defaults to 64 bytes (512 bits).
     const keylen = 64; 
