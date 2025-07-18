@@ -66,7 +66,7 @@ export function Breadcrumb({ projects }: BreadcrumbProps) {
 
 
   return (
-    <nav aria-label="Breadcrumb">
+    <nav aria-label="Breadcrumb" className='mb-6'>
       <ol className="flex items-center gap-1.5 text-sm text-muted-foreground">
         <li>
           <Link href="/dashboard" className="transition-colors hover:text-foreground">

@@ -203,9 +203,8 @@ export default function AppShell({
           </SidebarContent>
         </Sidebar>
         <SidebarMain>
-          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
             <MobileSidebarTrigger />
-            <Breadcrumb projects={allProjects} />
             <div className="flex-1" />
             {user && <CompanySwitcher user={user} selectedCompanies={selectedCompanies} onCompanyChange={setSelectedCompanies} />}
             <ThemeToggle />
@@ -245,6 +244,8 @@ export default function AppShell({
               </DropdownMenu>
             )}
           </header>
+          <div className="p-4 sm:p-6 md:p-8">
+            <Breadcrumb projects={allProjects} />
             <DashboardProvider value={{ allProjects, selectedCompanies }}>
                 {isInitialLoad ? (
                     <div className="flex-1 p-8 text-center text-muted-foreground">Cargando...</div>
@@ -252,6 +253,7 @@ export default function AppShell({
                     children
                 )}
             </DashboardProvider>
+          </div>
         </SidebarMain>
       </SidebarProvider>
     </TooltipProvider>

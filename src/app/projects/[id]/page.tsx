@@ -54,7 +54,7 @@ export default function ProjectPage() {
   
   if (!project) {
     return (
-       <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
+       <div className="space-y-6">
           <div className="text-center text-muted-foreground py-10">
               Cargando datos del proyecto...
           </div>
@@ -67,8 +67,8 @@ export default function ProjectPage() {
   const tasksPending = projectTasks.filter(t => t.status === 'pendiente').length;
 
   return (
-    <div className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 pt-6">
         <h1 className="text-3xl font-bold tracking-tight font-headline">
           {project.name}
         </h1>
