@@ -2,7 +2,7 @@
 "use client"
 
 import * as React from "react"
-import { Check, ChevronsUpDown, Building, Star } from "lucide-react"
+import { Check, ChevronsUpDown, Building, Star, CheckCheck, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -21,6 +21,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import type { Company, SessionUser } from "@/lib/types"
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
 
 interface CompanySwitcherProps {
   user: SessionUser;
@@ -119,12 +120,28 @@ export function CompanySwitcher({ user, selectedCompanies, onCompanyChange }: Co
           <CommandSeparator />
           <CommandList>
               <CommandGroup>
-                 <CommandItem onSelect={selectAll}>
-                    Seleccionar Todo
-                 </CommandItem>
-                 <CommandItem onSelect={deselectAll}>
-                    Quitar Selección
-                 </CommandItem>
+                 <div className="grid grid-cols-2 gap-1 p-1">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                         <CommandItem onSelect={selectAll} className="justify-center">
+                            <CheckCheck className="h-4 w-4" />
+                         </CommandItem>
+                      </TooltipTrigger>
+                       <TooltipContent>
+                          <p>Seleccionar Todo</p>
+                       </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                       <TooltipTrigger asChild>
+                          <CommandItem onSelect={deselectAll} className="justify-center">
+                              <X className="h-4 w-4" />
+                          </CommandItem>
+                       </TooltipTrigger>
+                       <TooltipContent>
+                          <p>Quitar Selección</p>
+                       </TooltipContent>
+                    </Tooltip>
+                 </div>
               </CommandGroup>
           </CommandList>
         </Command>
