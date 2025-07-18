@@ -39,6 +39,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { DashboardProvider } from "@/hooks/use-dashboard-context";
 
 
 function MobileSidebarTrigger() {
@@ -61,7 +62,7 @@ const LOCAL_STORAGE_KEY = 'selectedCompanies';
 
 export default function AppShell({
   children,
-  projects,
+  projects: allProjects, // Rename to avoid confusion
   title,
 }: {
   children: React.ReactNode;
@@ -118,20 +119,6 @@ export default function AppShell({
     }
   }, [selectedCompanies, isInitialLoad]);
 
-  const childrenWithProps = React.Children.map(children, child => {
-    // Don't render children until the initial state is loaded to prevent mismatches
-    if (isInitialLoad && user) {
-        return null; 
-    }
-    if (React.isValidElement(child)) {
-      return React.cloneElement(child as React.ReactElement<any>, { 
-        projects,
-        selectedCompanies, 
-      });
-    }
-    return child;
-  });
-
   return (
     <TooltipProvider>
       <SidebarProvider title={title}>
@@ -166,7 +153,7 @@ export default function AppShell({
                 </SidebarMenuItem>
               ) : (
                 <>
-                  {projects.map((project, index) => (
+                  {allProjects.map((project, index) => (
                     <SidebarMenuItem key={project.id}>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -199,7 +186,7 @@ export default function AppShell({
                       </Tooltip>
                     </SidebarMenuItem>
                   ))}
-                  {projects.length === 0 && (
+                  {allProjects.length === 0 && (
                     <SidebarMenuItem>
                       <span className="flex items-center gap-2 p-2 text-sm text-sidebar-foreground/70">
                         No hay proyectos.
@@ -214,7 +201,7 @@ export default function AppShell({
         <SidebarMain>
           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
             <MobileSidebarTrigger />
-            <Breadcrumb projects={projects} />
+            <Breadcrumb projects={allProjects} />
             <div className="flex-1" />
             {user && <CompanySwitcher user={user} selectedCompanies={selectedCompanies} onCompanyChange={setSelectedCompanies} />}
             <ThemeToggle />
@@ -257,7 +244,13 @@ export default function AppShell({
               </DropdownMenu>
             )}
           </header>
-          {childrenWithProps}
+            <DashboardProvider value={{ allProjects, selectedCompanies }}>
+                {isInitialLoad ? (
+                    <div className="flex-1 p-8 text-center text-muted-foreground">Cargando...</div>
+                ) : (
+                    children
+                )}
+            </DashboardProvider>
         </SidebarMain>
       </SidebarProvider>
     </TooltipProvider>

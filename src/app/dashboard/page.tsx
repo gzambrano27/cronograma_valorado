@@ -9,7 +9,8 @@ import { TaskStatusChart } from "@/components/dashboard/task-status-chart";
 import type { ChartConfig } from "@/components/ui/chart";
 import { formatCurrency } from "@/lib/utils";
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import type { Company, Project, Task } from '@/lib/types';
+import type { Task } from '@/lib/types';
+import { useDashboard } from "@/hooks/use-dashboard-context";
 
 const taskStatusConfig = {
   completado: {
@@ -27,7 +28,8 @@ const taskStatusConfig = {
 } satisfies ChartConfig;
 
 
-export default function DashboardPage({ projects = [], selectedCompanies = [] }: { projects: Project[], selectedCompanies?: Company[] }) {
+export default function DashboardPage() {
+  const { allProjects, selectedCompanies } = useDashboard();
   const [tasks, setTasks] = useState<Task[]>([]);
   
   const reloadTasks = useCallback(async () => {
@@ -41,11 +43,11 @@ export default function DashboardPage({ projects = [], selectedCompanies = [] }:
 
   const filteredProjects = useMemo(() => {
     if (!selectedCompanies || selectedCompanies.length === 0) {
-      return []; // Return empty array if no companies are selected to avoid errors.
+      return [];
     }
     const selectedCompanyIds = new Set(selectedCompanies.map(c => c.id));
-    return projects.filter(p => selectedCompanyIds.has(p.companyId));
-  }, [projects, selectedCompanies]);
+    return allProjects.filter(p => selectedCompanyIds.has(p.companyId));
+  }, [allProjects, selectedCompanies]);
 
   const totalProjects = filteredProjects.length;
   const totalValue = filteredProjects.reduce((sum, p) => sum + p.totalValue, 0);
