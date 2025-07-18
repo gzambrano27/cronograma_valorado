@@ -41,7 +41,7 @@ export default function DashboardPage({ projects = [], selectedCompanies = [] }:
 
   const filteredProjects = useMemo(() => {
     if (!selectedCompanies || selectedCompanies.length === 0) {
-      return projects;
+      return []; // Return empty array if no companies are selected to avoid errors.
     }
     const selectedCompanyIds = new Set(selectedCompanies.map(c => c.id));
     return projects.filter(p => selectedCompanyIds.has(p.companyId));
@@ -73,10 +73,7 @@ export default function DashboardPage({ projects = [], selectedCompanies = [] }:
     tasks: count,
   })).filter(item => item.tasks > 0);
   
-  // Create a function to reload all data for child components
   const reloadDashboardData = useCallback(() => {
-      // In a real app, you might re-fetch projects here, but since they are passed as props,
-      // we only need to re-fetch tasks. The parent component would handle re-fetching projects.
       reloadTasks();
   }, [reloadTasks]);
 
