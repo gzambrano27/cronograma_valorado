@@ -30,23 +30,29 @@ const taskStatusConfig = {
 export default function DashboardPage({ selectedCompanies = [] }: { selectedCompanies?: Company[] }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
+  
+  // Create a stable, primitive dependency from the selectedCompanies prop
   const selectedCompanyIds = useMemo(() => selectedCompanies.map(c => c.id), [selectedCompanies]);
 
   const reloadData = useCallback(async () => {
     // Only fetch data if companies are selected to avoid unnecessary calls
     if (selectedCompanyIds.length > 0) {
-      const [fetchedProjects, fetchedTasks] = await Promise.all([getProjects(selectedCompanyIds), getTasks()]);
+      const [fetchedProjects, fetchedTasks] = await Promise.all([
+        getProjects(selectedCompanyIds),
+        getTasks()
+      ]);
       setProjects(fetchedProjects);
       setTasks(fetchedTasks);
     } else {
       // Clear projects if no companies are selected
       setProjects([]);
+      setTasks([]); // Also clear tasks if they are company-specific, or fetch all if global
     }
-  }, [selectedCompanyIds]);
+  }, [selectedCompanyIds]); // Depend on the stable array of IDs
 
   useEffect(() => {
     reloadData();
-  }, [reloadData]);
+  }, [reloadData]); // reloadData is now wrapped in useCallback and stable
   
   const totalProjects = projects.length;
   const totalValue = projects.reduce((sum, p) => sum + p.totalValue, 0);
@@ -64,9 +70,11 @@ export default function DashboardPage({ selectedCompanies = [] }: { selectedComp
     .slice(0, 7); 
 
   const taskStatusCounts = tasks.reduce((acc, task) => {
-    acc[task.status] = (acc[task.status] || 0) + 1;
+    // Assuming task status is one of the keys in taskStatusConfig
+    const status = task.status as keyof typeof taskStatusConfig;
+    acc[status] = (acc[status] || 0) + 1;
     return acc;
-  }, {} as Record<string, number>);
+  }, {} as Record<keyof typeof taskStatusConfig, number>);
 
   const taskStatusData = Object.entries(taskStatusCounts).map(([status, count]) => ({
     status,

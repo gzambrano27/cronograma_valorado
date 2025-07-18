@@ -29,11 +29,9 @@ export function ProjectView({ projects, onSuccess }: { projects: Project[], onSu
 
   const ITEMS_PER_PAGE = view === 'grid' ? 6 : 10;
   
-  const { clients } = useMemo(() => {
+  const clients = useMemo(() => {
     const allClients = [...new Set(projects.map((p) => p.client).filter(Boolean) as string[])].sort();
-    return {
-      clients: ["all", ...allClients],
-    };
+    return ["all", ...allClients];
   }, [projects]);
 
 
