@@ -29,7 +29,8 @@ interface CompanySwitcherProps {
 
 export function CompanySwitcher({ user, onCompanyChange }: CompanySwitcherProps) {
   const [open, setOpen] = React.useState(false)
-  const [selectedCompanies, setSelectedCompanies] = React.useState<Company[]>(user.allowedCompanies || [])
+  const allowedCompanies = user.allowedCompanies || [];
+  const [selectedCompanies, setSelectedCompanies] = React.useState<Company[]>(allowedCompanies)
   const currentCompany = user.company;
 
   React.useEffect(() => {
@@ -49,7 +50,7 @@ export function CompanySwitcher({ user, onCompanyChange }: CompanySwitcherProps)
 
   const companyLabel = selectedCompanies.length === 1 
     ? selectedCompanies[0].name 
-    : selectedCompanies.length === user.allowedCompanies.length
+    : selectedCompanies.length === allowedCompanies.length
     ? "Todas las Compañías"
     : selectedCompanies.length > 1
     ? `${selectedCompanies.length} compañías`
@@ -95,7 +96,7 @@ export function CompanySwitcher({ user, onCompanyChange }: CompanySwitcherProps)
             )}
             <CommandSeparator />
             <CommandGroup heading="Compañías Permitidas">
-              {user.allowedCompanies.map((company) => (
+              {allowedCompanies.map((company) => (
                 <CommandItem
                   key={company.id}
                   onSelect={() => handleSelect(company)}
