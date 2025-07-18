@@ -30,36 +30,31 @@ const taskStatusConfig = {
 export default function DashboardPage({ selectedCompanies = [] }: { selectedCompanies?: Company[] }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
-  
+
   // Create a stable, primitive dependency from the selectedCompanies prop
   const selectedCompanyIds = useMemo(() => selectedCompanies.map(c => c.id), [selectedCompanies]);
 
-  const reloadData = useCallback(() => {
-    const fetchAndSetData = async () => {
-      // Only fetch data if companies are selected to avoid unnecessary calls
-      if (selectedCompanyIds.length > 0) {
-        const [fetchedProjects, fetchedTasks] = await Promise.all([
-          getProjects(selectedCompanyIds),
-          getTasks()
-        ]);
-        setProjects(fetchedProjects);
-        setTasks(fetchedTasks);
-      } else {
-        // Clear projects if no companies are selected
-        setProjects([]);
-        // Tasks are global, fetch them anyway or clear if they should be filtered.
-        // For now, we assume tasks are global as per the card.
-        const fetchedTasks = await getTasks();
-        setTasks(fetchedTasks);
-      }
-    };
-    fetchAndSetData();
+  const reloadData = useCallback(async () => {
+    // Fetch data only if companies are selected to avoid unnecessary calls
+    if (selectedCompanyIds.length > 0) {
+      const [fetchedProjects, fetchedTasks] = await Promise.all([
+        getProjects(selectedCompanyIds),
+        getTasks()
+      ]);
+      setProjects(fetchedProjects);
+      setTasks(fetchedTasks);
+    } else {
+      // Clear projects if no companies are selected (shouldn't happen with default)
+      setProjects([]);
+      const fetchedTasks = await getTasks();
+      setTasks(fetchedTasks);
+    }
   }, [selectedCompanyIds]);
 
   useEffect(() => {
     reloadData();
   }, [reloadData]);
-  
+
   const totalProjects = projects.length;
   const totalValue = projects.reduce((sum, p) => sum + p.totalValue, 0);
   const totalTasks = tasks.length;
@@ -73,7 +68,7 @@ export default function DashboardPage({ selectedCompanies = [] }: { selectedComp
       progress: p.taskCount > 0 ? (p.completedTasks / p.taskCount) * 100 : 0
     }))
     .sort((a, b) => b.value - a.value)
-    .slice(0, 7); 
+    .slice(0, 7);
 
   const taskStatusCounts = tasks.reduce((acc, task) => {
     // Assuming task status is one of the keys in taskStatusConfig
