@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster"
 import AppShell from '@/components/layout/app-shell';
 import { ThemeProvider } from '@/components/layout/theme-provider';
 import React from 'react';
-import type { Project } from '@/lib/types';
+import type { Project, SessionData } from '@/lib/types';
 import { checkDbConnection } from '@/lib/db';
 import { ConnectionError } from '@/components/layout/connection-error';
 import { getSession } from '@/lib/session';
@@ -17,7 +17,13 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const isDbConnected = await checkDbConnection();
-  const session = await getSession();
+  const sessionData = await getSession();
+
+  // Create a plain object to pass to the client
+  const session: SessionData = {
+    isLoggedIn: sessionData.isLoggedIn,
+    user: sessionData.user,
+  };
 
   let projects: Project[] = [];
   if (isDbConnected && session.isLoggedIn) {
@@ -47,7 +53,7 @@ export default async function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <SessionProvider value={{ session }}>
+          <SessionProvider value={session}>
             {isDbConnected ? (
               session.isLoggedIn ? (
                   <AppShell projects={projects} title={title}>

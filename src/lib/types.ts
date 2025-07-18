@@ -12,6 +12,11 @@ export type SessionUser = {
   allowedCompanies: Company[];
 };
 
+export interface SessionData {
+  isLoggedIn: boolean;
+  user?: SessionUser;
+}
+
 export type DailyConsumption = {
   date: Date;
   plannedQuantity: number;

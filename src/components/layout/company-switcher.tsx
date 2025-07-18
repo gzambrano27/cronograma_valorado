@@ -22,10 +22,19 @@ import {
 } from "@/components/ui/popover"
 import type { Company, SessionUser } from "@/lib/types"
 
-export function CompanySwitcher({ user }: { user: SessionUser }) {
+interface CompanySwitcherProps {
+  user: SessionUser;
+  onCompanyChange: (companies: Company[]) => void;
+}
+
+export function CompanySwitcher({ user, onCompanyChange }: CompanySwitcherProps) {
   const [open, setOpen] = React.useState(false)
   const [selectedCompanies, setSelectedCompanies] = React.useState<Company[]>(user.allowedCompanies || [])
   const currentCompany = user.company;
+
+  React.useEffect(() => {
+    onCompanyChange(selectedCompanies);
+  }, [selectedCompanies, onCompanyChange]);
 
   const handleSelect = (company: Company) => {
     setSelectedCompanies(prev => {
@@ -40,6 +49,8 @@ export function CompanySwitcher({ user }: { user: SessionUser }) {
 
   const companyLabel = selectedCompanies.length === 1 
     ? selectedCompanies[0].name 
+    : selectedCompanies.length === user.allowedCompanies.length
+    ? "Todas las Compañías"
     : selectedCompanies.length > 1
     ? `${selectedCompanies.length} compañías`
     : "Seleccionar compañía...";
@@ -63,7 +74,8 @@ export function CompanySwitcher({ user }: { user: SessionUser }) {
           <CommandList>
             <CommandInput placeholder="Buscar compañía..." />
             <CommandEmpty>No se encontró la compañía.</CommandEmpty>
-            <CommandGroup heading="Compañía Actual">
+            {currentCompany && (
+                 <CommandGroup heading="Compañía Actual">
                  <CommandItem
                     key={currentCompany.id}
                     onSelect={() => handleSelect(currentCompany)}
@@ -80,6 +92,7 @@ export function CompanySwitcher({ user }: { user: SessionUser }) {
                     {currentCompany.name}
                 </CommandItem>
             </CommandGroup>
+            )}
             <CommandSeparator />
             <CommandGroup heading="Compañías Permitidas">
               {user.allowedCompanies.map((company) => (

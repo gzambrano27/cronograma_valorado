@@ -31,6 +31,14 @@ import { logout } from "@/lib/auth-actions";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { CompanySwitcher } from "./company-switcher";
 import { useSession } from "@/hooks/use-session";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 
 function MobileSidebarTrigger() {
@@ -63,13 +71,11 @@ export default function AppShell({
   const user = session?.user;
   
   const isHomePage = pathname === "/";
-  const [currentCompany, setCurrentCompany] = React.useState<Company | undefined>(user?.allowedCompanies?.[0]);
   const [selectedCompanies, setSelectedCompanies] = React.useState<Company[]>(user?.allowedCompanies || []);
 
   React.useEffect(() => {
     if (user?.allowedCompanies) {
-      setCurrentCompany(user.allowedCompanies[0]);
-      setSelectedCompanies(user.allowedCompanies);
+       setSelectedCompanies(user.allowedCompanies);
     }
   }, [user?.allowedCompanies]);
 
@@ -167,7 +173,7 @@ export default function AppShell({
             <MobileSidebarTrigger />
             <Breadcrumb projects={projects} />
             <div className="flex-1" />
-            {user && <CompanySwitcher user={user} />}
+            {user && <CompanySwitcher user={user} onCompanyChange={setSelectedCompanies} />}
             <ThemeToggle />
             <Link href="/settings" passHref>
               <Button variant="ghost" size="icon" aria-label="Configuración">
@@ -214,12 +220,3 @@ export default function AppShell({
     </TooltipProvider>
   );
 }
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
