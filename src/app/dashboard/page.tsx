@@ -8,7 +8,7 @@ import { ProjectValueChart } from "@/components/dashboard/project-value-chart";
 import { TaskStatusChart } from "@/components/dashboard/task-status-chart";
 import type { ChartConfig } from "@/components/ui/chart";
 import { formatCurrency } from "@/lib/utils";
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import type { Company, Project, Task } from '@/lib/types';
 
 const taskStatusConfig = {
@@ -34,25 +34,31 @@ export default function DashboardPage({ selectedCompanies = [] }: { selectedComp
   // Create a stable, primitive dependency from the selectedCompanies prop
   const selectedCompanyIds = useMemo(() => selectedCompanies.map(c => c.id), [selectedCompanies]);
 
-  const reloadData = useCallback(async () => {
-    // Only fetch data if companies are selected to avoid unnecessary calls
-    if (selectedCompanyIds.length > 0) {
-      const [fetchedProjects, fetchedTasks] = await Promise.all([
-        getProjects(selectedCompanyIds),
-        getTasks()
-      ]);
-      setProjects(fetchedProjects);
-      setTasks(fetchedTasks);
-    } else {
-      // Clear projects if no companies are selected
-      setProjects([]);
-      setTasks([]); // Also clear tasks if they are company-specific, or fetch all if global
-    }
-  }, [selectedCompanyIds]); // Depend on the stable array of IDs
+  const reloadData = useCallback(() => {
+    const fetchAndSetData = async () => {
+      // Only fetch data if companies are selected to avoid unnecessary calls
+      if (selectedCompanyIds.length > 0) {
+        const [fetchedProjects, fetchedTasks] = await Promise.all([
+          getProjects(selectedCompanyIds),
+          getTasks()
+        ]);
+        setProjects(fetchedProjects);
+        setTasks(fetchedTasks);
+      } else {
+        // Clear projects if no companies are selected
+        setProjects([]);
+        // Tasks are global, fetch them anyway or clear if they should be filtered.
+        // For now, we assume tasks are global as per the card.
+        const fetchedTasks = await getTasks();
+        setTasks(fetchedTasks);
+      }
+    };
+    fetchAndSetData();
+  }, [selectedCompanyIds]);
 
   useEffect(() => {
     reloadData();
-  }, [reloadData]); // reloadData is now wrapped in useCallback and stable
+  }, [reloadData]);
   
   const totalProjects = projects.length;
   const totalValue = projects.reduce((sum, p) => sum + p.totalValue, 0);

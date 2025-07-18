@@ -18,8 +18,6 @@ import { TooltipProvider } from "../ui/tooltip";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
 
-// This component now receives a pre-filtered list of projects.
-// All company-based filtering logic has been removed from here and centralized in the DashboardPage.
 export function ProjectView({ projects, onSuccess }: { projects: Project[], onSuccess: () => void }) {
   const [view, setView] = useState<"grid" | "list">("grid");
   const [searchTerm, setSearchTerm] = useState("");
