@@ -27,15 +27,15 @@ export function ProjectView({ projects, onSuccess }: { projects: Project[], onSu
 
   const ITEMS_PER_PAGE = view === 'grid' ? 6 : 10;
   
-  const { clients } = useMemo(() => {
+  const clients = useMemo(() => {
     const allClients = [...new Set(projects.map((p) => p.client).filter(Boolean) as string[])].sort();
-    return {
-      clients: ["all", ...allClients],
-    };
+    return ["all", ...allClients];
   }, [projects]);
 
 
   const filteredProjects = useMemo(() => {
+    // The main company filter is now applied in the parent (DashboardPage).
+    // This component only handles secondary filters like search term and client.
     return projects
       .filter((project) =>
         project.name.toLowerCase().includes(searchTerm.toLowerCase())

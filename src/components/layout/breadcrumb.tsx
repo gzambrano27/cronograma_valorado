@@ -5,9 +5,10 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, ChevronRight } from 'lucide-react';
 import type { Project } from '@/lib/types';
+import { useDashboard } from '@/hooks/use-dashboard-context';
 
 interface BreadcrumbProps {
-  projects: Project[];
+  // projects prop is no longer needed
 }
 
 const translations: Record<string, string> = {
@@ -15,8 +16,9 @@ const translations: Record<string, string> = {
   settings: 'Configuración',
 };
 
-export function Breadcrumb({ projects }: BreadcrumbProps) {
+export function Breadcrumb({}: BreadcrumbProps) {
   const pathname = usePathname();
+  const { allProjects: projects } = useDashboard();
   
   if (pathname === '/' || pathname === '/login') {
     return null;

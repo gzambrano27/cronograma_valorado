@@ -39,6 +39,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useDashboard } from "@/hooks/use-dashboard-context";
 
 
 function MobileSidebarTrigger() {
@@ -59,14 +60,14 @@ function MobileSidebarTrigger() {
 
 interface AppShellProps {
     children: React.ReactNode;
-    allProjects: Project[];
     selectedCompanies: Company[];
     onCompanyChange: (companies: Company[]) => void;
 }
 
-export default function AppShell({ children, allProjects, selectedCompanies, onCompanyChange }: AppShellProps) {
+export default function AppShell({ children, selectedCompanies, onCompanyChange }: AppShellProps) {
   const pathname = usePathname();
   const { session } = useSession();
+  const { allProjects } = useDashboard();
   
   const user = session?.user;
 
@@ -199,7 +200,7 @@ export default function AppShell({ children, allProjects, selectedCompanies, onC
             )}
           </header>
           <div className="p-4 sm:p-6 md:p-8">
-            <Breadcrumb projects={allProjects} />
+            <Breadcrumb />
             {children}
           </div>
         </SidebarMain>

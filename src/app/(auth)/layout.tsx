@@ -5,7 +5,6 @@ import { getSession } from '@/lib/session';
 import AuthLayoutClient from '@/components/layout/auth-layout-client';
 import { checkDbConnection } from '@/lib/db';
 import { ConnectionError } from '@/components/layout/connection-error';
-import { DashboardProvider } from '@/hooks/use-dashboard-context';
 
 export default async function AuthLayout({
   children,
@@ -22,10 +21,8 @@ export default async function AuthLayout({
   const allProjects = await getProjects();
 
   return (
-    <DashboardProvider allProjects={allProjects}>
-        <AuthLayoutClient session={session}>
-            {children}
-        </AuthLayoutClient>
-    </DashboardProvider>
+    <AuthLayoutClient session={session} allProjects={allProjects}>
+        {children}
+    </AuthLayoutClient>
   );
 }

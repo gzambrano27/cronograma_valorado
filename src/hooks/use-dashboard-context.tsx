@@ -6,12 +6,13 @@ import { createContext, useContext } from 'react';
 
 type DashboardContextType = {
     allProjects: Project[];
+    selectedCompanies: Company[];
 };
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
-export const DashboardProvider = ({ children, allProjects }: { children: React.ReactNode, allProjects: Project[] }) => {
-    return <DashboardContext.Provider value={{ allProjects }}>{children}</DashboardContext.Provider>
+export const DashboardProvider = ({ children, allProjects, selectedCompanies }: { children: React.ReactNode, allProjects: Project[], selectedCompanies: Company[] }) => {
+    return <DashboardContext.Provider value={{ allProjects, selectedCompanies }}>{children}</DashboardContext.Provider>
 }
 
 export const useDashboard = () => {
