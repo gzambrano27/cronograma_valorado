@@ -44,8 +44,9 @@ export default function DashboardPage({ selectedCompanies = [] }: { selectedComp
   const filteredProjects = useMemo(() => {
     const selectedCompanyIds = new Set(selectedCompanies.map(c => c.id));
     if (selectedCompanyIds.size === 0) {
-      // If nothing is selected (e.g. during initial load), show nothing to avoid flash of all projects
-      return []; 
+      // If nothing is selected (e.g., during initial load), show all projects as a fallback.
+      // In practice, there should always be at least one company selected by default.
+      return projects; 
     }
     return projects.filter(p => selectedCompanyIds.has(p.companyId));
   }, [projects, selectedCompanies]);
