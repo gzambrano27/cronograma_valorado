@@ -70,8 +70,8 @@ export function CompanySwitcher({ user, selectedCompanies, onCompanyChange }: Co
     : selectedCompanies.length === allowedCompanies.length
     ? "Todas las Compañías"
     : selectedCompanies.length > 1
-    ? `${selectedCompanies.length} compañías seleccionadas`
-    : "Seleccionar compañía...";
+    ? `${selectedCompanies.length} compañías`
+    : "Seleccionar...";
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -81,18 +81,19 @@ export function CompanySwitcher({ user, selectedCompanies, onCompanyChange }: Co
           role="combobox"
           aria-expanded={open}
           aria-label="Seleccionar compañía"
-          className="w-[250px] justify-between"
+          className="w-full justify-between"
         >
+          <Building className="mr-2 h-4 w-4 shrink-0" />
           <span className="truncate">{companyLabel}</span>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[300px] p-0">
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
         <Command>
           <CommandList>
             <CommandInput placeholder="Buscar compañía..." />
             <CommandEmpty>No se encontró la compañía.</CommandEmpty>
-            <CommandGroup heading="Compañías Permitidas">
+            <CommandGroup>
               {allowedCompanies.map((company) => (
                 <CommandItem
                   key={company.id}
@@ -107,7 +108,6 @@ export function CompanySwitcher({ user, selectedCompanies, onCompanyChange }: Co
                         : "opacity-0"
                     )}
                   />
-                  <Building className="mr-2 h-4 w-4 text-muted-foreground" />
                   <span className="flex-1 truncate">{company.name}</span>
                   {company.id === currentCompanyId && (
                      <Star className="ml-auto h-4 w-4 text-yellow-400 fill-current" />
@@ -117,10 +117,16 @@ export function CompanySwitcher({ user, selectedCompanies, onCompanyChange }: Co
             </CommandGroup>
           </CommandList>
           <CommandSeparator />
-          <div className="p-2 flex justify-between">
-              <Button variant="link" size="sm" className="px-2" onClick={selectAll}>Seleccionar Todo</Button>
-              <Button variant="link" size="sm" className="px-2" onClick={deselectAll}>Quitar Selección</Button>
-          </div>
+          <CommandList>
+              <CommandGroup>
+                 <CommandItem onSelect={selectAll}>
+                    Seleccionar Todo
+                 </CommandItem>
+                 <CommandItem onSelect={deselectAll}>
+                    Quitar Selección
+                 </CommandItem>
+              </CommandGroup>
+          </CommandList>
         </Command>
       </PopoverContent>
     </Popover>

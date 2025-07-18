@@ -206,7 +206,6 @@ export default function AppShell({
           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
             <MobileSidebarTrigger />
             <div className="flex-1" />
-            {user && <CompanySwitcher user={user} selectedCompanies={selectedCompanies} onCompanyChange={setSelectedCompanies} />}
             <ThemeToggle />
             <Link href="/settings" passHref>
               <Button variant="ghost" size="icon" aria-label="Configuración">
@@ -222,7 +221,7 @@ export default function AppShell({
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align="end" className="w-64">
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">{user.name}</p>
@@ -231,6 +230,10 @@ export default function AppShell({
                       </p>
                     </div>
                   </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                     <CompanySwitcher user={user} selectedCompanies={selectedCompanies} onCompanyChange={setSelectedCompanies} />
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <form action={logout}>
                     <DropdownMenuItem asChild>
