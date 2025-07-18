@@ -10,6 +10,7 @@ import { query } from './db';
 import { getIronSession } from 'iron-session';
 import { sessionOptions, type SessionData } from './session-config';
 import { cookies } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 
 const LoginSchema = z.object({
   email: z.string().min(1, 'Por favor ingrese su usuario.'),
@@ -131,69 +132,16 @@ export async function login(prevState: { error: string } | undefined, formData: 
     }
     return { error: 'Ocurrió un error inesperado al conectar con Odoo.' };
   }
-
+  
+  // Revalidate the root path to update the layout with the new session.
+  revalidatePath('/', 'layout');
   redirect('/dashboard');
 }
 
 export async function logout() {
   const session = await getIronSession<SessionData>(cookies(), sessionOptions);
   session.destroy();
+  // Revalidate the root path to ensure the layout reflects the logged-out state.
+  revalidatePath('/', 'layout');
   redirect('/login');
-}
-
-
-export async function revalidateSessionUser(): Promise<SessionUser | null> {
-    const session = await getIronSession<SessionData>(cookies(), sessionOptions);
-    if (!session.isLoggedIn || !session.uid || !session.password) {
-        return null;
-    }
-
-    try {
-        const odooClient = getOdooClient(session.uid, session.password);
-
-        const userDetails = await odooClient.executeKw<any[]>('res.users', 'search_read',
-            [[['id', '=', session.uid]]],
-            { fields: ['name', 'login', 'company_id', 'company_ids'] }
-        );
-
-        if (!userDetails || userDetails.length === 0) {
-            throw new Error("User not found in Odoo during revalidation.");
-        }
-
-        const user = userDetails[0];
-        const isManager = await checkUserIsManager(user.id);
-
-        const allowedCompanyIds = user.company_ids || [];
-        let allowedCompanies: Company[] = [];
-        if (allowedCompanyIds.length > 0) {
-            const companiesData = await odooClient.executeKw<any[]>('res.company', 'search_read',
-                [[['id', 'in', allowedCompanyIds]]],
-                { fields: ['name'] }
-            );
-            allowedCompanies = companiesData.map(c => ({ id: c.id, name: getTranslatedName(c.name) }));
-        }
-
-        const currentCompany: Company = { id: user.company_id[0], name: getTranslatedName(user.company_id[1]) };
-
-        const updatedUser: SessionUser = {
-            id: user.id,
-            name: getTranslatedName(user.name),
-            email: user.login,
-            company: currentCompany,
-            allowedCompanies: allowedCompanies,
-            isManager,
-        };
-
-        // Update the session with the latest user data
-        session.user = updatedUser;
-        await session.save();
-
-        return updatedUser;
-
-    } catch (error) {
-        console.error("Failed to revalidate session, logging out:", error);
-        // If revalidation fails (e.g., user deactivated in Odoo), destroy session
-        await logout();
-        return null;
-    }
 }

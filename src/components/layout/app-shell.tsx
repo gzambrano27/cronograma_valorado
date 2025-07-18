@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Building2, Cog, Briefcase, GanttChartSquare, PanelLeft, LogOut, CheckCheck, X } from "lucide-react";
+import { Building2, Cog, Briefcase, GanttChartSquare, PanelLeft, LogOut } from "lucide-react";
 import React from "react";
 
 import type { Company, Project, SessionUser } from "@/lib/types";
@@ -27,7 +27,7 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from "../ui/tooltip";
-import { revalidateSessionUser, logout } from "@/lib/auth-actions";
+import { logout } from "@/lib/auth-actions";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { CompanySwitcher } from "./company-switcher";
 import { useSession } from "@/hooks/use-session";
@@ -70,29 +70,11 @@ export default function AppShell({
   title: string;
 }) {
   const pathname = usePathname();
-  const { session, setSession } = useSession();
+  const { session } = useSession();
   
-  const [user, setUser] = React.useState<SessionUser | undefined>(session?.user);
+  const user = session?.user;
   const [selectedCompanies, setSelectedCompanies] = React.useState<Company[]>([]);
   const [isInitialLoad, setIsInitialLoad] = React.useState(true);
-
-  React.useEffect(() => {
-    const revalidate = async () => {
-        try {
-            const updatedUser = await revalidateSessionUser();
-            if (updatedUser) {
-              setUser(updatedUser);
-              // Update the session in the provider if user data changes
-              setSession(prev => ({...prev, user: updatedUser }));
-            }
-        } catch (error) {
-            console.error("Session revalidation failed, logging out.", error);
-            // The action will redirect, no need to set state
-            logout();
-        }
-    };
-    revalidate();
-  }, [setSession]);
   
   const isDashboardPage = pathname.startsWith("/dashboard");
   
