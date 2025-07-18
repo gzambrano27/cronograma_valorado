@@ -9,7 +9,7 @@ import { TaskStatusChart } from "@/components/dashboard/task-status-chart";
 import type { ChartConfig } from "@/components/ui/chart";
 import { formatCurrency } from "@/lib/utils";
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import type { Task } from '@/lib/types';
+import type { Task, Company } from '@/lib/types';
 import { useDashboard } from "@/hooks/use-dashboard-context";
 import { useSession } from "@/hooks/use-session";
 
@@ -30,12 +30,9 @@ const taskStatusConfig = {
 
 
 export default function DashboardPage() {
-  const { allProjects } = useDashboard(); // This is now safe to call
+  const { allProjects, selectedCompanies } = useDashboard(); 
   const { session } = useSession();
   const isManager = session.user?.isManager ?? false;
-
-  // We no longer manage selectedCompanies here, it's in AuthLayoutClient
-  // The filtering of projects happens in the ProjectView component based on props
   
   const [tasks, setTasks] = useState<Task[]>([]);
   
@@ -47,16 +44,21 @@ export default function DashboardPage() {
   useEffect(() => {
     reloadTasks();
   }, [reloadTasks]);
+  
+  const filteredProjects = useMemo(() => {
+    if (!selectedCompanies || selectedCompanies.length === 0) {
+      return [];
+    }
+    const selectedCompanyIds = new Set(selectedCompanies.map(c => c.id));
+    return allProjects.filter(p => selectedCompanyIds.has(p.companyId));
+  }, [allProjects, selectedCompanies]);
 
-  // The rest of the component logic relies on `allProjects` which is now
-  // correctly provided by the context.
-
-  const totalProjects = allProjects.length;
-  const totalValue = allProjects.reduce((sum, p) => sum + p.totalValue, 0);
+  const totalProjects = filteredProjects.length;
+  const totalValue = filteredProjects.reduce((sum, p) => sum + p.totalValue, 0);
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(t => t.status === 'completado').length;
 
-  const projectValueData = allProjects
+  const projectValueData = filteredProjects
     .map(p => ({
       name: p.name.length > 20 ? `${p.name.substring(0, 20)}...` : p.name,
       value: p.totalValue,
@@ -93,7 +95,7 @@ export default function DashboardPage() {
               <CardContent>
                 <div className="text-xl font-bold">{formatCurrency(totalValue)}</div>
                 <p className="text-xs text-muted-foreground">
-                  Suma de todos los proyectos
+                  Suma de los proyectos seleccionados
                 </p>
               </CardContent>
             </Card>
@@ -106,7 +108,7 @@ export default function DashboardPage() {
           <CardContent>
             <div className="text-xl font-bold">{totalProjects}</div>
             <p className="text-xs text-muted-foreground">
-              Total de proyectos accesibles
+              Total de proyectos seleccionados
             </p>
           </CardContent>
         </Card>
@@ -159,7 +161,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <ProjectView projects={allProjects} onSuccess={reloadDashboardData} />
+      <ProjectView projects={filteredProjects} onSuccess={reloadDashboardData} />
     </div>
   );
 }

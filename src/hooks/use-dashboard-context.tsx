@@ -2,16 +2,26 @@
 'use client';
 
 import type { Project, Company } from '@/lib/types';
-import { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useState, Dispatch, SetStateAction } from 'react';
 
 type DashboardContextType = {
     allProjects: Project[];
+    selectedCompanies: Company[];
+    setSelectedCompanies: Dispatch<SetStateAction<Company[]>>;
 };
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
 export const DashboardProvider = ({ children, allProjects }: { children: ReactNode, allProjects: Project[] }) => {
-    return <DashboardContext.Provider value={{ allProjects }}>{children}</DashboardContext.Provider>
+    const [selectedCompanies, setSelectedCompanies] = useState<Company[]>([]);
+    
+    const value = {
+      allProjects,
+      selectedCompanies,
+      setSelectedCompanies
+    };
+
+    return <DashboardContext.Provider value={value}>{children}</DashboardContext.Provider>
 }
 
 export const useDashboard = () => {

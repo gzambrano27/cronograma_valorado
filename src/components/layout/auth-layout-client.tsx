@@ -13,12 +13,10 @@ export default function AuthLayoutClient({
 }: Readonly<{
   children: React.ReactNode;
   session: SessionData;
-  allProjects: Project[]; // This prop is now passed to DashboardProvider in the layout
 }>) {
   const user = session?.user;
-  const { allProjects } = useDashboard(); // Consume from provider
+  const { allProjects, selectedCompanies, setSelectedCompanies } = useDashboard();
   
-  const [selectedCompanies, setSelectedCompanies] = React.useState<Company[]>([]);
   const [isInitialLoad, setIsInitialLoad] = React.useState(true);
   
   React.useEffect(() => {
@@ -47,7 +45,7 @@ export default function AuthLayoutClient({
         setSelectedCompanies([user.company]);
         setIsInitialLoad(false);
     }
-  }, [user, isInitialLoad]);
+  }, [user, isInitialLoad, setSelectedCompanies]);
 
 
   React.useEffect(() => {
