@@ -44,7 +44,7 @@ export default function DashboardPage({ selectedCompanies = [] }: { selectedComp
       setProjects(fetchedProjects);
       setTasks(fetchedTasks);
     } else {
-      // Clear projects if no companies are selected (shouldn't happen with default)
+      // Clear projects if no companies are selected
       setProjects([]);
       const fetchedTasks = await getTasks();
       setTasks(fetchedTasks);
