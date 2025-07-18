@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Building2, Cog, Briefcase, GanttChartSquare, PanelLeft, LogOut } from "lucide-react";
-import React from "react";
+import React, { useEffect } from "react";
 
 import type { Company, Project, SessionUser } from "@/lib/types";
 import {
@@ -40,6 +40,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DashboardProvider } from "@/hooks/use-dashboard-context";
+import { getProjects } from "@/lib/data";
 
 
 function MobileSidebarTrigger() {
@@ -60,23 +61,31 @@ function MobileSidebarTrigger() {
 
 const LOCAL_STORAGE_KEY = 'selectedCompanies';
 
-export default function AppShell({
-  children,
-  projects: allProjects, // Rename to avoid confusion
-  title,
-}: {
-  children: React.ReactNode;
-  projects: Project[];
-  title: string;
-}) {
+export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { session } = useSession();
   
   const user = session?.user;
   const [selectedCompanies, setSelectedCompanies] = React.useState<Company[]>([]);
   const [isInitialLoad, setIsInitialLoad] = React.useState(true);
+  const [allProjects, setAllProjects] = React.useState<Project[]>([]);
   
+  useEffect(() => {
+    const fetchProjects = async () => {
+      if (session.isLoggedIn) {
+        try {
+          const projects = await getProjects();
+          setAllProjects(projects);
+        } catch (error) {
+          console.error("Failed to fetch projects:", error);
+        }
+      }
+    };
+    fetchProjects();
+  }, [session.isLoggedIn]);
+
   const isDashboardPage = pathname.startsWith("/dashboard");
+  const title = "Centro de Aplicaciones";
   
   // Effect to initialize selectedCompanies from localStorage or user's default company
   React.useEffect(() => {
@@ -85,18 +94,15 @@ export default function AppShell({
         const storedCompanies = localStorage.getItem(LOCAL_STORAGE_KEY);
         if (storedCompanies) {
           const parsedCompanies = JSON.parse(storedCompanies);
-          // Validate that stored companies are a subset of allowed companies
           const validStoredCompanies = parsedCompanies.filter((sc: Company) => 
             user.allowedCompanies.some(ac => ac.id === sc.id)
           );
           if (validStoredCompanies.length > 0) {
             setSelectedCompanies(validStoredCompanies);
           } else {
-             // If stored is invalid, default to user's main company
              setSelectedCompanies([user.company]);
           }
         } else {
-          // If nothing is stored, default to user's main company
           setSelectedCompanies([user.company]);
         }
       } catch (error) {

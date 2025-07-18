@@ -1,35 +1,18 @@
 
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
-import AppShell from '@/components/layout/app-shell';
 import { ThemeProvider } from '@/components/layout/theme-provider';
 import React from 'react';
-import type { Project, SessionData } from '@/lib/types';
-import { checkDbConnection } from '@/lib/db';
-import { ConnectionError } from '@/components/layout/connection-error';
-import { getSession } from '@/lib/session';
-import { getProjects } from '@/lib/data';
 import { SessionProvider } from '@/hooks/use-session';
+import { getSession } from '@/lib/session';
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const isDbConnected = await checkDbConnection();
-  const session = await getSession();
-
-  let projects: Project[] = [];
-  if (isDbConnected && session.isLoggedIn) {
-    try {
-      // Fetch all projects for the user. Filtering will happen on the client side.
-      projects = await getProjects();
-    } catch (error) {
-      console.error("Failed to fetch projects:", error);
-    }
-  }
   
-  const title = "Centro de Aplicaciones";
+  const session = await getSession();
 
   return (
     <html lang="es" suppressHydrationWarning>
@@ -49,17 +32,7 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <SessionProvider initialSession={session}>
-            {isDbConnected ? (
-              session.isLoggedIn ? (
-                  <AppShell projects={projects} title={title}>
-                    {children}
-                  </AppShell>
-                ) : (
-                  children
-                )
-            ) : (
-              <ConnectionError />
-            )}
+              {children}
             <Toaster />
           </SessionProvider>
         </ThemeProvider>
