@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import type { Company, Project } from "@/lib/types";
+import type { Project } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,7 +18,9 @@ import { TooltipProvider } from "../ui/tooltip";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
 
-export function ProjectView({ projects, onSuccess, selectedCompanies: extSelectedCompanies }: { projects: Project[], onSuccess: () => void, selectedCompanies?: Company[] }) {
+// This component now receives a pre-filtered list of projects.
+// All company-based filtering logic has been removed from here and centralized in the DashboardPage.
+export function ProjectView({ projects, onSuccess }: { projects: Project[], onSuccess: () => void }) {
   const [view, setView] = useState<"grid" | "list">("grid");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedClient, setSelectedClient] = useState("all");
@@ -36,26 +38,23 @@ export function ProjectView({ projects, onSuccess, selectedCompanies: extSelecte
 
 
   const filteredProjects = useMemo(() => {
-    const selectedCompanyIds = new Set(extSelectedCompanies?.map(c => c.id) || []);
-
+    // The main company filter is now applied in the parent (DashboardPage).
+    // This component only handles secondary filters like search term and client.
     return projects
       .filter((project) =>
         project.name.toLowerCase().includes(searchTerm.toLowerCase())
       )
       .filter(
-        (project) => selectedCompanyIds.size === 0 || selectedCompanyIds.has(project.companyId)
-      )
-      .filter(
         (project) =>
           selectedClient === "all" || project.client === selectedClient
       );
-  }, [projects, searchTerm, extSelectedCompanies, selectedClient]);
+  }, [projects, searchTerm, selectedClient]);
   
   const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedClient, view, extSelectedCompanies]);
+  }, [searchTerm, selectedClient, view, projects]);
 
   useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) {
