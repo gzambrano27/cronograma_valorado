@@ -1,4 +1,4 @@
-import type { IronSessionOptions } from 'iron-session';
+import type { SessionOptions } from 'iron-session';
 import type { SessionUser } from './types';
 
 const password = process.env.SECRET_COOKIE_PASSWORD;
@@ -9,7 +9,7 @@ if (!password) {
   );
 }
 
-export const sessionOptions: IronSessionOptions = {
+export const sessionOptions: SessionOptions = {
   password,
   cookieName: 'project-valuator-session',
   cookieOptions: {
