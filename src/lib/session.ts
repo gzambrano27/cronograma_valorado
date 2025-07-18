@@ -1,32 +1,10 @@
 'use server';
 import 'server-only';
 
-import { getIronSession, type IronSession, type IronSessionData } from 'iron-session';
+import { getIronSession, type IronSession } from 'iron-session';
 import { cookies } from 'next/headers';
-import type { SessionUser } from './types';
+import { sessionOptions, type SessionData } from './session-config';
 
-const password = process.env.SECRET_COOKIE_PASSWORD;
-
-if (!password) {
-  throw new Error(
-    'Missing SECRET_COOKIE_PASSWORD environment variable. Use `openssl rand -base64 32` to generate a secret.'
-  );
-}
-
-export const sessionOptions = {
-  password,
-  cookieName: 'project-valuator-session',
-  cookieOptions: {
-    secure: process.env.NODE_ENV === 'production',
-  },
-};
-
-export interface SessionData extends IronSessionData {
-  isLoggedIn: boolean;
-  user?: SessionUser;
-  uid?: number;
-  password?: string;
-}
 
 // This function gets the raw session object. Use it only in server actions to modify the session.
 export async function getIronSessionInstance(): Promise<IronSession<SessionData>> {
