@@ -73,7 +73,7 @@ export default function AppShell({
   const { session } = useSession();
   const user = session?.user;
   
-  const isHomePage = pathname === "/";
+  const isDashboardPage = pathname.startsWith("/dashboard");
 
   const [selectedCompanies, setSelectedCompanies] = React.useState<Company[]>([]);
   const [isInitialLoad, setIsInitialLoad] = React.useState(true);
@@ -119,6 +119,14 @@ export default function AppShell({
     }
   }, [selectedCompanies, isInitialLoad]);
 
+  const filteredProjectsForSidebar = React.useMemo(() => {
+    if (!selectedCompanies || selectedCompanies.length === 0) {
+      return allProjects;
+    }
+    const selectedCompanyIds = new Set(selectedCompanies.map(c => c.id));
+    return allProjects.filter(p => selectedCompanyIds.has(p.companyId));
+  }, [allProjects, selectedCompanies]);
+
   return (
     <TooltipProvider>
       <SidebarProvider title={title}>
@@ -135,65 +143,61 @@ export default function AppShell({
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
-              {isHomePage ? (
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    size="sm"
-                    isActive={pathname === `/dashboard`}
-                    tooltip={{ children: "Cronograma Valorado" }}
-                  >
-                    <Link href={`/dashboard`}>
-                      <GanttChartSquare className="h-4 w-4 shrink-0" />
-                      <span className="truncate">
-                        Cronograma Valorado
-                      </span>
-                    </Link>
-                  </SidebarMenuButton>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  size="sm"
+                  isActive={isDashboardPage}
+                  tooltip={{ children: "Panel Principal" }}
+                >
+                  <Link href={`/dashboard`}>
+                    <GanttChartSquare className="h-4 w-4 shrink-0" />
+                    <span className="truncate">
+                      Panel Principal
+                    </span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {filteredProjectsForSidebar.map((project, index) => (
+                <SidebarMenuItem key={project.id}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <SidebarMenuButton
+                        asChild
+                        size="sm"
+                        isActive={pathname === `/projects/${project.id}`}
+                        tooltip={{ children: project.name }}
+                      >
+                        <Link href={`/projects/${project.id}`}>
+                          <div className="relative">
+                            <Briefcase className="h-4 w-4 shrink-0" />
+                            <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
+                              {index + 1}
+                            </span>
+                          </div>
+                          <span>
+                            {project.name}
+                          </span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="right"
+                      align="start"
+                      className="group-data-[state=expanded]/sidebar:block hidden"
+                    >
+                      {project.name}
+                    </TooltipContent>
+                  </Tooltip>
                 </SidebarMenuItem>
-              ) : (
-                <>
-                  {allProjects.map((project, index) => (
-                    <SidebarMenuItem key={project.id}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <SidebarMenuButton
-                            asChild
-                            size="sm"
-                            isActive={pathname === `/projects/${project.id}`}
-                            tooltip={{ children: project.name }}
-                          >
-                            <Link href={`/projects/${project.id}`}>
-                              <div className="relative">
-                                <Briefcase className="h-4 w-4 shrink-0" />
-                                <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
-                                  {index + 1}
-                                </span>
-                              </div>
-                              <span>
-                                {project.name}
-                              </span>
-                            </Link>
-                          </SidebarMenuButton>
-                        </TooltipTrigger>
-                        <TooltipContent
-                          side="right"
-                          align="start"
-                          className="group-data-[state=expanded]/sidebar:block hidden"
-                        >
-                          {project.name}
-                        </TooltipContent>
-                      </Tooltip>
-                    </SidebarMenuItem>
-                  ))}
-                  {allProjects.length === 0 && (
-                    <SidebarMenuItem>
-                      <span className="flex items-center gap-2 p-2 text-sm text-sidebar-foreground/70">
+              ))}
+              {filteredProjectsForSidebar.length === 0 && (
+                 <SidebarMenuItem>
+                    <span className="flex items-center gap-2 p-2 text-sm text-sidebar-foreground/70">
                         No hay proyectos.
-                      </span>
-                    </SidebarMenuItem>
-                  )}
-                </>
+                    </span>
+                 </SidebarMenuItem>
               )}
             </SidebarMenu>
           </SidebarContent>
@@ -209,9 +213,6 @@ export default function AppShell({
               <Button variant="ghost" size="icon" aria-label="Configuración">
                 <Cog className="h-5 w-5" />
               </Button>
-            </Link>
-            <Link href="/dashboard" passHref>
-              <Button variant="outline">Panel Principal</Button>
             </Link>
             {user && (
               <DropdownMenu>
