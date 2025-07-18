@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Building2, Cog, Briefcase, GanttChartSquare, PanelLeft, LogOut } from "lucide-react";
-import React, { useEffect } from "react";
+import React from "react";
 
 import type { Company, Project, SessionUser } from "@/lib/types";
 import {
@@ -39,8 +39,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DashboardProvider } from "@/hooks/use-dashboard-context";
-import { getProjects } from "@/lib/data";
 
 
 function MobileSidebarTrigger() {
@@ -59,71 +57,21 @@ function MobileSidebarTrigger() {
     )
 }
 
-const LOCAL_STORAGE_KEY = 'selectedCompanies';
+interface AppShellProps {
+    children: React.ReactNode;
+    allProjects: Project[];
+    selectedCompanies: Company[];
+    onCompanyChange: (companies: Company[]) => void;
+}
 
-export default function AppShell({ children }: { children: React.ReactNode }) {
+export default function AppShell({ children, allProjects, selectedCompanies, onCompanyChange }: AppShellProps) {
   const pathname = usePathname();
   const { session } = useSession();
   
   const user = session?.user;
-  const [selectedCompanies, setSelectedCompanies] = React.useState<Company[]>([]);
-  const [isInitialLoad, setIsInitialLoad] = React.useState(true);
-  const [allProjects, setAllProjects] = React.useState<Project[]>([]);
-  
-  useEffect(() => {
-    const fetchProjects = async () => {
-      if (session.isLoggedIn) {
-        try {
-          const projects = await getProjects();
-          setAllProjects(projects);
-        } catch (error) {
-          console.error("Failed to fetch projects:", error);
-        }
-      }
-    };
-    fetchProjects();
-  }, [session.isLoggedIn]);
 
   const isDashboardPage = pathname.startsWith("/dashboard");
   const title = "Centro de Aplicaciones";
-  
-  // Effect to initialize selectedCompanies from localStorage or user's default company
-  React.useEffect(() => {
-    if (user?.allowedCompanies && user.company && isInitialLoad) {
-      try {
-        const storedCompanies = localStorage.getItem(LOCAL_STORAGE_KEY);
-        if (storedCompanies) {
-          const parsedCompanies = JSON.parse(storedCompanies);
-          const validStoredCompanies = parsedCompanies.filter((sc: Company) => 
-            user.allowedCompanies.some(ac => ac.id === sc.id)
-          );
-          if (validStoredCompanies.length > 0) {
-            setSelectedCompanies(validStoredCompanies);
-          } else {
-             setSelectedCompanies([user.company]);
-          }
-        } else {
-          setSelectedCompanies([user.company]);
-        }
-      } catch (error) {
-        console.error("Failed to process selected companies from localStorage", error);
-        setSelectedCompanies([user.company]);
-      }
-      setIsInitialLoad(false);
-    }
-  }, [user, isInitialLoad]);
-
-
-  // Effect to save selectedCompanies to localStorage whenever they change
-  React.useEffect(() => {
-    if (!isInitialLoad) {
-      try {
-          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(selectedCompanies));
-      } catch (error) {
-          console.error("Failed to save selected companies to localStorage", error);
-      }
-    }
-  }, [selectedCompanies, isInitialLoad]);
 
   const filteredProjectsForSidebar = React.useMemo(() => {
     if (!selectedCompanies || selectedCompanies.length === 0) {
@@ -212,7 +160,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
             <MobileSidebarTrigger />
             <div className="flex-1" />
-            {user && <CompanySwitcher user={user} selectedCompanies={selectedCompanies} onCompanyChange={setSelectedCompanies} />}
+            {user && <CompanySwitcher user={user} selectedCompanies={selectedCompanies} onCompanyChange={onCompanyChange} />}
             <ThemeToggle />
             <Link href="/settings" passHref>
               <Button variant="ghost" size="icon" aria-label="Configuración">
@@ -252,13 +200,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </header>
           <div className="p-4 sm:p-6 md:p-8">
             <Breadcrumb projects={allProjects} />
-            <DashboardProvider value={{ allProjects, selectedCompanies }}>
-                {isInitialLoad ? (
-                    <div className="flex-1 p-8 text-center text-muted-foreground">Cargando...</div>
-                ) : (
-                    children
-                )}
-            </DashboardProvider>
+            {children}
           </div>
         </SidebarMain>
       </SidebarProvider>
