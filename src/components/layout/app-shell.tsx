@@ -121,7 +121,7 @@ export default function AppShell({
 
   const filteredProjectsForSidebar = React.useMemo(() => {
     if (!selectedCompanies || selectedCompanies.length === 0) {
-      return allProjects;
+      return [];
     }
     const selectedCompanyIds = new Set(selectedCompanies.map(c => c.id));
     return allProjects.filter(p => selectedCompanyIds.has(p.companyId));
@@ -203,7 +203,7 @@ export default function AppShell({
           </SidebarContent>
         </Sidebar>
         <SidebarMain>
-          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
             <MobileSidebarTrigger />
             <Breadcrumb projects={allProjects} />
             <div className="flex-1" />
