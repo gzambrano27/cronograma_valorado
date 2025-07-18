@@ -1,26 +1,30 @@
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { sessionOptions } from '@/lib/session-config';
+import { getIronSession } from 'iron-session';
+import { sessionOptions, type SessionData } from '@/lib/session-config';
+import { cookies } from 'next/headers';
 
 
 export const middleware = async (req: NextRequest) => {
   const { pathname } = req.nextUrl;
-  const cookieName = sessionOptions.cookieName;
-  const sessionCookie = req.cookies.get(cookieName);
+  
+  const cookieStore = cookies();
+  const session = await getIronSession<SessionData>(cookieStore, sessionOptions);
+  const { isLoggedIn } = session;
 
   const publicRoutes = ['/login'];
   const isPublicRoute = publicRoutes.includes(pathname);
 
   // If user has a session cookie and tries to access a public route (like /login),
   // redirect them to the dashboard.
-  if (sessionCookie && isPublicRoute) {
+  if (isLoggedIn && isPublicRoute) {
     return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 
   // If user does not have a session cookie and is trying to access a protected route,
   // redirect them to the login page.
-  if (!sessionCookie && !isPublicRoute) {
+  if (!isLoggedIn && !isPublicRoute) {
     // Construct an absolute URL for redirection
     const loginUrl = new URL('/login', req.url);
     return NextResponse.redirect(loginUrl);
@@ -28,7 +32,7 @@ export const middleware = async (req: NextRequest) => {
 
   // Special case for the root path
   if (pathname === '/') {
-    const targetUrl = new URL(sessionCookie ? '/dashboard' : '/login', req.url);
+    const targetUrl = new URL(isLoggedIn ? '/dashboard' : '/login', req.url);
     return NextResponse.redirect(targetUrl);
   }
 
