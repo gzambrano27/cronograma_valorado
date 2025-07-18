@@ -53,6 +53,7 @@ import { DeleteMultipleTasksDialog } from "./delete-multiple-tasks-dialog"
 import { Switch } from "../ui/switch"
 import { Label } from "../ui/label"
 import { cn, formatCurrency } from "@/lib/utils"
+import { useSession } from "@/hooks/use-session"
 
 const statusTranslations: Record<Task['status'], string> = {
     'pendiente': 'Pendiente',
@@ -67,166 +68,178 @@ const adjustDateForTimezone = (date: Date | string): Date => {
 };
 
 
-const getColumns = (onSuccess: () => void): ColumnDef<Task>[] => [
-  {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Seleccionar todo"
-          className="translate-y-[2px]"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          onClick={(e) => e.stopPropagation()}
-          aria-label="Seleccionar fila"
-          className="translate-y-[2px]"
-        />
-      ),
-      enableSorting: false,
+const getColumns = (onSuccess: () => void, isManager: boolean): ColumnDef<Task>[] => {
+  
+  const columns: ColumnDef<Task>[] = [
+    {
+        id: "select",
+        header: ({ table }) => (
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Seleccionar todo"
+            className="translate-y-[2px]"
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            onClick={(e) => e.stopPropagation()}
+            aria-label="Seleccionar fila"
+            className="translate-y-[2px]"
+          />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+        size: 40,
+    },
+    {
+      id: 'expander',
+      header: () => null,
+      cell: ({ row }) => {
+        return (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={(e) => {
+              e.stopPropagation();
+              row.getToggleExpandedHandler()();
+            }}
+            className="w-8 p-0 data-[state=open]:bg-muted"
+          >
+            {row.getIsExpanded() ? (
+              <ChevronDown className="h-4 w-4" />
+            ) : (
+              <ChevronRight className="h-4 w-4" />
+            )}
+          </Button>
+        )
+      },
       enableHiding: false,
       size: 40,
-  },
-  {
-    id: 'expander',
-    header: () => null,
-    cell: ({ row }) => {
-      return (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={(e) => {
-            e.stopPropagation();
-            row.getToggleExpandedHandler()();
-          }}
-          className="w-8 p-0 data-[state=open]:bg-muted"
-        >
-          {row.getIsExpanded() ? (
-            <ChevronDown className="h-4 w-4" />
-          ) : (
-            <ChevronRight className="h-4 w-4" />
-          )}
-        </Button>
-      )
     },
-    enableHiding: false,
-    size: 40,
-  },
-  {
-    accessorKey: "name",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Tarea
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-    cell: ({ row }) => <div className="capitalize font-medium">{row.getValue("name")}</div>,
-    size: 350,
-  },
-  {
-    accessorKey: "status",
-    header: "Estado",
-    cell: ({ row }) => {
-      const status = row.getValue("status") as Task['status'];
-      const translatedStatus = statusTranslations[status] || status;
-
-      let badgeVariant: "default" | "secondary" | "outline" = "outline";
-      
-      if (status === 'completado') {
-        badgeVariant = 'default';
-      } else if (status === 'en-progreso') {
-        badgeVariant = 'secondary';
-      }
-
-      return <Badge variant={badgeVariant}>{translatedStatus}</Badge>
-    },
-    filterFn: (row, id, value) => {
-        return value.includes(row.getValue(id))
-    }
-  },
-  {
-    accessorKey: "quantity",
-    header: () => <div className="text-right">Cant. Planificada</div>,
-    cell: ({ row }) => {
-      const quantity = parseFloat(row.getValue("quantity"))
-      return <div className="text-right font-mono">{quantity.toLocaleString('es-ES')}</div>
-    },
-  },
-  {
-    accessorKey: "consumedQuantity",
-    header: () => <div className="text-right">Cant. Consumida</div>,
-    cell: ({ row }) => {
-        const consumed = row.getValue("consumedQuantity") as number;
-        return <div className="text-right font-mono">{consumed.toLocaleString('es-ES')}</div>;
-    }
-  },
-  {
-    id: "difference",
-    header: () => <div className="text-right">Diferencia de Consumo</div>,
-    cell: ({ row }) => {
-        const difference = row.original.quantity - row.original.consumedQuantity;
-        return <div className="text-right font-mono">{difference.toLocaleString('es-ES')}</div>;
-    }
-  },
-  {
-    accessorKey: "value",
-    header: () => <div className="text-right">PVP</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("value"))
-      return <div className="text-right font-mono">{formatCurrency(amount)}</div>
-    },
-  },
-  {
-    id: "subtotalValued",
-    header: () => <div className="text-right">Subtotal Valorado</div>,
-    cell: ({ row }) => {
-        const subtotal = row.original.quantity * row.original.value;
-        return <div className="text-right font-mono">{formatCurrency(subtotal)}</div>;
-    }
-  },
-  {
-    id: "subtotalActual",
-    header: () => <div className="text-right">Subtotal Avance Real</div>,
-    cell: ({ row }) => {
-        const subtotal = row.original.consumedQuantity * row.original.value;
-        return <div className="text-right font-mono">{formatCurrency(subtotal)}</div>;
-    }
-  },
-  {
-    accessorKey: "startDate",
-    header: "Fecha Inicio",
-    cell: ({ row }) => {
-      const date = adjustDateForTimezone(row.getValue("startDate"));
-      return format(date, "dd/MM/yyyy", { locale: es });
-    },
-  },
     {
-    accessorKey: "endDate",
-    header: "Fecha Fin",
-    cell: ({ row }) => {
-      const date = adjustDateForTimezone(row.getValue("endDate"));
-      return format(date, "dd/MM/yyyy", { locale: es });
+      accessorKey: "name",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Tarea
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => <div className="capitalize font-medium">{row.getValue("name")}</div>,
+      size: 350,
     },
-  },
-  {
-    id: "actions",
-    header: () => <div className="text-right pr-4">Acciones</div>,
-    cell: ({ row }) => <TaskActions task={row.original} onSuccess={onSuccess} />,
-    size: 80,
-  },
-]
+    {
+      accessorKey: "status",
+      header: "Estado",
+      cell: ({ row }) => {
+        const status = row.getValue("status") as Task['status'];
+        const translatedStatus = statusTranslations[status] || status;
+
+        let badgeVariant: "default" | "secondary" | "outline" = "outline";
+        
+        if (status === 'completado') {
+          badgeVariant = 'default';
+        } else if (status === 'en-progreso') {
+          badgeVariant = 'secondary';
+        }
+
+        return <Badge variant={badgeVariant}>{translatedStatus}</Badge>
+      },
+      filterFn: (row, id, value) => {
+          return value.includes(row.getValue(id))
+      }
+    },
+    {
+      accessorKey: "quantity",
+      header: () => <div className="text-right">Cant. Planificada</div>,
+      cell: ({ row }) => {
+        const quantity = parseFloat(row.getValue("quantity"))
+        return <div className="text-right font-mono">{quantity.toLocaleString('es-ES')}</div>
+      },
+    },
+    {
+      accessorKey: "consumedQuantity",
+      header: () => <div className="text-right">Cant. Consumida</div>,
+      cell: ({ row }) => {
+          const consumed = row.getValue("consumedQuantity") as number;
+          return <div className="text-right font-mono">{consumed.toLocaleString('es-ES')}</div>;
+      }
+    },
+    {
+      id: "difference",
+      header: () => <div className="text-right">Diferencia de Consumo</div>,
+      cell: ({ row }) => {
+          const difference = row.original.quantity - row.original.consumedQuantity;
+          return <div className="text-right font-mono">{difference.toLocaleString('es-ES')}</div>;
+      }
+    },
+  ];
+
+  if (isManager) {
+      columns.push(...[
+        {
+          accessorKey: "value",
+          header: () => <div className="text-right">PVP</div>,
+          cell: ({ row }) => {
+            const amount = parseFloat(row.getValue("value"))
+            return <div className="text-right font-mono">{formatCurrency(amount)}</div>
+          },
+        },
+        {
+          id: "subtotalValued",
+          header: () => <div className="text-right">Subtotal Valorado</div>,
+          cell: ({ row }) => {
+              const subtotal = row.original.quantity * row.original.value;
+              return <div className="text-right font-mono">{formatCurrency(subtotal)}</div>;
+          }
+        },
+        {
+          id: "subtotalActual",
+          header: () => <div className="text-right">Subtotal Avance Real</div>,
+          cell: ({ row }) => {
+              const subtotal = row.original.consumedQuantity * row.original.value;
+              return <div className="text-right font-mono">{formatCurrency(subtotal)}</div>;
+          }
+        },
+      ]);
+  }
+
+  columns.push(...[
+    {
+      accessorKey: "startDate",
+      header: "Fecha Inicio",
+      cell: ({ row }) => {
+        const date = adjustDateForTimezone(row.getValue("startDate"));
+        return format(date, "dd/MM/yyyy", { locale: es });
+      },
+    },
+      {
+      accessorKey: "endDate",
+      header: "Fecha Fin",
+      cell: ({ row }) => {
+        const date = adjustDateForTimezone(row.getValue("endDate"));
+        return format(date, "dd/MM/yyyy", { locale: es });
+      },
+    },
+    {
+      id: "actions",
+      header: () => <div className="text-right pr-4">Acciones</div>,
+      cell: ({ row }) => <TaskActions task={row.original} onSuccess={onSuccess} />,
+      size: 80,
+    },
+  ]);
+  return columns;
+};
 
 const columnTranslations: Record<string, string> = {
     name: "Tarea",
@@ -248,6 +261,8 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [showAll, setShowAll] = React.useState(false);
+  const { session } = useSession();
+  const isManager = session.user?.isManager ?? false;
   
   const isMobile = useIsMobile();
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
@@ -257,30 +272,37 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
   });
   
   React.useEffect(() => {
-    if (isMobile) {
-      setColumnVisibility({
+    const mobileVisibility: VisibilityState = {
         quantity: false,
         consumedQuantity: false,
         difference: false,
-        value: false,
-        subtotalValued: false,
-        subtotalActual: false,
         startDate: false,
         endDate: false,
-      });
-    } else {
-      setColumnVisibility({
-        value: false,
-        subtotalValued: false,
-        subtotalActual: false,
-      });
+    };
+    if (isManager) {
+        mobileVisibility.value = false;
+        mobileVisibility.subtotalValued = false;
+        mobileVisibility.subtotalActual = false;
     }
-  }, [isMobile]);
+
+    const desktopVisibility: VisibilityState = {};
+    if (isManager) {
+        desktopVisibility.value = false;
+        desktopVisibility.subtotalValued = false;
+        desktopVisibility.subtotalActual = false;
+    }
+
+    if (isMobile) {
+      setColumnVisibility(mobileVisibility);
+    } else {
+      setColumnVisibility(desktopVisibility);
+    }
+  }, [isMobile, isManager]);
 
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
   const [expanded, setExpanded] = React.useState({})
 
-  const columns = React.useMemo(() => getColumns(onSuccess), [onSuccess]);
+  const columns = React.useMemo(() => getColumns(onSuccess, isManager), [onSuccess, isManager]);
 
   const table = useReactTable({
     data,

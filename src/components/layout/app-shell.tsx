@@ -27,7 +27,7 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from "../ui/tooltip";
-import { logout, revalidateSessionUser } from "@/lib/auth-actions";
+import { revalidateSessionUser, logout } from "@/lib/auth-actions";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { CompanySwitcher } from "./company-switcher";
 import { useSession } from "@/hooks/use-session";
@@ -70,9 +70,9 @@ export default function AppShell({
   title: string;
 }) {
   const pathname = usePathname();
-  const { session } = useSession();
+  const { session, setSession } = useSession();
   
-  const [user, setUser] = React.useState(session?.user);
+  const [user, setUser] = React.useState<SessionUser | undefined>(session?.user);
   const [selectedCompanies, setSelectedCompanies] = React.useState<Company[]>([]);
   const [isInitialLoad, setIsInitialLoad] = React.useState(true);
 
@@ -82,15 +82,15 @@ export default function AppShell({
             const updatedUser = await revalidateSessionUser();
             if (updatedUser) {
               setUser(updatedUser);
+              setSession({ isLoggedIn: true, user: updatedUser });
             }
         } catch (error) {
             console.error("Session revalidation failed, logging out.", error);
-            // Optional: force logout if revalidation fails
-            // logout();
+            logout();
         }
     };
     revalidate();
-  }, []);
+  }, [setSession]);
   
   const isDashboardPage = pathname.startsWith("/dashboard");
   

@@ -1,7 +1,7 @@
 
 'use client'
 import { notFound, useParams } from "next/navigation";
-import { getProjectById, getTasksByProjectId, generateSCurveData } from "@/lib/data";
+import { getProjects, getTasksByProjectId, generateSCurveData } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TaskTable } from "@/components/tasks/task-table";
 import { XmlImport } from "@/components/tasks/xml-import";
@@ -12,6 +12,7 @@ import { SCurveCard } from "@/components/tasks/s-curve-card";
 import { formatCurrency } from "@/lib/utils";
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Project, Task, SCurveData } from '@/lib/types';
+import { useSession } from "@/hooks/use-session";
 
 
 export default function ProjectPage() {
@@ -20,6 +21,8 @@ export default function ProjectPage() {
   const [project, setProject] = useState<Project | null>(null);
   const [projectTasks, setProjectTasks] = useState<Task[]>([]);
   const [sCurve, setSCurve] = useState<SCurveData[]>([]);
+  const { session } = useSession();
+  const isManager = session.user?.isManager ?? false;
 
   const reloadData = useCallback(async () => {
     if (isNaN(id)) {
@@ -27,7 +30,9 @@ export default function ProjectPage() {
         return;
     }
     try {
-        const fetchedProject = await getProjectById(id);
+        const allProjects = await getProjects();
+        const fetchedProject = allProjects.find(p => p.id === id);
+
         if (!fetchedProject) {
             notFound();
             return;
@@ -37,14 +42,16 @@ export default function ProjectPage() {
         const fetchedTasks = await getTasksByProjectId(id);
         setProjectTasks(fetchedTasks);
         
-        const sCurveData = await generateSCurveData(fetchedTasks, fetchedProject.totalValue);
-        setSCurve(sCurveData);
+        if (isManager) {
+            const sCurveData = await generateSCurveData(fetchedTasks, fetchedProject.totalValue);
+            setSCurve(sCurveData);
+        }
 
     } catch(error) {
         console.error("Failed to load project data", error);
         // Optionally redirect to an error page or show a message
     }
-  }, [id]);
+  }, [id, isManager]);
 
   useEffect(() => {
     if (id) {
@@ -79,16 +86,18 @@ export default function ProjectPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Valor Total</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-bold">{formatCurrency(project.totalValue)}</div>
-            <p className="text-xs text-muted-foreground">Valor estimado del proyecto</p>
-          </CardContent>
-        </Card>
+        {isManager && (
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Valor Total</CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl font-bold">{formatCurrency(project.totalValue)}</div>
+                <p className="text-xs text-muted-foreground">Valor estimado del proyecto</p>
+              </CardContent>
+            </Card>
+        )}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Tareas Totales</CardTitle>
@@ -112,8 +121,8 @@ export default function ProjectPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <SCurveCard data={sCurve} />
-          <Card className="lg:col-span-1">
+          {isManager && <SCurveCard data={sCurve} />}
+          <Card className={isManager ? "lg:col-span-1" : "lg:col-span-3"}>
               <CardHeader>
                   <CardTitle className="font-headline">Resumen de Tareas</CardTitle>
                   <CardDescription>Vista rápida del estado de las tareas.</CardDescription>

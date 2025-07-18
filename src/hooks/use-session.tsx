@@ -2,16 +2,19 @@
 'use client';
 
 import type { SessionData } from '@/lib/types';
-import { createContext, useContext } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 type SessionContextType = {
     session: SessionData;
+    setSession: React.Dispatch<React.SetStateAction<SessionData>>;
 };
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
-export const SessionProvider = ({ children, value }: { children: React.ReactNode, value: SessionData }) => {
-    return <SessionContext.Provider value={{ session: value }}>{children}</SessionContext.Provider>
+export const SessionProvider = ({ children, initialSession }: { children: React.ReactNode, initialSession: SessionData }) => {
+    const [session, setSession] = useState<SessionData>(initialSession);
+    
+    return <SessionContext.Provider value={{ session, setSession }}>{children}</SessionContext.Provider>
 }
 
 export const useSession = () => {

@@ -58,8 +58,11 @@ const getTranslatedName = (nameField: any): string => {
     if (typeof nameField === 'string') {
         return nameField;
     }
-    if (typeof nameField === 'object' && nameField !== null) {
+    if (typeof nameField === 'object' && nameField !== null && !Array.isArray(nameField)) {
         return nameField.es_EC || nameField.en_US || 'N/A';
+    }
+     if (Array.isArray(nameField) && nameField.length > 1) {
+        return getTranslatedName(nameField[1]);
     }
     return 'N/A';
 };
@@ -129,7 +132,7 @@ export async function getTasks(): Promise<Task[]> {
 }
 
 export async function getProjectById(id: number): Promise<Project | undefined> {
-    const projects = await getProjects(); // Note: This gets all projects, might need filtering
+    const projects = await getProjects(); // This fetches all projects every time, which can be inefficient
     return projects.find(p => p.id === id);
 }
 

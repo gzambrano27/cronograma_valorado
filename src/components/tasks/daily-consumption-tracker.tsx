@@ -18,6 +18,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { updateTaskConsumption } from "@/lib/actions";
 import { formatCurrency } from "@/lib/utils";
+import { useSession } from "@/hooks/use-session";
 
 
 interface DailyConsumptionTrackerProps {
@@ -29,6 +30,8 @@ interface DailyConsumptionTrackerProps {
 export function DailyConsumptionTracker({ task, onSuccess }: DailyConsumptionTrackerProps) {
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
+  const { session } = useSession();
+  const isManager = session.user?.isManager ?? false;
 
   // Initialize local state from the pre-generated dailyConsumption array
   const [consumptions, setConsumptions] = useState<DailyConsumption[]>(
@@ -107,7 +110,7 @@ export function DailyConsumptionTracker({ task, onSuccess }: DailyConsumptionTra
                 <TableHead>Cant. Planificada</TableHead>
                 <TableHead>Cant. Registrada</TableHead>
                 <TableHead>Diferencia</TableHead>
-                <TableHead>Valor Consumido</TableHead>
+                {isManager && <TableHead>Valor Consumido</TableHead>}
                 <TableHead className="w-[100px] text-right">Acción</TableHead>
             </TableRow>
             </TableHeader>
@@ -135,9 +138,11 @@ export function DailyConsumptionTracker({ task, onSuccess }: DailyConsumptionTra
                       />
                     </TableCell>
                     <TableCell className="font-mono">{difference.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
-                    <TableCell className="font-mono">
-                      {formatCurrency(consumedValue)}
-                    </TableCell>
+                    {isManager && (
+                        <TableCell className="font-mono">
+                          {formatCurrency(consumedValue)}
+                        </TableCell>
+                    )}
                     <TableCell className="text-right">
                     <Button 
                         size="sm" 

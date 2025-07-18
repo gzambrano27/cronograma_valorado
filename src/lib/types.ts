@@ -10,6 +10,7 @@ export type SessionUser = {
   email: string;
   company: Company;
   allowedCompanies: Company[];
+  isManager: boolean;
 };
 
 export interface SessionData {
@@ -107,3 +108,11 @@ export type SCurveData = {
 export type AppConfig = {
   endpointUrl: string;
 };
+
+export type UserGroupInfo = {
+    usuario: string;
+    categoria_id: number;
+    nombre_categoria: any;
+    grupo_id: number;
+    nombre_grupo: any;
+}

@@ -6,7 +6,8 @@ import { z } from 'zod';
 import { redirect } from 'next/navigation';
 import { getSession } from './session';
 import { getOdooClient } from './odoo-client';
-import type { Company, SessionUser } from './types';
+import type { Company, SessionUser, UserGroupInfo } from './types';
+import { query } from './db';
 
 const LoginSchema = z.object({
   email: z.string().email('Por favor ingrese un correo válido.'),
@@ -26,6 +27,34 @@ const getTranslatedName = (nameField: any): string => {
     }
     return 'N/A';
 };
+
+async function checkUserIsManager(userId: number): Promise<boolean> {
+    const userGroups = await query<UserGroupInfo>(`
+        SELECT
+            ru.login AS usuario,
+            rg.category_id AS categoria_id,
+            rgc.name AS nombre_categoria,
+            rg.id AS grupo_id,
+            rg.name AS nombre_grupo
+        FROM
+            res_users ru
+        JOIN
+            res_groups_users_rel rel ON ru.id = rel.uid
+        JOIN
+            res_groups rg ON rg.id = rel.gid
+        LEFT JOIN
+            ir_module_category rgc ON rg.category_id = rgc.id
+        WHERE
+            ru.id = $1;
+    `, [userId]);
+
+    const isManager = userGroups.some(group => 
+        getTranslatedName(group.nombre_categoria) === 'Apus' &&
+        getTranslatedName(group.nombre_grupo) === 'Gerente'
+    );
+
+    return isManager;
+}
 
 export async function login(prevState: { error: string } | undefined, formData: FormData) {
   const validatedFields = LoginSchema.safeParse(Object.fromEntries(formData.entries()));
@@ -54,6 +83,7 @@ export async function login(prevState: { error: string } | undefined, formData: 
     }
     
     const user = userDetails[0];
+    const isManager = await checkUserIsManager(user.id);
 
     const allowedCompanyIds = user.company_ids || [];
     let allowedCompanies: Company[] = [];
@@ -75,6 +105,7 @@ export async function login(prevState: { error: string } | undefined, formData: 
       email: user.login,
       company: currentCompany,
       allowedCompanies: allowedCompanies,
+      isManager,
     };
     session.uid = uid;
     session.password = password;
@@ -124,6 +155,7 @@ export async function revalidateSessionUser(): Promise<SessionUser | null> {
         }
         
         const user = userDetails[0];
+        const isManager = await checkUserIsManager(user.id);
 
         const allowedCompanyIds = user.company_ids || [];
         let allowedCompanies: Company[] = [];
@@ -143,6 +175,7 @@ export async function revalidateSessionUser(): Promise<SessionUser | null> {
             email: user.login,
             company: currentCompany,
             allowedCompanies: allowedCompanies,
+            isManager,
         };
 
         // Update the session with the latest user data
@@ -156,5 +189,6 @@ export async function revalidateSessionUser(): Promise<SessionUser | null> {
         // If revalidation fails (e.g., user deactivated in Odoo), destroy session
         await session.destroy();
         redirect('/login');
+        return null;
     }
 }

@@ -54,7 +54,7 @@ export default async function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <SessionProvider value={session}>
+          <SessionProvider initialSession={session}>
             {isDbConnected ? (
               session.isLoggedIn ? (
                   <AppShell projects={projects} title={title}>

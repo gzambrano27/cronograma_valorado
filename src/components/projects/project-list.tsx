@@ -23,6 +23,7 @@ import {
 } from "@tanstack/react-table";
 import { formatCurrency } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { useSession } from "@/hooks/use-session";
 
 
 interface ProjectListProps {
@@ -31,79 +32,91 @@ interface ProjectListProps {
   onSuccess: () => void;
 }
 
+const getColumns = (isManager: boolean): ColumnDef<Project>[] => {
+  const columns: ColumnDef<Project>[] = [
+      {
+          accessorKey: "name",
+          header: "Proyecto",
+          cell: ({ row }) => (
+              <div>
+                  <span className="font-medium hover:underline line-clamp-2">{row.original.name}</span>
+                  <div className="flex items-center text-sm text-muted-foreground gap-1.5 mt-1">
+                    <Building2 className="h-4 w-4 flex-shrink-0" />
+                    <p className="line-clamp-1">{row.original.company}</p>
+                  </div>
+              </div>
+          )
+      },
+      {
+          accessorKey: "client",
+          header: "Cliente",
+          cell: ({ row }) => {
+            const client = row.original.client;
+            return (
+              <div className="flex items-center text-sm text-muted-foreground gap-1.5">
+                {client ? (
+                  <>
+                    <User className="h-4 w-4 flex-shrink-0" />
+                    <p className="line-clamp-1">{client}</p>
+                  </>
+                ) : (
+                  <span className="text-muted-foreground/60">-</span>
+                )}
+              </div>
+            );
+          },
+      },
+      {
+          accessorKey: "progress",
+          header: "Progreso",
+          cell: ({ row }) => {
+              const project = row.original;
+              const progress = project.progress;
+              return (
+                  <div className="flex flex-col gap-1.5 w-32 sm:w-40">
+                      <div className="flex justify-between items-center text-xs text-muted-foreground">
+                          <span>{project.completedTasks} / {project.taskCount} tareas</span>
+                          <span>{`${progress.toFixed(2)}%`}</span>
+                      </div>
+                      <Progress value={progress} className="h-2" />
+                  </div>
+              )
+          }
+      },
+  ];
+
+  if (isManager) {
+      columns.push(
+          {
+              accessorKey: "consumedValue",
+              header: () => <div className="text-right hidden sm:table-cell">Valor Consumido</div>,
+              cell: ({ row }) => (
+                  <div className="text-right font-mono hidden sm:table-cell">
+                      {formatCurrency(row.original.consumedValue)}
+                  </div>
+              )
+          },
+          {
+              accessorKey: "totalValue",
+              header: () => <div className="text-right hidden sm:table-cell">Valor Total</div>,
+              cell: ({ row }) => (
+                  <div className="text-right font-mono hidden sm:table-cell">
+                      {formatCurrency(row.original.totalValue)}
+                  </div>
+              )
+          }
+      );
+  }
+
+  return columns;
+};
+
 export default function ProjectList({ projects, view, onSuccess }: ProjectListProps) {
     const router = useRouter();
+    const { session } = useSession();
+    const isManager = session.user?.isManager ?? false;
     
-    // Actions column is removed as project management is now read-only.
-    const columns: ColumnDef<Project>[] = [
-        {
-            accessorKey: "name",
-            header: "Proyecto",
-            cell: ({ row }) => (
-                <div>
-                    <span className="font-medium hover:underline line-clamp-2">{row.original.name}</span>
-                    <div className="flex items-center text-sm text-muted-foreground gap-1.5 mt-1">
-                      <Building2 className="h-4 w-4 flex-shrink-0" />
-                      <p className="line-clamp-1">{row.original.company}</p>
-                    </div>
-                </div>
-            )
-        },
-        {
-            accessorKey: "client",
-            header: "Cliente",
-            cell: ({ row }) => {
-              const client = row.original.client;
-              return (
-                <div className="flex items-center text-sm text-muted-foreground gap-1.5">
-                  {client ? (
-                    <>
-                      <User className="h-4 w-4 flex-shrink-0" />
-                      <p className="line-clamp-1">{client}</p>
-                    </>
-                  ) : (
-                    <span className="text-muted-foreground/60">-</span>
-                  )}
-                </div>
-              );
-            },
-        },
-        {
-            accessorKey: "progress",
-            header: "Progreso",
-            cell: ({ row }) => {
-                const project = row.original;
-                const progress = project.progress;
-                return (
-                    <div className="flex flex-col gap-1.5 w-32 sm:w-40">
-                        <div className="flex justify-between items-center text-xs text-muted-foreground">
-                            <span>{project.completedTasks} / {project.taskCount} tareas</span>
-                            <span>{`${progress.toFixed(2)}%`}</span>
-                        </div>
-                        <Progress value={progress} className="h-2" />
-                    </div>
-                )
-            }
-        },
-        {
-            accessorKey: "consumedValue",
-            header: () => <div className="text-right hidden sm:table-cell">Valor Consumido</div>,
-            cell: ({ row }) => (
-                <div className="text-right font-mono hidden sm:table-cell">
-                    {formatCurrency(row.original.consumedValue)}
-                </div>
-            )
-        },
-        {
-            accessorKey: "totalValue",
-            header: () => <div className="text-right hidden sm:table-cell">Valor Total</div>,
-            cell: ({ row }) => (
-                <div className="text-right font-mono hidden sm:table-cell">
-                    {formatCurrency(row.original.totalValue)}
-                </div>
-            )
-        },
-    ];
+    const columns = React.useMemo(() => getColumns(isManager), [isManager]);
 
     const table = useReactTable({
         data: projects,
@@ -160,16 +173,18 @@ export default function ProjectList({ projects, view, onSuccess }: ProjectListPr
                   </div>
                 </CardContent>
 
-                <CardFooter className="flex flex-col gap-2 bg-muted/40 p-4 border-t">
-                  <div className="flex justify-between items-baseline w-full">
-                    <p className="text-xs text-muted-foreground">Valor Consumido</p>
-                    <p className="font-bold text-base">{formatCurrency(project.consumedValue, 2)}</p>
-                  </div>
-                  <div className="flex justify-between items-baseline w-full">
-                    <p className="text-xs text-muted-foreground">Valor Total</p>
-                    <p className="font-bold text-base">{formatCurrency(project.totalValue, 2)}</p>
-                  </div>
-                </CardFooter>
+                {isManager && (
+                  <CardFooter className="flex flex-col gap-2 bg-muted/40 p-4 border-t">
+                    <div className="flex justify-between items-baseline w-full">
+                      <p className="text-xs text-muted-foreground">Valor Consumido</p>
+                      <p className="font-bold text-base">{formatCurrency(project.consumedValue, 2)}</p>
+                    </div>
+                    <div className="flex justify-between items-baseline w-full">
+                      <p className="text-xs text-muted-foreground">Valor Total</p>
+                      <p className="font-bold text-base">{formatCurrency(project.totalValue, 2)}</p>
+                    </div>
+                  </CardFooter>
+                )}
               </Card>
             </Link>
           )

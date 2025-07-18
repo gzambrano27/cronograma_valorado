@@ -11,6 +11,7 @@ import { formatCurrency } from "@/lib/utils";
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import type { Task } from '@/lib/types';
 import { useDashboard } from "@/hooks/use-dashboard-context";
+import { useSession } from "@/hooks/use-session";
 
 const taskStatusConfig = {
   completado: {
@@ -30,6 +31,9 @@ const taskStatusConfig = {
 
 export default function DashboardPage() {
   const { allProjects, selectedCompanies } = useDashboard();
+  const { session } = useSession();
+  const isManager = session.user?.isManager ?? false;
+
   const [tasks, setTasks] = useState<Task[]>([]);
   
   const reloadTasks = useCallback(async () => {
@@ -92,18 +96,20 @@ export default function DashboardPage() {
         </h1>
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Valor Total de Proyectos</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-bold">{formatCurrency(totalValue)}</div>
-            <p className="text-xs text-muted-foreground">
-              Suma de proyectos en compañías seleccionadas
-            </p>
-          </CardContent>
-        </Card>
+        {isManager && (
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Valor Total de Proyectos</CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl font-bold">{formatCurrency(totalValue)}</div>
+                <p className="text-xs text-muted-foreground">
+                  Suma de proyectos en compañías seleccionadas
+                </p>
+              </CardContent>
+            </Card>
+        )}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total de Proyectos</CardTitle>
@@ -131,19 +137,21 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-        <Card className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle className="font-headline flex items-center gap-2">
-              <BarChart className="h-5 w-5" />
-              Valor por Proyecto
-            </CardTitle>
-            <CardDescription>Visualización del valor de los proyectos principales.</CardDescription>
-          </CardHeader>
-          <CardContent className="pl-2">
-            <ProjectValueChart data={projectValueData} />
-          </CardContent>
-        </Card>
-        <Card className="lg:col-span-2">
+        {isManager && (
+            <Card className="lg:col-span-3">
+              <CardHeader>
+                <CardTitle className="font-headline flex items-center gap-2">
+                  <BarChart className="h-5 w-5" />
+                  Valor por Proyecto
+                </CardTitle>
+                <CardDescription>Visualización del valor de los proyectos principales.</CardDescription>
+              </CardHeader>
+              <CardContent className="pl-2">
+                <ProjectValueChart data={projectValueData} />
+              </CardContent>
+            </Card>
+        )}
+        <Card className={isManager ? "lg:col-span-2" : "lg:col-span-5"}>
           <CardHeader>
             <CardTitle className="font-headline flex items-center gap-2">
               <PieChart className="h-5 w-5" />
