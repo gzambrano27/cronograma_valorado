@@ -5,7 +5,7 @@ import 'server-only';
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
 import { getSession } from './session';
-import { OdooClient, getOdooClient } from './odoo-client';
+import { getOdooClient } from './odoo-client';
 
 const LoginSchema = z.object({
   email: z.string().email('Por favor ingrese un correo válido.'),
@@ -39,7 +39,6 @@ export async function login(prevState: { error: string } | undefined, formData: 
       return { error: 'Credenciales inválidas.' };
     }
 
-    // Authenticated successfully, now get user details
     const userDetails = await odooClient.executeKw<any[]>('res.users', 'search_read', [
         [['id', '=', uid]],
         { fields: ['name', 'login', 'partner_id'] }
@@ -59,16 +58,19 @@ export async function login(prevState: { error: string } | undefined, formData: 
       email: user.login,
     };
     session.uid = uid;
-    session.password = password; // Store password for subsequent requests
+    session.password = password;
     await session.save();
     
   } catch (error: any) {
-    console.error('Login error:', error);
-    // Provide a more user-friendly error message
+    console.error(`Error en el inicio de sesión para ${email}:`, error);
     if (error.message && error.message.includes('AccessDenied')) {
         return { error: 'Credenciales inválidas.' };
     }
-    return { error: 'Ocurrió un error inesperado al conectar con Odoo. Por favor, verifique la URL y la base de datos en la configuración.' };
+    if (error.message && error.message.includes('ECONNREFUSED')) {
+        const odooUrl = process.env.ODOO_URL || 'URL no configurada';
+        return { error: `No se pudo conectar al servidor de Odoo en ${odooUrl}. Por favor, verifique la URL y que el servidor esté en ejecución.` };
+    }
+    return { error: 'Ocurrió un error inesperado al conectar con Odoo.' };
   }
   
   redirect('/dashboard');

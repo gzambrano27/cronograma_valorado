@@ -7,12 +7,11 @@ import type { SessionData } from '@/lib/session';
 const password = process.env.SECRET_COOKIE_PASSWORD;
 
 if (!password) {
-  throw new Error(
-    'Missing SECRET_COOKIE_PASSWORD environment variable in middleware scope.'
-  );
+  // This should not happen in middleware if session.ts already checked, but it's good practice
+  throw new Error('Missing SECRET_COOKIE_PASSWORD for middleware session.');
 }
 
-const sessionOptions = {
+export const sessionOptions = {
   password,
   cookieName: 'project-valuator-session',
   cookieOptions: {
@@ -20,11 +19,10 @@ const sessionOptions = {
   },
 };
 
+
 export const middleware = async (req: NextRequest) => {
   const res = NextResponse.next();
-  // The 'cookies' object from 'next/headers' is not available in middleware.
-  // Instead, getIronSession can work directly with the request and response objects.
-  const session = await getIronSession<SessionData>(req, res, sessionOptions);
+  const session = await getIronSession<SessionData>(req.cookies, sessionOptions);
 
   const { isLoggedIn } = session;
   const { pathname } = req.nextUrl;
@@ -42,7 +40,6 @@ export const middleware = async (req: NextRequest) => {
     return NextResponse.redirect(new URL('/login', req.url));
   }
   
-  // If user is logged in and trying to access the root, redirect to dashboard
   if (pathname === '/') {
       return NextResponse.redirect(new URL('/dashboard', req.url));
   }

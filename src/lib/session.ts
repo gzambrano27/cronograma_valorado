@@ -5,7 +5,7 @@ import 'server-only';
 import {getIronSession} from 'iron-session';
 import type {IronSession, IronSessionData} from 'iron-session';
 import {cookies} from 'next/headers';
-import {SessionUser} from './types';
+import type {SessionUser} from './types';
 
 const password = process.env.SECRET_COOKIE_PASSWORD;
 
