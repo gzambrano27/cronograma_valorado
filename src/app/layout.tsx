@@ -17,13 +17,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const isDbConnected = await checkDbConnection();
-  const sessionData = await getSession();
-
-  // Create a plain object to pass to the client
-  const session: SessionData = {
-    isLoggedIn: sessionData.isLoggedIn,
-    user: sessionData.user,
-  };
+  const session = await getSession();
 
   let projects: Project[] = [];
   if (isDbConnected && session.isLoggedIn) {

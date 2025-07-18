@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Building2, Cog, Briefcase, GanttChartSquare, PanelLeft, LogOut } from "lucide-react";
+import { Building2, Cog, Briefcase, GanttChartSquare, PanelLeft, LogOut, CheckCheck, X } from "lucide-react";
 import React from "react";
 
 import type { Company, Project, SessionUser } from "@/lib/types";
@@ -82,10 +82,12 @@ export default function AppShell({
             const updatedUser = await revalidateSessionUser();
             if (updatedUser) {
               setUser(updatedUser);
-              setSession({ isLoggedIn: true, user: updatedUser });
+              // Update the session in the provider if user data changes
+              setSession(prev => ({...prev, user: updatedUser }));
             }
         } catch (error) {
             console.error("Session revalidation failed, logging out.", error);
+            // The action will redirect, no need to set state
             logout();
         }
     };
