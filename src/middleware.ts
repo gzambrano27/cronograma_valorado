@@ -1,24 +1,24 @@
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { sessionOptions } from '@/lib/session-config';
+import { getSession } from '@/lib/session';
 
 export const middleware = async (req: NextRequest) => {
   const { pathname } = req.nextUrl;
-  const sessionCookie = req.cookies.get(sessionOptions.cookieName);
+  const session = await getSession();
 
-  const publicRoutes = ['/login'];
-  const isPublicRoute = publicRoutes.includes(pathname);
+  const isPublicRoute = pathname === '/login';
+  const isProtectedRoute = pathname.startsWith('/dashboard') || pathname.startsWith('/projects') || pathname.startsWith('/settings');
 
-  // If user has a session cookie and tries to access a public route (like /login),
+  // If user is logged in and tries to access a public route (like /login),
   // redirect them to the dashboard.
-  if (sessionCookie && isPublicRoute) {
+  if (session.isLoggedIn && isPublicRoute) {
     return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 
-  // If user does not have a session cookie and is trying to access a protected route,
+  // If user is not logged in and is trying to access a protected route,
   // redirect them to the login page.
-  if (!sessionCookie && !isPublicRoute) {
+  if (!session.isLoggedIn && isProtectedRoute) {
     const loginUrl = new URL('/login', req.url);
     loginUrl.searchParams.set('from', pathname);
     return NextResponse.redirect(loginUrl);
@@ -26,10 +26,9 @@ export const middleware = async (req: NextRequest) => {
   
   // Special case for the root path
   if (pathname === '/') {
-    const targetUrl = new URL(sessionCookie ? '/dashboard' : '/login', req.url);
+    const targetUrl = new URL(session.isLoggedIn ? '/dashboard' : '/login', req.url);
     return NextResponse.redirect(targetUrl);
   }
-
 
   return NextResponse.next();
 };
