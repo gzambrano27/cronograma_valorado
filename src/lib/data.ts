@@ -18,15 +18,15 @@ const toFloat = (value: string | number | null): number => {
 function processTask(rawTask: RawTask): Task {
   return {
     id: parseInt(rawTask.id, 10),
-    projectId: parseInt(rawTask.projectid, 10),
+    projectId: parseInt(rawTask.project_id, 10),
     name: rawTask.name,
     quantity: toFloat(rawTask.quantity),
-    consumedQuantity: toFloat(rawTask.consumedquantity),
-    value: toFloat(rawTask.value),
-    startDate: new Date(rawTask.startdate),
-    endDate: new Date(rawTask.enddate),
+    consumedQuantity: toFloat(rawTask.consumed_quantity),
+    value: toFloat(rawTask.unit_price),
+    startDate: new Date(rawTask.date_start),
+    endDate: new Date(rawTask.date_end),
     status: rawTask.status,
-    dailyConsumption: (rawTask.dailyconsumption || []).map((dc: any) => ({
+    dailyConsumption: (rawTask.daily_consumption || []).map((dc: any) => ({
       ...dc,
       date: new Date(dc.date),
       plannedQuantity: toFloat(dc.plannedQuantity),
@@ -34,9 +34,9 @@ function processTask(rawTask: RawTask): Task {
     })),
     validations: (rawTask.validations || []).map((v: RawTaskValidation) => ({
       id: parseInt(v.id, 10),
-      taskId: parseInt(v.taskid, 10),
+      taskId: parseInt(v.task_id, 10),
       date: new Date(v.date),
-      imageUrl: v.imageurl,
+      imageUrl: v.image_url,
       location: v.location,
     })),
   };
@@ -71,15 +71,15 @@ export async function getProjects(): Promise<Project[]> {
     const sqlQuery = `
       WITH ProjectTaskMetrics AS (
         SELECT
-          projectid,
-          SUM(quantity * value) AS total_value,
-          SUM(consumedquantity * value) AS consumed_value,
+          project_id,
+          SUM(quantity * unit_price) AS total_value,
+          SUM(consumed_quantity * unit_price) AS consumed_value,
           COUNT(id) AS task_count,
           COUNT(id) FILTER (WHERE status = 'completado') AS completed_tasks
         FROM
-          externo_tasks
+          project_task
         GROUP BY
-          projectid
+          project_id
       )
       SELECT
         pp.id,
@@ -99,7 +99,7 @@ export async function getProjects(): Promise<Project[]> {
       FROM
         project_project pp
       LEFT JOIN
-        ProjectTaskMetrics ptm ON pp.id = ptm.projectid
+        ProjectTaskMetrics ptm ON pp.id = ptm.project_id
       LEFT JOIN
         res_company rc ON pp.company_id = rc.id
       LEFT JOIN
@@ -126,7 +126,7 @@ export async function getProjects(): Promise<Project[]> {
 }
 
 export async function getTasks(): Promise<Task[]> {
-  const tasks_raw = await query<RawTask>(`SELECT * FROM "externo_tasks"`);
+  const tasks_raw = await query<RawTask>(`SELECT * FROM "project_task"`);
   return tasks_raw.map(processTask);
 }
 
@@ -135,12 +135,12 @@ export async function getTasksByProjectId(id: number): Promise<Task[]> {
       SELECT t.*,
         (
           SELECT json_agg(v.*)
-          FROM "externo_task_validations" v
-          WHERE v.taskid = t.id
+          FROM "project_task_validation" v
+          WHERE v.task_id = t.id
         ) as validations
-      FROM "externo_tasks" t
-      WHERE t.projectid = $1
-      ORDER BY t.startdate, t.id
+      FROM "project_task" t
+      WHERE t.project_id = $1
+      ORDER BY t.date_start, t.id
     `, [id]);
     return tasks_raw.map(processTask);
 }

@@ -16,6 +16,8 @@ export type SessionUser = {
 export interface SessionData {
   isLoggedIn: boolean;
   user?: SessionUser;
+  uid?: number; // Keep for odoo client compatibility
+  password?: string; // Keep for odoo client compatibility
 }
 
 export type DailyConsumption = {
@@ -26,9 +28,9 @@ export type DailyConsumption = {
 
 export type RawTaskValidation = {
   id: string;
-  taskid: string;
+  task_id: string;
   date: string;
-  imageurl: string;
+  image_url: string;
   location: string;
 }
 
@@ -68,16 +70,16 @@ export type Project = {
 
 export type RawTask = {
   id: string;
-  projectid: string;
+  project_id: string;
   name:string;
   quantity: string;
-  consumedquantity: string;
-  value: string;
-  startdate: string;
-  enddate: string;
+  consumed_quantity: string;
+  unit_price: string;
+  date_start: string;
+  date_end: string;
   validations?: RawTaskValidation[];
   status: 'pendiente' | 'en-progreso' | 'completado';
-  dailyconsumption?: DailyConsumption[];
+  daily_consumption?: DailyConsumption[];
 };
 
 export type Task = {
@@ -86,7 +88,7 @@ export type Task = {
   name:string;
   quantity: number;
   consumedQuantity: number;
-  value: number; // This is PVP (Precio de Venta al Público) or Unit Price
+  value: number; // This is unit_price
   startDate: Date;
   endDate: Date;
   validations?: TaskValidation[];
