@@ -5,32 +5,24 @@ import { getSession } from '@/lib/session';
 
 export const middleware = async (req: NextRequest) => {
   const { pathname } = req.nextUrl;
+  const session = await getSession();
 
-  // The root path '/' is special and needs to be handled.
-  // We'll let a client component on the page handle the redirect
-  // to avoid calling getSession here for every single request.
-  if (pathname === '/') {
-    return NextResponse.next();
+  // If user is logged in and tries to access login page, redirect to dashboard
+  if (session.isLoggedIn && pathname.startsWith('/login')) {
+    return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 
-  // For any other path, we check if it's a protected route.
-  const isProtectedRoute = pathname.startsWith('/dashboard') || pathname.startsWith('/projects') || pathname.startsWith('/settings');
-
-  if (isProtectedRoute) {
-    // We only call getSession for protected routes.
-    const session = await getSession();
-    if (!session.isLoggedIn) {
-      // If the user is not logged in, redirect to the login page.
-      const loginUrl = new URL('/login', req.url);
-      loginUrl.searchParams.set('from', pathname);
-      return NextResponse.redirect(loginUrl);
-    }
+  // If user is not logged in and tries to access a protected route, redirect to login
+  if (!session.isLoggedIn && (pathname.startsWith('/dashboard') || pathname.startsWith('/settings'))) {
+    const loginUrl = new URL('/login', req.url);
+    loginUrl.searchParams.set('from', pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   return NextResponse.next();
 };
 
 export const config = {
-  // This matcher ensures the middleware runs on all paths except for static assets and API routes.
+  // Matcher for all routes except static assets and API routes
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico|images|manifest.json).*)'],
 };

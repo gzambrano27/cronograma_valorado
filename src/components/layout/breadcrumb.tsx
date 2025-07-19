@@ -38,11 +38,19 @@ export function Breadcrumb({}: BreadcrumbProps) {
         path += `/${segment}`;
         const isLast = index === segments.length - 1;
         
+        if (segment === 'dashboard' && segments.length === 1) {
+             return {
+                name: translations[segment] || segment,
+                href: path,
+                isLast: true,
+            };
+        }
+
         if (segment === 'projects' && segments[index + 1]) {
             const projectId = parseInt(segments[index + 1], 10);
             return {
                 name: translations[segment] || segment,
-                href: path,
+                href: '/dashboard', // Projects level should link back to dashboard overview for now
                 isLast: false,
             };
         }
@@ -62,7 +70,15 @@ export function Breadcrumb({}: BreadcrumbProps) {
         };
     });
 
-    return crumbs;
+    // Remove the 'dashboard' segment if it's not the only one
+    const finalCrumbs = crumbs.filter((crumb, index) => {
+        if (crumb.name.toLowerCase() === 'dashboard' && crumbs.length > 1) {
+            return false;
+        }
+        return true;
+    });
+
+    return finalCrumbs;
   }
 
   const breadcrumbs = buildBreadcrumbs();

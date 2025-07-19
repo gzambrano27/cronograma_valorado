@@ -70,7 +70,7 @@ export default function AppShell({ children, allProjects, selectedCompanies, onC
   
   const user = session?.user;
 
-  const isDashboardPage = pathname.startsWith("/dashboard");
+  const isDashboardPage = pathname === "/dashboard";
   const title = "ProjectValuator";
 
   const filteredProjectsForSidebar = React.useMemo(() => {
@@ -120,10 +120,10 @@ export default function AppShell({ children, allProjects, selectedCompanies, onC
                       <SidebarMenuButton
                         asChild
                         size="sm"
-                        isActive={pathname === `/projects/${project.id}`}
+                        isActive={pathname === `/dashboard/projects/${project.id}`}
                         tooltip={{ children: project.name }}
                       >
-                        <Link href={`/projects/${project.id}`}>
+                        <Link href={`/dashboard/projects/${project.id}`}>
                           <div className="relative">
                             <Briefcase className="h-4 w-4 shrink-0" />
                             <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">

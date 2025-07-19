@@ -1,3 +1,4 @@
+
 'use server';
 
 import type { Project, Task, TaskValidation, AppConfig, DailyConsumption, RawTask } from './types';
@@ -103,14 +104,14 @@ export async function createTask(projectId: number, formData: FormData) {
     VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7)
   `, [projectId, name, quantity, value, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption)]);
 
-  revalidatePath(`/projects/${projectId}`);
+  revalidatePath(`/dashboard/projects/${projectId}`);
   revalidatePath(`/dashboard`);
   return { success: true };
 }
 
 export async function deleteTask(taskId: number, projectId: number) {
     await query(`DELETE FROM "externo_tasks" WHERE id = $1`, [taskId]);
-    revalidatePath(`/projects/${projectId}`);
+    revalidatePath(`/dashboard/projects/${projectId}`);
     revalidatePath(`/dashboard`);
     return { success: true };
 }
@@ -124,7 +125,7 @@ export async function deleteMultipleTasks(taskIds: number[], projectId: number |
     }
     const placeholders = taskIds.map((_, i) => `$${i + 1}`).join(',');
     await query(`DELETE FROM "externo_tasks" WHERE id IN (${placeholders})`, taskIds);
-    revalidatePath(`/projects/${projectId}`);
+    revalidatePath(`/dashboard/projects/${projectId}`);
     revalidatePath(`/dashboard`);
     return { success: true };
 }
@@ -171,7 +172,7 @@ export async function updateTaskConsumption(taskId: number, date: string, consum
         WHERE id = $4
     `, [JSON.stringify(dailyConsumption), totalConsumed, newStatus, taskId]);
 
-    revalidatePath(`/projects/${taskData.projectid}`);
+    revalidatePath(`/dashboard/projects/${taskData.projectid}`);
     revalidatePath(`/dashboard`);
     return { success: true };
 }
@@ -217,13 +218,13 @@ export async function validateTask(formData: FormData) {
       VALUES ($1, $2, $3, $4)
     `, [newValidation.taskId, newValidation.date.toISOString(), newValidation.imageUrl, newValidation.location]);
 
-    revalidatePath(`/projects/${projectId}`);
+    revalidatePath(`/dashboard/projects/${projectId}`);
     return { success: true };
 }
 
 export async function deleteValidation(validationId: number, projectId: number) {
     await query(`DELETE FROM "externo_task_validations" WHERE id = $1`, [validationId]);
-    revalidatePath(`/projects/${projectId}`);
+    revalidatePath(`/dashboard/projects/${projectId}`);
     return { success: true };
 }
 
@@ -326,7 +327,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
     `, [task.projectId, task.name, task.quantity, task.value, task.startDate.toISOString(), task.endDate.toISOString(), JSON.stringify(task.dailyConsumption)]);
   }
 
-  revalidatePath(`/projects/${projectId}`);
+  revalidatePath(`/dashboard/projects/${projectId}`);
   revalidatePath(`/dashboard`);
   return { success: true, message: `${newTasks.length} tareas importadas.` };
 }
