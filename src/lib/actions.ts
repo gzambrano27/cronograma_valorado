@@ -99,7 +99,7 @@ export async function createTask(projectId: number, formData: FormData) {
   const dailyConsumption = createDailyConsumption(start, end, quantity);
 
   await query(`
-    INSERT INTO "externo_task" ("projectid", "name", "quantity", "value", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
+    INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
     VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7)
   `, [projectId, name, quantity, value, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption)]);
 
@@ -109,7 +109,7 @@ export async function createTask(projectId: number, formData: FormData) {
 }
 
 export async function deleteTask(taskId: number, projectId: number) {
-    await query(`DELETE FROM "externo_task" WHERE id = $1`, [taskId]);
+    await query(`DELETE FROM "externo_tasks" WHERE id = $1`, [taskId]);
     revalidatePath(`/projects/${projectId}`);
     revalidatePath(`/dashboard`);
     return { success: true };
@@ -123,14 +123,14 @@ export async function deleteMultipleTasks(taskIds: number[], projectId: number |
         return { success: false, message: 'Project ID is missing.' };
     }
     const placeholders = taskIds.map((_, i) => `$${i + 1}`).join(',');
-    await query(`DELETE FROM "externo_task" WHERE id IN (${placeholders})`, taskIds);
+    await query(`DELETE FROM "externo_tasks" WHERE id IN (${placeholders})`, taskIds);
     revalidatePath(`/projects/${projectId}`);
     revalidatePath(`/dashboard`);
     return { success: true };
 }
 
 export async function updateTaskConsumption(taskId: number, date: string, consumedQuantity: number) {
-    const result = await query<RawTask>(`SELECT * FROM "externo_task" WHERE id = $1`, [taskId]);
+    const result = await query<RawTask>(`SELECT * FROM "externo_tasks" WHERE id = $1`, [taskId]);
     const taskData = result[0];
 
 
@@ -163,7 +163,7 @@ export async function updateTaskConsumption(taskId: number, date: string, consum
     const newStatus = totalConsumed >= task.quantity ? 'completado' : (totalConsumed > 0 ? 'en-progreso' : 'pendiente');
 
     await query(`
-        UPDATE "externo_task"
+        UPDATE "externo_tasks"
         SET
             "dailyconsumption" = $1,
             "consumedquantity" = $2,
@@ -213,7 +213,7 @@ export async function validateTask(formData: FormData) {
     };
 
     await query(`
-      INSERT INTO "externo_task_validation" ("task_id", "date", "image_url", "location")
+      INSERT INTO "externo_task_validations" ("task_id", "date", "image_url", "location")
       VALUES ($1, $2, $3, $4)
     `, [newValidation.taskId, newValidation.date.toISOString(), newValidation.imageUrl, newValidation.location]);
 
@@ -222,7 +222,7 @@ export async function validateTask(formData: FormData) {
 }
 
 export async function deleteValidation(validationId: number, projectId: number) {
-    await query(`DELETE FROM "externo_task_validation" WHERE id = $1`, [validationId]);
+    await query(`DELETE FROM "externo_task_validations" WHERE id = $1`, [validationId]);
     revalidatePath(`/projects/${projectId}`);
     return { success: true };
 }
@@ -321,7 +321,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
 
   for (const task of newTasks) {
     await query(`
-      INSERT INTO "externo_task" ("projectid", "name", "quantity", "value", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
+      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
       VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7)
     `, [task.projectId, task.name, task.quantity, task.value, task.startDate.toISOString(), task.endDate.toISOString(), JSON.stringify(task.dailyConsumption)]);
   }

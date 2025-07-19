@@ -76,7 +76,7 @@ export async function getProjects(): Promise<Project[]> {
           COUNT(id) AS task_count,
           COUNT(id) FILTER (WHERE status = 'completado') AS completed_tasks
         FROM
-          externo_task
+          externo_tasks
         GROUP BY
           projectid
       )
@@ -125,7 +125,7 @@ export async function getProjects(): Promise<Project[]> {
 }
 
 export async function getTasks(): Promise<Task[]> {
-  const tasks_raw = await query<RawTask>(`SELECT * FROM "externo_task"`);
+  const tasks_raw = await query<RawTask>(`SELECT * FROM "externo_tasks"`);
   return tasks_raw.map(processTask);
 }
 
@@ -134,10 +134,10 @@ export async function getTasksByProjectId(id: number): Promise<Task[]> {
       SELECT t.*,
         (
           SELECT json_agg(v.*)
-          FROM "externo_task_validation" v
+          FROM "externo_task_validations" v
           WHERE v.task_id = t.id
         ) as validations
-      FROM "externo_task" t
+      FROM "externo_tasks" t
       WHERE t.projectid = $1
       ORDER BY t.startdate, t.id
     `, [id]);
