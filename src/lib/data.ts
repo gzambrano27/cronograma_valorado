@@ -1,4 +1,3 @@
-
 'use server';
 import type { Project, Task, SCurveData, AppConfig, TaskValidation, RawTask, RawTaskValidation, RawProject } from './types';
 import fs from 'fs/promises';
@@ -54,6 +53,20 @@ export async function getAppConfig(): Promise<AppConfig> {
 }
 
 export async function getProjects(): Promise<Project[]> {
+    // Helper function to extract translated names from Odoo's JSONB format
+    const getTranslatedName = (nameField: any): string => {
+        if (typeof nameField === 'string') {
+            return nameField;
+        }
+        if (typeof nameField === 'object' && nameField !== null && !Array.isArray(nameField)) {
+            return nameField.es_EC || nameField.en_US || 'N/A';
+        }
+        if (Array.isArray(nameField) && nameField.length > 1) {
+            return getTranslatedName(nameField[1]);
+        }
+        return 'N/A';
+    };
+
     const sqlQuery = `
       WITH ProjectTaskMetrics AS (
         SELECT
@@ -77,10 +90,10 @@ export async function getProjects(): Promise<Project[]> {
         COALESCE(ptm.consumed_value, 0) as "consumedValue",
         COALESCE(ptm.task_count, 0) as "taskCount",
         COALESCE(ptm.completed_tasks, 0) as "completedTasks",
-        CASE 
-            WHEN COALESCE(ptm.task_count, 0) > 0 
+        CASE
+            WHEN COALESCE(ptm.task_count, 0) > 0
             THEN (COALESCE(ptm.completed_tasks, 0) * 100.0) / COALESCE(ptm.task_count, 1)
-            ELSE 0 
+            ELSE 0
         END as progress
       FROM
         project_project pp
@@ -92,21 +105,10 @@ export async function getProjects(): Promise<Project[]> {
         res_partner rp ON pp.partner_id = rp.id
       WHERE (pp.name->>'en_US' != 'Interno' AND pp.name->>'es_EC' != 'Interno') OR pp.name->>'en_US' IS NULL
       ORDER BY
-        pp.name->>'es_EC', pp.name->>'en_US';
+        pp.name;
     `;
 
     const rawProjects = await query<RawProject>(sqlQuery);
-
-    const getTranslatedName = (nameField: any): string => {
-        if (typeof nameField === 'string') {
-            return nameField;
-        }
-        if (typeof nameField === 'object' && nameField !== null && !Array.isArray(nameField)) {
-            return nameField.es_EC || nameField.en_US || 'N/A';
-        }
-        return 'N/A';
-    };
-
 
     return rawProjects.map(p => ({
         id: p.id,
@@ -146,12 +148,12 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
     if (tasks.length === 0 || totalProjectValue <= 0) {
       return [];
     }
-  
+
     const valuesByDate = new Map<number, { planned: number; actual: number }>();
-  
+
     let minDate: Date | null = null;
     let maxDate: Date | null = null;
-  
+
     tasks.forEach(task => {
       if (task.dailyConsumption) {
         task.dailyConsumption.forEach(dc => {
@@ -161,37 +163,37 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
           if (!valuesByDate.has(dayTimestamp)) {
             valuesByDate.set(dayTimestamp, { planned: 0, actual: 0 });
           }
-  
+
           const currentValues = valuesByDate.get(dayTimestamp)!;
           currentValues.planned += dc.plannedQuantity * task.value;
           currentValues.actual += dc.consumedQuantity * task.value;
-  
+
           if (!minDate || day < minDate) minDate = day;
           if (!maxDate || day > maxDate) maxDate = day;
         });
       }
     });
-  
+
     if (!minDate || !maxDate) {
       return [];
     }
-  
+
     const dateRange = eachDayOfInterval({ start: minDate, end: maxDate });
-  
+
     const finalCurve: SCurveData[] = [];
     let cumulativePlanned = 0;
     let cumulativeActual = 0;
-  
+
     for (const day of dateRange) {
       const dayTimestamp = day.getTime();
       const dailyValues = valuesByDate.get(dayTimestamp) || { planned: 0, actual: 0 };
-  
+
       cumulativePlanned += dailyValues.planned;
       cumulativeActual += dailyValues.actual;
-  
+
       const plannedPercent = (cumulativePlanned / totalProjectValue) * 100;
       const actualPercent = (cumulativeActual / totalProjectValue) * 100;
-  
+
       finalCurve.push({
         date: format(day, "d MMM", { locale: es }),
         planned: plannedPercent,
@@ -201,7 +203,7 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
         deviation: actualPercent - plannedPercent,
       });
     }
-  
+
     if (minDate > new Date()) {
        const dayBefore = new Date(minDate.getTime() - 86400000);
         finalCurve.unshift({
@@ -213,7 +215,7 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
           deviation: 0,
         });
     }
-  
+
     return finalCurve.map(point => ({
       ...point,
       planned: Math.round(point.planned * 100) / 100,

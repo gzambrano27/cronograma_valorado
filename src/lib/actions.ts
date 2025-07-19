@@ -1,4 +1,3 @@
-
 'use server';
 
 import type { Project, Task, TaskValidation, AppConfig, DailyConsumption, RawTask } from './types';
@@ -42,17 +41,17 @@ const TaskSchema = z.object({
 
 function createDailyConsumption(startDate: Date, endDate: Date, totalQuantity: number): DailyConsumption[] {
     if (totalQuantity === 0) return [];
-    
+
     const startUTC = new Date(Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()));
     const endUTC = new Date(Date.UTC(endDate.getFullYear(), endDate.getMonth(), endDate.getDate()));
-    
+
     const dates = eachDayOfInterval({ start: startUTC, end: endUTC });
     const totalDays = dates.length;
 
     if (totalDays <= 0) return [];
 
     const dailyPlannedQuantity = totalQuantity / totalDays;
-    
+
     let distributedQuantity = 0;
 
     const consumptionBreakdown = dates.map((date, index) => {
@@ -63,7 +62,7 @@ function createDailyConsumption(startDate: Date, endDate: Date, totalQuantity: n
             plannedQtyForDay = parseFloat(dailyPlannedQuantity.toPrecision(15));
             distributedQuantity += plannedQtyForDay;
         }
-        
+
         return {
             date: date,
             plannedQuantity: plannedQtyForDay,
@@ -89,21 +88,21 @@ export async function createTask(projectId: number, formData: FormData) {
   }
 
   const { name, quantity, value, startDate, endDate } = validatedFields.data;
-  
+
   const start = new Date(startDate);
   const end = new Date(endDate);
-  
+
   if (start > end) {
       throw new Error('La fecha de inicio no puede ser posterior a la fecha de fin.');
   }
-  
+
   const dailyConsumption = createDailyConsumption(start, end, quantity);
 
   await query(`
     INSERT INTO "externo_task" ("projectid", "name", "quantity", "value", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
     VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7)
   `, [projectId, name, quantity, value, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption)]);
-  
+
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/dashboard`);
   return { success: true };
@@ -138,7 +137,7 @@ export async function updateTaskConsumption(taskId: number, date: string, consum
     if (!taskData) {
         throw new Error('Tarea no encontrada.');
     }
-    
+
     const task = {
         ...taskData,
         quantity: parseFloat(taskData.quantity)
@@ -148,24 +147,24 @@ export async function updateTaskConsumption(taskId: number, date: string, consum
       ...dc,
       date: new Date(dc.date)
     })) as DailyConsumption[];
-    
+
     const consumptionIndex = dailyConsumption.findIndex(c => {
         const d = new Date(c.date);
         const userTimezoneOffset = d.getTimezoneOffset() * 60000;
         const adjustedDate = new Date(d.getTime() + userTimezoneOffset);
         return format(adjustedDate, 'yyyy-MM-dd') === date;
     });
-    
+
     if (consumptionIndex > -1) {
         dailyConsumption[consumptionIndex].consumedQuantity = consumedQuantity;
     }
-    
+
     const totalConsumed = dailyConsumption.reduce((sum, c) => sum + c.consumedQuantity, 0);
     const newStatus = totalConsumed >= task.quantity ? 'completado' : (totalConsumed > 0 ? 'en-progreso' : 'pendiente');
 
     await query(`
         UPDATE "externo_task"
-        SET 
+        SET
             "dailyconsumption" = $1,
             "consumedquantity" = $2,
             "status" = $3
@@ -194,7 +193,7 @@ export async function validateTask(formData: FormData) {
         console.error(validatedFields.error.flatten().fieldErrors);
         throw new Error('Datos de validación inválidos.');
     }
-    
+
     const { taskId, projectId, location } = validatedFields.data;
     const imageFile = formData.get('image') as File | null;
 
@@ -217,7 +216,7 @@ export async function validateTask(formData: FormData) {
       INSERT INTO "externo_task_validation" ("task_id", "date", "image_url", "location")
       VALUES ($1, $2, $3, $4)
     `, [newValidation.taskId, newValidation.date.toISOString(), newValidation.imageUrl, newValidation.location]);
-    
+
     revalidatePath(`/projects/${projectId}`);
     return { success: true };
 }
@@ -231,19 +230,19 @@ export async function deleteValidation(validationId: number, projectId: number) 
 
 export async function importTasksFromXML(projectId: number, formData: FormData) {
   const { XMLParser } = await import('fast-xml-parser');
-  
+
   const file = formData.get('xmlFile') as File | null;
   if (!file) {
     throw new Error('No se ha seleccionado ningún archivo XML.');
   }
 
   const fileContent = await file.text();
-  
+
   const parser = new XMLParser({
     ignoreAttributes: true,
     isArray: (tagName, jPath) => [
-      'Project.Tasks.Task', 
-      'Project.ExtendedAttributes.ExtendedAttribute', 
+      'Project.Tasks.Task',
+      'Project.ExtendedAttributes.ExtendedAttribute',
       'Project.Tasks.Task.ExtendedAttribute'
     ].includes(jPath),
     stopNodes: ["Project.Resources", "Project.Assignments"]
@@ -260,7 +259,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   if (!projectData || !projectData.Tasks?.Task) {
     throw new Error('El archivo XML no tiene el formato esperado o no contiene tareas.');
   }
-  
+
   const extendedAttrDefs = projectData.ExtendedAttributes?.ExtendedAttribute || [];
   const cantidadAttrDef = extendedAttrDefs.find((attr: any) => attr.Alias?.toLowerCase() === 'cantidades');
   const cantidadFieldId = cantidadAttrDef?.FieldID;
@@ -276,13 +275,13 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
         const endDate = new Date(task.Finish);
 
         if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) continue;
-        
+
         const costRaw = task.FixedCost ?? task.Cost;
         if (costRaw === undefined || costRaw === null) continue;
 
         const parsedCost = parseFloat(costRaw);
         if (isNaN(parsedCost)) continue;
-        
+
         const totalTaskValue = parsedCost / 100;
 
         let quantity = 0;
@@ -293,14 +292,14 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
                 if (!isNaN(parsedQuantity)) quantity = parsedQuantity;
             }
         }
-        
+
         if (totalTaskValue === 0 || quantity === 0) {
             continue;
         }
 
         const value = quantity > 0 ? totalTaskValue / quantity : 0;
         const dailyConsumption = createDailyConsumption(startDate, endDate, quantity);
-        
+
         newTasks.push({
             projectId,
             name: task.Name,

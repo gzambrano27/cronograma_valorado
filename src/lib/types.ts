@@ -1,4 +1,3 @@
-
 export type Company = {
   id: number;
   name: string;
@@ -16,8 +15,8 @@ export type SessionUser = {
 export interface SessionData {
   isLoggedIn: boolean;
   user?: SessionUser;
-  uid?: number; // Keep for odoo client compatibility
-  password?: string; // Keep for odoo client compatibility
+  uid?: number;
+  password?: string;
 }
 
 export type DailyConsumption = {
@@ -88,7 +87,7 @@ export type Task = {
   name:string;
   quantity: number;
   consumedQuantity: number;
-  value: number; // This is unit_price
+  value: number; // This is PVP (Precio de Venta al Público) or Unit Price
   startDate: Date;
   endDate: Date;
   validations?: TaskValidation[];
