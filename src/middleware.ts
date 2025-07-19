@@ -1,23 +1,16 @@
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getSession } from '@/lib/session';
 
 export const middleware = async (req: NextRequest) => {
   const { pathname } = req.nextUrl;
-  const session = await getSession();
 
-  // If user is logged in and tries to access login page, redirect to dashboard
-  if (session.isLoggedIn && pathname.startsWith('/login')) {
-    return NextResponse.redirect(new URL('/dashboard', req.url));
-  }
-
-  // If user is not logged in and tries to access a protected route, redirect to login
-  if (!session.isLoggedIn && (pathname.startsWith('/dashboard') || pathname.startsWith('/settings'))) {
-    const loginUrl = new URL('/login', req.url);
-    loginUrl.searchParams.set('from', pathname);
-    return NextResponse.redirect(loginUrl);
-  }
+  // The root path should be handled by the page itself to decide where to redirect.
+  // Other protected routes will be handled by their respective layouts.
+  // This middleware is now much simpler.
+  
+  // Example: You could add logic here for internationalization (i18n) redirects
+  // or other logic that doesn't depend on session state.
 
   return NextResponse.next();
 };

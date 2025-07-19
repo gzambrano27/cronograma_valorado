@@ -6,6 +6,7 @@ import AuthLayoutClient from '@/components/layout/auth-layout-client';
 import { checkDbConnection } from '@/lib/db';
 import { ConnectionError } from '@/components/layout/connection-error';
 import { DashboardProvider } from '@/hooks/use-dashboard-context';
+import { redirect } from 'next/navigation';
 
 export default async function DashboardLayout({
   children,
@@ -19,6 +20,11 @@ export default async function DashboardLayout({
   }
 
   const session = await getSession();
+
+  if (!session.isLoggedIn) {
+    redirect('/login');
+  }
+
   const allProjects = await getProjects();
 
   return (
