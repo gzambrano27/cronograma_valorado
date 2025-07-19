@@ -34,11 +34,11 @@ export default function DashboardPage() {
   const { session } = useSession();
   const isManager = session.user?.isManager ?? false;
   
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [allTasks, setAllTasks] = useState<Task[]>([]);
   
   const reloadTasks = useCallback(async () => {
     const fetchedTasks = await getTasks();
-    setTasks(fetchedTasks);
+    setAllTasks(fetchedTasks);
   }, []);
 
   useEffect(() => {
@@ -53,10 +53,15 @@ export default function DashboardPage() {
     return allProjects.filter(p => selectedCompanyIds.has(p.companyId));
   }, [allProjects, selectedCompanies]);
 
+  const filteredTasks = useMemo(() => {
+    const filteredProjectIds = new Set(filteredProjects.map(p => p.id));
+    return allTasks.filter(t => filteredProjectIds.has(t.projectId));
+  }, [allTasks, filteredProjects]);
+
   const totalProjects = filteredProjects.length;
   const totalValue = filteredProjects.reduce((sum, p) => sum + p.totalValue, 0);
-  const totalTasks = tasks.length;
-  const completedTasks = tasks.filter(t => t.status === 'completado').length;
+  const totalTasks = filteredTasks.length;
+  const completedTasks = filteredTasks.filter(t => t.status === 'completado').length;
 
   const projectValueData = filteredProjects
     .map(p => ({
@@ -68,7 +73,7 @@ export default function DashboardPage() {
     .sort((a, b) => b.value - a.value)
     .slice(0, 7);
 
-  const taskStatusCounts = tasks.reduce((acc, task) => {
+  const taskStatusCounts = filteredTasks.reduce((acc, task) => {
     const status = task.status as keyof typeof taskStatusConfig;
     acc[status] = (acc[status] || 0) + 1;
     return acc;
@@ -120,7 +125,7 @@ export default function DashboardPage() {
           <CardContent>
             <div className="text-xl font-bold">{totalTasks}</div>
             <p className="text-xs text-muted-foreground">
-              +{completedTasks} completadas en todos los proyectos
+              +{completedTasks} completadas en los proyectos seleccionados
             </p>
           </CardContent>
         </Card>
@@ -147,10 +152,10 @@ export default function DashboardPage() {
               <PieChart className="h-5 w-5" />
               Distribución de Tareas
             </CardTitle>
-            <CardDescription>Estado de las tareas en todos los proyectos.</CardDescription>
+            <CardDescription>Estado de las tareas en los proyectos seleccionados.</CardDescription>
           </CardHeader>
           <CardContent>
-            {tasks.length > 0 ? (
+            {filteredTasks.length > 0 ? (
                 <TaskStatusChart data={taskStatusData} config={taskStatusConfig} totalTasks={totalTasks} />
             ) : (
                 <div className="flex items-center justify-center h-full min-h-[250px] text-muted-foreground">
