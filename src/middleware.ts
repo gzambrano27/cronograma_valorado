@@ -2,16 +2,9 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+// This middleware is now much simpler and does not handle session logic.
+// All redirection and session checks are handled in layouts and pages.
 export const middleware = async (req: NextRequest) => {
-  const { pathname } = req.nextUrl;
-
-  // The root path should be handled by the page itself to decide where to redirect.
-  // Other protected routes will be handled by their respective layouts.
-  // This middleware is now much simpler.
-  
-  // Example: You could add logic here for internationalization (i18n) redirects
-  // or other logic that doesn't depend on session state.
-
   return NextResponse.next();
 };
 

@@ -1,3 +1,4 @@
+
 'use server';
 
 import 'server-only';
@@ -113,9 +114,7 @@ export async function login(prevState: { error: string } | undefined, formData: 
       allowedCompanies: allowedCompanies,
       isManager,
     };
-    session.uid = uid;
-    session.password = password;
-
+    
     await session.save();
 
   } catch (error: any) {

@@ -16,8 +16,6 @@ export type SessionUser = {
 export interface SessionData {
   isLoggedIn: boolean;
   user?: SessionUser;
-  uid?: number;
-  password?: string;
 }
 
 export type DailyConsumption = {

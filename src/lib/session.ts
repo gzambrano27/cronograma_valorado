@@ -1,3 +1,4 @@
+
 'use server'
 
 import { getIronSession } from 'iron-session'
@@ -20,7 +21,5 @@ export const getSession = cache(async (): Promise<SessionData> => {
   return {
     isLoggedIn: session.isLoggedIn,
     user: session.user,
-    uid: session.uid,
-    password: session.password,
   };
 });
