@@ -55,13 +55,11 @@ export async function getAppConfig(): Promise<AppConfig> {
 
 export async function getProjects(): Promise<Project[]> {
     const sqlQuery = `
-      WITH ProjectTaskMetrics AS (
+      WITH TaskCounts AS (
         SELECT
           project_id,
-          SUM(quantity * unit_price) AS total_value,
-          SUM(consumed_quantity * unit_price) AS consumed_value,
           COUNT(id) AS task_count,
-          COUNT(id) FILTER (WHERE status = 'completado') AS completed_tasks
+          COUNT(id) FILTER (WHERE is_closed = TRUE) AS completed_tasks
         FROM
           project_task
         GROUP BY
@@ -73,19 +71,19 @@ export async function getProjects(): Promise<Project[]> {
         rc.id as "companyId",
         rc.name as company,
         rp.name as client,
-        COALESCE(ptm.total_value, 0) as "totalValue",
-        COALESCE(ptm.consumed_value, 0) as "consumedValue",
-        COALESCE(ptm.task_count, 0) as "taskCount",
-        COALESCE(ptm.completed_tasks, 0) as "completedTasks",
+        COALESCE(pp.planned_revenue, 0) as "totalValue",
+        COALESCE(pp.effective_revenue, 0) as "consumedValue",
+        COALESCE(tc.task_count, 0) as "taskCount",
+        COALESCE(tc.completed_tasks, 0) as "completedTasks",
         CASE 
-            WHEN COALESCE(ptm.task_count, 0) > 0 
-            THEN (COALESCE(ptm.completed_tasks, 0) * 100.0) / COALESCE(ptm.task_count, 1)
+            WHEN COALESCE(tc.task_count, 0) > 0 
+            THEN (COALESCE(tc.completed_tasks, 0) * 100.0) / COALESCE(tc.task_count, 1)
             ELSE 0 
         END as progress
       FROM
         project_project pp
       LEFT JOIN
-        ProjectTaskMetrics ptm ON pp.id = ptm.project_id
+        TaskCounts tc ON pp.id = tc.project_id
       LEFT JOIN
         res_company rc ON pp.company_id = rc.id
       LEFT JOIN
