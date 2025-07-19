@@ -28,7 +28,7 @@ export type DailyConsumption = {
 
 export type RawTaskValidation = {
   id: string;
-  task_id: string;
+  taskid: string;
   date: string;
   image_url: string;
   location: string;

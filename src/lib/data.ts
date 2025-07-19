@@ -1,4 +1,3 @@
-
 'use server';
 import type { Project, Task, SCurveData, AppConfig, TaskValidation, RawTask, RawTaskValidation, RawProject } from './types';
 import fs from 'fs/promises';
@@ -34,7 +33,7 @@ function processTask(rawTask: RawTask): Task {
     })),
     validations: (rawTask.validations || []).map((v: RawTaskValidation) => ({
       id: parseInt(v.id, 10),
-      taskId: parseInt(v.task_id, 10),
+      taskId: parseInt(v.taskid, 10),
       date: new Date(v.date),
       imageUrl: v.image_url,
       location: v.location,
@@ -136,7 +135,7 @@ export async function getTasksByProjectId(id: number): Promise<Task[]> {
         (
           SELECT json_agg(v.*)
           FROM "externo_task_validations" v
-          WHERE v.task_id = t.id
+          WHERE v.taskid = t.id
         ) as validations
       FROM "externo_tasks" t
       WHERE t.projectid = $1
