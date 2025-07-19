@@ -70,16 +70,16 @@ export type Project = {
 
 export type RawTask = {
   id: string;
-  project_id: string;
+  projectid: string;
   name:string;
   quantity: string;
-  consumed_quantity: string;
-  unit_price: string;
-  date_start: string;
-  date_end: string;
+  consumedquantity: string;
+  value: string;
+  startdate: string;
+  enddate: string;
   validations?: RawTaskValidation[];
   status: 'pendiente' | 'en-progreso' | 'completado';
-  daily_consumption?: DailyConsumption[];
+  dailyconsumption?: DailyConsumption[];
 };
 
 export type Task = {

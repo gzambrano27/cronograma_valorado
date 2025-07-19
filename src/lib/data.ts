@@ -18,15 +18,15 @@ const toFloat = (value: string | number | null): number => {
 function processTask(rawTask: RawTask): Task {
   return {
     id: parseInt(rawTask.id, 10),
-    projectId: parseInt(rawTask.project_id, 10),
+    projectId: parseInt(rawTask.projectid, 10),
     name: rawTask.name,
     quantity: toFloat(rawTask.quantity),
-    consumedQuantity: toFloat(rawTask.consumed_quantity),
-    value: toFloat(rawTask.unit_price),
-    startDate: new Date(rawTask.date_start),
-    endDate: new Date(rawTask.date_end),
+    consumedQuantity: toFloat(rawTask.consumedquantity),
+    value: toFloat(rawTask.value),
+    startDate: new Date(rawTask.startdate),
+    endDate: new Date(rawTask.enddate),
     status: rawTask.status,
-    dailyConsumption: (rawTask.daily_consumption || []).map((dc: any) => ({
+    dailyConsumption: (rawTask.dailyconsumption || []).map((dc: any) => ({
       ...dc,
       date: new Date(dc.date),
       plannedQuantity: toFloat(dc.plannedQuantity),
@@ -55,15 +55,17 @@ export async function getAppConfig(): Promise<AppConfig> {
 
 export async function getProjects(): Promise<Project[]> {
     const sqlQuery = `
-      WITH TaskCounts AS (
+      WITH ProjectTaskMetrics AS (
         SELECT
-          project_id,
+          projectid,
+          SUM(quantity * value) AS total_value,
+          SUM(consumedquantity * value) AS consumed_value,
           COUNT(id) AS task_count,
-          COUNT(id) FILTER (WHERE is_closed = TRUE) AS completed_tasks
+          COUNT(id) FILTER (WHERE status = 'completado') AS completed_tasks
         FROM
-          project_task
+          externo_task
         GROUP BY
-          project_id
+          projectid
       )
       SELECT
         pp.id,
@@ -71,19 +73,19 @@ export async function getProjects(): Promise<Project[]> {
         rc.id as "companyId",
         rc.name as company,
         rp.name as client,
-        COALESCE(pp.planned_revenue, 0) as "totalValue",
-        COALESCE(pp.effective_revenue, 0) as "consumedValue",
-        COALESCE(tc.task_count, 0) as "taskCount",
-        COALESCE(tc.completed_tasks, 0) as "completedTasks",
+        COALESCE(ptm.total_value, 0) as "totalValue",
+        COALESCE(ptm.consumed_value, 0) as "consumedValue",
+        COALESCE(ptm.task_count, 0) as "taskCount",
+        COALESCE(ptm.completed_tasks, 0) as "completedTasks",
         CASE 
-            WHEN COALESCE(tc.task_count, 0) > 0 
-            THEN (COALESCE(tc.completed_tasks, 0) * 100.0) / COALESCE(tc.task_count, 1)
+            WHEN COALESCE(ptm.task_count, 0) > 0 
+            THEN (COALESCE(ptm.completed_tasks, 0) * 100.0) / COALESCE(ptm.task_count, 1)
             ELSE 0 
         END as progress
       FROM
         project_project pp
       LEFT JOIN
-        TaskCounts tc ON pp.id = tc.project_id
+        ProjectTaskMetrics ptm ON pp.id = ptm.projectid
       LEFT JOIN
         res_company rc ON pp.company_id = rc.id
       LEFT JOIN
@@ -121,7 +123,7 @@ export async function getProjects(): Promise<Project[]> {
 }
 
 export async function getTasks(): Promise<Task[]> {
-  const tasks_raw = await query<RawTask>(`SELECT * FROM "project_task"`);
+  const tasks_raw = await query<RawTask>(`SELECT * FROM "externo_task"`);
   return tasks_raw.map(processTask);
 }
 
@@ -130,12 +132,12 @@ export async function getTasksByProjectId(id: number): Promise<Task[]> {
       SELECT t.*,
         (
           SELECT json_agg(v.*)
-          FROM "project_task_validation" v
+          FROM "externo_task_validation" v
           WHERE v.task_id = t.id
         ) as validations
-      FROM "project_task" t
-      WHERE t.project_id = $1
-      ORDER BY t.date_start, t.id
+      FROM "externo_task" t
+      WHERE t.projectid = $1
+      ORDER BY t.startdate, t.id
     `, [id]);
     return tasks_raw.map(processTask);
 }
