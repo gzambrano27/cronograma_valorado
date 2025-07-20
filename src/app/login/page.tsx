@@ -21,21 +21,30 @@ export default function LoginPage() {
     if (state?.success && state.user) {
       const newSession = { isLoggedIn: true, user: state.user };
       setSession(newSession);
+      // Redirect happens in the next effect
     }
   }, [state, setSession]);
 
   useEffect(() => {
-    // Redirect if user is already logged in
+    // Redirect if user becomes logged in
     if (!isLoading && session.isLoggedIn) {
       router.replace('/dashboard');
     }
   }, [session, isLoading, router]);
   
-  // Don't render the form while session is loading or if already logged in
-  if (isLoading || session.isLoggedIn) {
+  if (isLoading) {
     return (
         <div className="flex h-screen items-center justify-center">
             <p>Cargando...</p>
+        </div>
+    );
+  }
+
+  // Prevents flicker of login form if already logged in and redirecting
+  if (session.isLoggedIn) {
+    return (
+        <div className="flex h-screen items-center justify-center">
+            <p>Redirigiendo al dashboard...</p>
         </div>
     );
   }

@@ -5,7 +5,7 @@ import { useDashboard } from '@/hooks/use-dashboard-context';
 import type { Company } from '@/lib/types';
 import React, { useEffect, useState } from 'react';
 import { useSession } from '@/hooks/use-session';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 const LOCAL_STORAGE_KEY_COMPANIES = 'selectedCompanies';
 
@@ -16,6 +16,7 @@ export default function AuthLayoutClient({
 }>) {
   const { session, isLoading } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
   const user = session.user;
   const { allProjects, selectedCompanies, setSelectedCompanies } = useDashboard();
   
@@ -28,7 +29,7 @@ export default function AuthLayoutClient({
     if (!session.isLoggedIn) {
       router.replace('/login');
     }
-  }, [session.isLoggedIn, isLoading, router]);
+  }, [session.isLoggedIn, isLoading, router, pathname]);
   
   useEffect(() => {
     if (user?.allowedCompanies && user.company && isInitialLoad) {

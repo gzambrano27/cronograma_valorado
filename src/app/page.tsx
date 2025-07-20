@@ -2,21 +2,17 @@
 'use client'
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from '@/hooks/use-session';
 
+// This is now a simple redirector page.
+// The session logic is handled within the protected dashboard layout.
 export default function Home() {
     const router = useRouter();
-    const { session, isLoading } = useSession();
 
     useEffect(() => {
-      if (!isLoading) {
-        if (session.isLoggedIn) {
-          router.replace('/dashboard');
-        } else {
-          router.replace('/login');
-        }
-      }
-    }, [isLoading, session.isLoggedIn, router]);
+        // Redirect everyone to the login page by default.
+        // The dashboard layout will handle auth checks for protected routes.
+        router.replace('/login');
+    }, [router]);
 
     return (
       <div className="flex h-screen items-center justify-center">
