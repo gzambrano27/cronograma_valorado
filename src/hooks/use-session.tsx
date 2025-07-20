@@ -30,25 +30,24 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
             if (storedSession) {
                 const parsedSession: SessionData = JSON.parse(storedSession);
                 setSessionState(parsedSession);
-                
-                if (parsedSession.isLoggedIn && pathname === '/login') {
-                    router.replace('/dashboard');
-                }
-            } else {
-                if (pathname.startsWith('/dashboard')) {
-                    router.replace('/login');
-                }
             }
         } catch (error) {
             console.error("Failed to parse session from localStorage", error);
             localStorage.removeItem(LOCAL_STORAGE_KEY_SESSION);
-            if (pathname.startsWith('/dashboard')) {
-                router.replace('/login');
-            }
         } finally {
             setIsLoading(false);
         }
-    }, [pathname, router]);
+    }, []);
+
+    useEffect(() => {
+        if (!isLoading) {
+            if (session.isLoggedIn && pathname === '/login') {
+                router.replace('/dashboard');
+            } else if (!session.isLoggedIn && pathname.startsWith('/dashboard')) {
+                router.replace('/login');
+            }
+        }
+    }, [session, isLoading, pathname, router]);
 
     const setSession = useCallback((newSession: SessionData) => {
         setSessionState(newSession);
@@ -66,7 +65,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         }
     }, []);
     
-    // Do not render children until loading is complete to prevent hydration mismatch
+    // Do not render children until loading is complete to prevent hydration mismatch and incorrect routing
     if (isLoading) {
         return null;
     }

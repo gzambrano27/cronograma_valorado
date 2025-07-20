@@ -21,13 +21,10 @@ export default function LoginPage() {
     if (state?.success && state.user) {
       const newSession = { isLoggedIn: true, user: state.user };
       setSession(newSession);
-      // Also set a cookie for server-side checks
-      document.cookie = `userSession=${JSON.stringify(newSession)}; path=/;`;
-      router.replace('/dashboard');
     }
-  }, [state, setSession, router]);
+  }, [state, setSession]);
   
-  // If user is already logged in, redirect to dashboard
+  // Redirect to dashboard if the session becomes logged in
   useEffect(() => {
       if (session.isLoggedIn) {
           router.replace('/dashboard');
