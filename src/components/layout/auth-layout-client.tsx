@@ -5,6 +5,7 @@ import { useDashboard } from '@/hooks/use-dashboard-context';
 import type { Company } from '@/lib/types';
 import React, { useEffect, useState } from 'react';
 import { useSession } from '@/hooks/use-session';
+import { useRouter } from 'next/navigation';
 
 const LOCAL_STORAGE_KEY_COMPANIES = 'selectedCompanies';
 
@@ -13,11 +14,21 @@ export default function AuthLayoutClient({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { session } = useSession();
+  const { session, isLoading } = useSession();
+  const router = useRouter();
   const user = session.user;
   const { allProjects, selectedCompanies, setSelectedCompanies } = useDashboard();
   
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  useEffect(() => {
+    if (isLoading) {
+      return; // Espera a que la sesión se cargue
+    }
+    if (!session.isLoggedIn) {
+      router.replace('/login');
+    }
+  }, [session.isLoggedIn, isLoading, router]);
   
   useEffect(() => {
     if (user?.allowedCompanies && user.company && isInitialLoad) {
@@ -56,6 +67,14 @@ export default function AuthLayoutClient({
       }
     }
   }, [selectedCompanies, isInitialLoad]);
+
+  if (isLoading || !session.isLoggedIn) {
+     return (
+        <div className="flex h-screen items-center justify-center">
+            <p>Cargando sesión...</p>
+        </div>
+    );
+  }
 
   return (
     <AppShell 

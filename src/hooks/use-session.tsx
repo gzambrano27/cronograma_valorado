@@ -50,10 +50,13 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         }
     }, []);
 
-    // The router logic is now removed from here.
-    // Redirection is handled by the page components themselves.
+    const value = { session, setSession, isLoading };
 
-    return <SessionContext.Provider value={{ session, setSession, isLoading }}>{children}</SessionContext.Provider>
+    return (
+        <SessionContext.Provider value={value}>
+            {!isLoading && children}
+        </SessionContext.Provider>
+    );
 }
 
 export const useSession = () => {
