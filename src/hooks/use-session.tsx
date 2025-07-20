@@ -34,21 +34,11 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         } catch (error) {
             console.error("Failed to parse session from localStorage", error);
             localStorage.removeItem(LOCAL_STORAGE_KEY_SESSION);
+            setSessionState(defaultSession);
         } finally {
             setIsLoading(false);
         }
     }, []);
-
-    useEffect(() => {
-        if (!isLoading) {
-            const isAuthPage = pathname === '/login';
-            if (session.isLoggedIn && isAuthPage) {
-                router.replace('/dashboard');
-            } else if (!session.isLoggedIn && !isAuthPage) {
-                router.replace('/login');
-            }
-        }
-    }, [session.isLoggedIn, isLoading, pathname, router]);
 
     const setSession = useCallback((newSession: SessionData) => {
         setSessionState(newSession);
@@ -63,8 +53,18 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
             console.error("Failed to save session to localStorage", error);
         }
     }, []);
-    
-    // Do not render children until loading is complete to prevent hydration mismatch and incorrect routing
+
+    useEffect(() => {
+        if (!isLoading) {
+            const isAuthPage = pathname === '/login';
+            if (session.isLoggedIn && isAuthPage) {
+                router.replace('/dashboard');
+            } else if (!session.isLoggedIn && !isAuthPage) {
+                router.replace('/login');
+            }
+        }
+    }, [session.isLoggedIn, isLoading, pathname, router]);
+
     if (isLoading) {
         return null;
     }

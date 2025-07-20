@@ -23,12 +23,11 @@ export default function LoginPage() {
       setSession(newSession);
     }
   }, [state, setSession]);
-  
-  // Redirect to dashboard if the session becomes logged in
+
   useEffect(() => {
-      if (session.isLoggedIn) {
-          router.replace('/dashboard');
-      }
+    if (session.isLoggedIn) {
+      router.replace('/dashboard');
+    }
   }, [session, router]);
 
   return (
