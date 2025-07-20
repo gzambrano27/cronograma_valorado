@@ -88,7 +88,7 @@ function createDailyConsumption(startDate: Date, endDate: Date, totalQuantity: n
 
 
 // Acción para crear una nueva tarea en la base de datos.
-export async function createTask(projectId: number, formData: FormData) {
+export async function createTask(projectId: number, formData: FormData): Promise<{ success: boolean, message: string | null }> {
   const validatedFields = TaskSchema.safeParse({
     name: formData.get('name'),
     quantity: formData.get('quantity'),
@@ -98,7 +98,7 @@ export async function createTask(projectId: number, formData: FormData) {
   });
 
   if (!validatedFields.success) {
-    throw new Error('Datos de la tarea inválidos.');
+    return { success: false, message: 'Datos de la tarea inválidos.' };
   }
 
   const { name, quantity, value, startDate, endDate } = validatedFields.data;
@@ -107,20 +107,25 @@ export async function createTask(projectId: number, formData: FormData) {
   const end = new Date(endDate);
 
   if (start > end) {
-      throw new Error('La fecha de inicio no puede ser posterior a la fecha de fin.');
+      return { success: false, message: 'La fecha de inicio no puede ser posterior a la fecha de fin.'};
   }
-
-  const dailyConsumption = createDailyConsumption(start, end, quantity);
-
-  await query(`
-    INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
-    VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7)
-  `, [projectId, name, quantity, value, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption)]);
-
-  // Revalida las rutas para que Next.js actualice la caché y muestre los nuevos datos.
-  revalidatePath(`/dashboard/projects-overview/${projectId}`);
-  revalidatePath(`/dashboard`);
-  return { success: true };
+  
+  try {
+    const dailyConsumption = createDailyConsumption(start, end, quantity);
+  
+    await query(`
+      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
+      VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7)
+    `, [projectId, name, quantity, value, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption)]);
+  
+    // Revalida las rutas para que Next.js actualice la caché y muestre los nuevos datos.
+    revalidatePath(`/dashboard/projects-overview/${projectId}`);
+    revalidatePath(`/dashboard`);
+    return { success: true, message: 'Tarea creada con éxito.' };
+  } catch(error) {
+    console.error("Error en createTask:", error);
+    return { success: false, message: 'Error de base de datos al crear la tarea.' };
+  }
 }
 
 // Acción para eliminar una tarea.

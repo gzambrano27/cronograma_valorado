@@ -48,31 +48,30 @@ export function AddTaskSheet({ projectId, onSuccess }: { projectId: number, onSu
     if (endDate) {
         formData.set('endDate', format(endDate, 'yyyy-MM-dd'));
     }
-    try {
-        const result = await createTask(projectId, formData);
-        if (result?.success) {
-            toast({
-                title: "Tarea Creada",
-                description: "La nueva tarea ha sido añadida al cronograma.",
-            });
-            onSuccess();
-            setOpen(false);
-            return { success: true, message: "Tarea creada." };
-        } else {
-             throw new Error(result?.message || 'Error al crear la tarea');
-        }
-    } catch (error: any) {
-         toast({
-            variant: "destructive",
-            title: "Error al crear la tarea",
-            description: error.message || "No se pudo crear la tarea.",
-          });
-          return { success: false, message: error.message || "No se pudo crear la tarea." };
-    }
+    const result = await createTask(projectId, formData);
+    return result;
   };
 
 
-  const [state, formAction] = useActionState(createTaskWithSuccess, { message: '', success: false });
+  const [state, formAction] = useActionState(createTaskWithSuccess, { success: false, message: null });
+
+  useEffect(() => {
+    if (state.success) {
+      toast({
+        title: "Tarea Creada",
+        description: "La nueva tarea ha sido añadida al cronograma.",
+      });
+      onSuccess();
+      setOpen(false);
+    } else if (state.message) {
+      toast({
+        variant: "destructive",
+        title: "Error al crear la tarea",
+        description: state.message,
+      });
+    }
+  }, [state, toast, onSuccess]);
+
 
   useEffect(() => {
     if (!open) {
