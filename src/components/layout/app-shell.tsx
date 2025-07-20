@@ -72,7 +72,7 @@ export default function AppShell({ children, allProjects, selectedCompanies, onC
   const user = session?.user;
 
   const isDashboardPage = pathname === "/dashboard";
-  const title = "ProjectValuator";
+  const title = "Menú";
 
   const handleLogout = () => {
     setSession({ isLoggedIn: false });
