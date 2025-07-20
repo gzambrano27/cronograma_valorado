@@ -18,7 +18,7 @@ export default async function DashboardLayout({
     return <ConnectionError />;
   }
 
-  // getSession now reads from headers, it's safe to call
+  // getSession now returns a plain object, safe to pass to client components
   const session = await getSession();
   
   // Note: Redirection logic is now handled by the middleware.
