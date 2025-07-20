@@ -1,13 +1,11 @@
 
-'use server';
-
 import { getProjects } from "@/lib/data";
 import { ConnectionError } from '@/components/layout/connection-error';
 import { DashboardProvider } from '@/hooks/use-dashboard-context';
 import AuthLayoutClient from "@/components/layout/auth-layout-client";
 import { checkDbConnection } from "@/lib/db";
 
-// This is a pure Server Component.
+// This is a pure Server Component by default.
 // All data fetching happens on the server before rendering.
 // Authentication and redirects are now handled on the client-side via useSession hook.
 
