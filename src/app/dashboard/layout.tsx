@@ -1,6 +1,4 @@
 
-'use server';
-
 import { getProjects } from "@/lib/data";
 import { ConnectionError } from '@/components/layout/connection-error';
 import { DashboardProvider } from '@/hooks/use-dashboard-context';
