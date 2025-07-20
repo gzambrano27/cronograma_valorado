@@ -37,7 +37,7 @@ export default async function DashboardLayout({
             <DashboardProvider allProjects={projects}>
               <AuthLayoutClient>
                   {children}
-              </Auth-layout-client>
+              </AuthLayoutClient>
             </DashboardProvider>
         </ThemeProvider>
     </SessionProvider>
