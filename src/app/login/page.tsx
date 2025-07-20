@@ -10,44 +10,25 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { SubmitButton } from '@/components/layout/submit-button';
 import { useRouter } from 'next/navigation';
-import { useSession } from '@/hooks/use-session';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { setSession, session, isLoading } = useSession();
   const [state, formAction, isPending] = useActionState(login, undefined);
 
   useEffect(() => {
+    // When the login server action is successful, the state will be updated.
+    // We then save the session to localStorage and redirect to the dashboard.
     if (state?.success && state.user) {
       const newSession = { isLoggedIn: true, user: state.user };
-      setSession(newSession);
-      // Redirect happens in the next effect
-    }
-  }, [state, setSession]);
-
-  useEffect(() => {
-    // Redirect if user becomes logged in
-    if (!isLoading && session.isLoggedIn) {
+      try {
+          localStorage.setItem('userSession', JSON.stringify(newSession));
+      } catch (error) {
+          console.error("Failed to save session to localStorage", error);
+          // Handle potential storage errors, e.g., private browsing mode
+      }
       router.replace('/dashboard');
     }
-  }, [session, isLoading, router]);
-  
-  if (isLoading) {
-    return (
-        <div className="flex h-screen items-center justify-center">
-            <p>Cargando...</p>
-        </div>
-    );
-  }
-
-  // Prevents flicker of login form if already logged in and redirecting
-  if (session.isLoggedIn) {
-    return (
-        <div className="flex h-screen items-center justify-center">
-            <p>Redirigiendo al dashboard...</p>
-        </div>
-    );
-  }
+  }, [state, router]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
