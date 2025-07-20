@@ -22,7 +22,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "../ui/skeleton";
 import dynamic from "next/dynamic";
 import { useSession } from "@/hooks/use-session";
-import { useRouter } from "next/navigation";
 
 // Importación dinámica del componente de mapa para evitar errores de SSR,
 // ya que depende de objetos del navegador como `window`.
@@ -51,10 +50,12 @@ export function ValidateTaskDialog({
   task,
   open,
   onOpenChange,
+  onSuccess,
 }: {
   task: Task;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess: () => void;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -63,7 +64,6 @@ export function ValidateTaskDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { session } = useSession();
-  const router = useRouter();
   const hasValidations = task.validations && task.validations.length > 0;
   const userId = session.user?.id;
 
@@ -114,7 +114,7 @@ export function ValidateTaskDialog({
           title: "Tarea Validada",
           description: "La imagen y la ubicación han sido guardadas correctamente.",
       });
-      router.refresh();
+      onSuccess();
       onOpenChange(false);
     } catch (error: any) {
        toast({

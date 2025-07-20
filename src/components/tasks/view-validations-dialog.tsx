@@ -24,22 +24,22 @@ import { MapPin, Calendar, Trash2, User } from "lucide-react";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { DeleteValidationDialog } from "./delete-validation-dialog";
-import { useRouter } from "next/navigation";
 
 interface ViewValidationsDialogProps {
   task: Task;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess: () => void;
 }
 
 export function ViewValidationsDialog({
   task,
   open,
   onOpenChange,
+  onSuccess
 }: ViewValidationsDialogProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedValidation, setSelectedValidation] = useState<TaskValidation | null>(null);
-  const router = useRouter();
 
   const handleDeleteClick = (validation: TaskValidation) => {
     setSelectedValidation(validation);
@@ -47,7 +47,7 @@ export function ViewValidationsDialog({
   };
   
   const handleSuccess = () => {
-    router.refresh();
+    onSuccess();
     // Potentially close this dialog if no validations are left
     if (task.validations && task.validations.length <= 1) {
         onOpenChange(false);

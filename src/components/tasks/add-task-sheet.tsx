@@ -23,7 +23,6 @@ import React, { useEffect, useRef, useActionState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { useFormStatus } from "react-dom"
 import { createTask } from "@/lib/actions"
-import { useRouter } from "next/navigation"
 
 function SubmitButton() {
     const { pending } = useFormStatus();
@@ -34,10 +33,9 @@ function SubmitButton() {
     );
 }
 
-export function AddTaskSheet({ projectId }: { projectId: number }) {
+export function AddTaskSheet({ projectId, onSuccess }: { projectId: number, onSuccess: () => void }) {
   const [open, setOpen] = React.useState(false)
   const { toast } = useToast()
-  const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
 
   const [startDate, setStartDate] = React.useState<Date>()
@@ -63,7 +61,7 @@ export function AddTaskSheet({ projectId }: { projectId: number }) {
         title: "Tarea Creada",
         description: "La nueva tarea ha sido añadida al cronograma.",
       });
-      router.refresh(); // Refresca los datos usando el router de Next.js
+      onSuccess(); // Vuelve a cargar los datos en la página principal
       setOpen(false);
     } else if (state.message) {
       toast({
@@ -72,7 +70,7 @@ export function AddTaskSheet({ projectId }: { projectId: number }) {
         description: state.message,
       });
     }
-  }, [state, toast, router]);
+  }, [state, toast, onSuccess]);
 
 
   useEffect(() => {

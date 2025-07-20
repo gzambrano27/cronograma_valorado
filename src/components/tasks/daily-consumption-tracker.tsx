@@ -19,17 +19,16 @@ import { es } from "date-fns/locale";
 import { updateTaskConsumption } from "@/lib/actions";
 import { formatCurrency } from "@/lib/utils";
 import { useSession } from "@/hooks/use-session";
-import { useRouter } from "next/navigation";
 
 
 interface DailyConsumptionTrackerProps {
   task: Task;
+  onSuccess: () => void;
 }
 
 
-export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) {
+export function DailyConsumptionTracker({ task, onSuccess }: DailyConsumptionTrackerProps) {
   const { toast } = useToast();
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const { session } = useSession();
   const isManager = session.user?.isManager ?? false;
@@ -83,7 +82,7 @@ export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) 
             "PPP", { locale: es }
           )} ha sido actualizado.`,
         });
-        router.refresh();
+        onSuccess();
       } catch (error) {
         toast({
           variant: "destructive",

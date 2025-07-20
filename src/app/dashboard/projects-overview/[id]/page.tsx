@@ -25,9 +25,8 @@ export default function ProjectPage() {
   const { session } = useSession();
   const isManager = session.user?.isManager ?? false;
 
-  // Carga inicial de datos del lado del cliente.
-  // Next.js se encargará de las actualizaciones a través de revalidatePath y router.refresh().
-  const loadInitialData = useCallback(async () => {
+  // Carga inicial de datos del lado del cliente y función para recargar.
+  const loadProjectData = useCallback(async () => {
     if (isNaN(id)) {
         notFound();
         return;
@@ -57,9 +56,9 @@ export default function ProjectPage() {
 
   useEffect(() => {
     if (id) {
-        loadInitialData();
+        loadProjectData();
     }
-  }, [id, loadInitialData]);
+  }, [id, loadProjectData]);
   
   if (!project) {
     return (
@@ -82,8 +81,8 @@ export default function ProjectPage() {
           {project.name}
         </h1>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          <XmlImport projectId={id} />
-          <AddTaskSheet projectId={project.id} />
+          <XmlImport projectId={id} onSuccess={loadProjectData} />
+          <AddTaskSheet projectId={project.id} onSuccess={loadProjectData} />
         </div>
       </div>
 
@@ -171,7 +170,7 @@ export default function ProjectPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <TaskTable data={projectTasks} />
+          <TaskTable data={projectTasks} onSuccess={loadProjectData} />
         </CardContent>
       </Card>
     </div>

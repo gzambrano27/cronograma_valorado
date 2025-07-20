@@ -15,23 +15,18 @@ import { MoreHorizontal, Trash2, Camera, GalleryThumbnails } from "lucide-react"
 import { DeleteTaskDialog } from "./delete-task-dialog";
 import { ValidateTaskDialog } from "./validate-task-dialog";
 import { ViewValidationsDialog } from "./view-validations-dialog";
-import { useRouter } from "next/navigation";
 
 interface TaskActionsProps {
   task: Task;
+  onSuccess: () => void;
 }
 
-export function TaskActions({ task }: TaskActionsProps) {
+export function TaskActions({ task, onSuccess }: TaskActionsProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isValidateDialogOpen, setIsValidateDialogOpen] = useState(false);
   const [isViewValidationsOpen, setIsViewValidationsOpen] = useState(false);
-  const router = useRouter();
 
   const hasValidations = task.validations && task.validations.length > 0;
-
-  const handleSuccess = () => {
-    router.refresh();
-  };
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
@@ -40,17 +35,20 @@ export function TaskActions({ task }: TaskActionsProps) {
         projectId={task.projectId}
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
+        onSuccess={onSuccess}
       />
       <ValidateTaskDialog
         task={task}
         open={isValidateDialogOpen}
         onOpenChange={setIsValidateDialogOpen}
+        onSuccess={onSuccess}
       />
       {hasValidations && (
         <ViewValidationsDialog
           task={task}
           open={isViewValidationsOpen}
           onOpenChange={setIsViewValidationsOpen}
+          onSuccess={onSuccess}
         />
       )}
       <DropdownMenu>

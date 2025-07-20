@@ -68,7 +68,7 @@ const adjustDateForTimezone = (date: Date | string): Date => {
 };
 
 
-const getColumns = (isManager: boolean): ColumnDef<Task>[] => {
+const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[] => {
   
   const columns: ColumnDef<Task>[] = [
     {
@@ -234,7 +234,7 @@ const getColumns = (isManager: boolean): ColumnDef<Task>[] => {
     {
       id: "actions",
       header: () => <div className="text-right pr-4">Acciones</div>,
-      cell: ({ row }) => <TaskActions task={row.original} />,
+      cell: ({ row }) => <TaskActions task={row.original} onSuccess={onSuccess} />,
       size: 80,
     },
   ]);
@@ -257,7 +257,7 @@ const columnTranslations: Record<string, string> = {
     select: "Seleccionar"
 };
 
-export function TaskTable({ data }: { data: Task[] }) {
+export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => void }) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [showAll, setShowAll] = React.useState(false);
@@ -302,7 +302,7 @@ export function TaskTable({ data }: { data: Task[] }) {
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
   const [expanded, setExpanded] = React.useState({})
 
-  const columns = React.useMemo(() => getColumns(isManager), [isManager]);
+  const columns = React.useMemo(() => getColumns(isManager, onSuccess), [isManager, onSuccess]);
 
   const table = useReactTable({
     data,
@@ -345,6 +345,7 @@ export function TaskTable({ data }: { data: Task[] }) {
                   onOpenChange={setIsDeleteDialogOpen}
                   onSuccess={() => {
                     setRowSelection({});
+                    onSuccess();
                   }}
               />
               <div className="flex items-center justify-between gap-4 mb-4">
@@ -469,7 +470,7 @@ export function TaskTable({ data }: { data: Task[] }) {
                   {row.getIsExpanded() && (
                      <TableRow>
                         <TableCell colSpan={row.getVisibleCells().length}>
-                           <DailyConsumptionTracker task={row.original} />
+                           <DailyConsumptionTracker task={row.original} onSuccess={onSuccess} />
                         </TableCell>
                      </TableRow>
                   )}
