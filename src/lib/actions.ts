@@ -216,7 +216,7 @@ export async function validateTask(formData: FormData) {
     };
 
     await query(`
-      INSERT INTO "externo_task_validations" ("taskid", "date", "image_url", "location")
+      INSERT INTO "externo_task_validations" ("taskid", "date", "imageurl", "location")
       VALUES ($1, $2, $3, $4)
     `, [newValidation.taskId, newValidation.date.toISOString(), newValidation.imageUrl, newValidation.location]);
 
@@ -333,3 +333,5 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   revalidatePath(`/dashboard`);
   return { success: true, message: `${newTasks.length} tareas importadas.` };
 }
+
+    

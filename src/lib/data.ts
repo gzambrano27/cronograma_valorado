@@ -37,7 +37,7 @@ function processTask(rawTask: RawTask): Task {
       id: parseInt(v.id, 10),
       taskId: parseInt(v.taskid, 10),
       date: new Date(v.date),
-      imageUrl: v.image_url,
+      imageUrl: v.imageurl,
       location: v.location,
     })),
   };
@@ -211,3 +211,5 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
       deviation: Math.round(point.deviation * 100) / 100,
     }));
 }
+
+    

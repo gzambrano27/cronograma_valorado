@@ -35,7 +35,7 @@ export type RawTaskValidation = {
   id: string;
   taskid: string;
   date: string;
-  image_url: string;
+  imageurl: string;
   location: string;
 }
 
@@ -123,3 +123,5 @@ export type UserGroupInfo = {
     grupo_id: number;
     nombre_grupo: any;
 }
+
+    
