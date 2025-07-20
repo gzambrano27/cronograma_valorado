@@ -29,7 +29,6 @@ import { useSession } from "@/hooks/use-session";
 interface ProjectListProps {
   projects: Project[];
   view: "grid" | "list";
-  onSuccess: () => void;
 }
 
 const getColumns = (isManager: boolean): ColumnDef<Project>[] => {
@@ -111,7 +110,7 @@ const getColumns = (isManager: boolean): ColumnDef<Project>[] => {
   return columns;
 };
 
-export default function ProjectList({ projects, view, onSuccess }: ProjectListProps) {
+export default function ProjectList({ projects, view }: ProjectListProps) {
     const router = useRouter();
     const { session } = useSession();
     const isManager = session.user?.isManager ?? false;
@@ -245,4 +244,3 @@ export default function ProjectList({ projects, view, onSuccess }: ProjectListPr
     </div>
   );
 }
-

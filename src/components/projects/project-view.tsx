@@ -22,7 +22,7 @@ import { Label } from "../ui/label";
  * Componente principal para visualizar la lista de proyectos.
  * Incluye filtros, cambio de vista (cuadrícula/lista) y paginación.
  */
-export function ProjectView({ projects, onSuccess }: { projects: Project[], onSuccess: () => void }) {
+export function ProjectView({ projects }: { projects: Project[]}) {
   const [view, setView] = useState<"grid" | "list">("grid");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedClient, setSelectedClient] = useState("all");
@@ -142,7 +142,7 @@ export function ProjectView({ projects, onSuccess }: { projects: Project[], onSu
       </div>
 
       <TooltipProvider>
-        <ProjectList projects={paginatedProjects} view={view} onSuccess={onSuccess} />
+        <ProjectList projects={paginatedProjects} view={view} />
       </TooltipProvider>
 
       {/* Controles de paginación */}

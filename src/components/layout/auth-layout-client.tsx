@@ -6,6 +6,7 @@ import type { Company } from '@/lib/types';
 import React, { useEffect, useState } from 'react';
 import { useSession } from '@/hooks/use-session';
 import { usePathname, useRouter } from 'next/navigation';
+import { revalidateSession } from '@/lib/auth-actions';
 
 const LOCAL_STORAGE_KEY_COMPANIES = 'selectedCompanies';
 
@@ -19,7 +20,7 @@ export default function AuthLayoutClient({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { session, isLoading } = useSession();
+  const { session, setSession, isLoading } = useSession();
   const router = useRouter();
   const pathname = usePathname();
   const user = session.user;
@@ -36,6 +37,21 @@ export default function AuthLayoutClient({
     // Si la carga ha terminado y el usuario no está logueado, redirigir al login.
     if (!session.isLoggedIn && pathname !== '/login') {
       router.replace('/login');
+      return;
+    }
+
+    // Si el usuario está logueado, revalidar su sesión para obtener permisos actualizados.
+    if (session.isLoggedIn && session.user) {
+      revalidateSession(session.user.id).then(newSessionData => {
+        if (newSessionData.success && newSessionData.user) {
+          // Actualiza la sesión en el contexto y localStorage con los datos frescos.
+          setSession({ isLoggedIn: true, user: newSessionData.user });
+        } else {
+          // Si la revalidación falla (ej. el usuario fue eliminado de Odoo), cierra la sesión.
+          setSession({ isLoggedIn: false });
+          router.replace('/login');
+        }
+      });
     }
   }, [session.isLoggedIn, isLoading, router, pathname]);
   

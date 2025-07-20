@@ -4,7 +4,7 @@
 import 'server-only';
 import { z } from 'zod';
 import { getOdooClient } from './odoo-client';
-import type { Company, UserGroupInfo, LoginResult } from './types';
+import type { Company, UserGroupInfo, LoginResult, SessionUser } from './types';
 import { query } from './db';
 import { getTranslatedName } from './utils';
 
@@ -127,6 +127,60 @@ export async function login(prevState: LoginResult | undefined, formData: FormDa
     return { success: false, error: 'Ocurrió un error inesperado al intentar conectar con Odoo.' };
   }
 }
+
+/**
+ * Revalida la sesión de un usuario para comprobar si sus permisos han cambiado.
+ * Específicamente, vuelve a comprobar si es "Gerente".
+ * @param userId - El ID del usuario a revalidar.
+ * @returns - Un objeto `LoginResult` con los datos actualizados del usuario.
+ */
+export async function revalidateSession(userId: number): Promise<LoginResult> {
+    try {
+        const odooClient = getOdooClient();
+        const userDetails = await odooClient.executeKw<any[]>('res.users', 'search_read',
+            [[['id', '=', userId]]],
+            { fields: ['name', 'login', 'partner_id', 'company_id', 'company_ids'] }
+        );
+
+        if (!userDetails || userDetails.length === 0) {
+            return { success: false, error: 'Usuario no encontrado durante la revalidación.' };
+        }
+
+        const user = userDetails[0];
+        const isManager = await checkUserIsManager(user.id);
+
+        const allowedCompanyIds = user.company_ids || [];
+        let allowedCompanies: Company[] = [];
+        if (allowedCompanyIds.length > 0) {
+            const companiesData = await odooClient.executeKw<any[]>('res.company', 'search_read',
+                [[['id', 'in', allowedCompanyIds]]],
+                { fields: ['name'] }
+            );
+            allowedCompanies = companiesData.map(c => ({ id: c.id, name: getTranslatedName(c.name) }));
+        }
+
+        const currentCompany: Company = {
+            id: user.company_id[0],
+            name: getTranslatedName(user.company_id[1]),
+        };
+
+        return {
+            success: true,
+            user: {
+                id: user.id,
+                name: getTranslatedName(user.name),
+                email: user.login,
+                company: currentCompany,
+                allowedCompanies: allowedCompanies,
+                isManager,
+            },
+        };
+    } catch (error) {
+        console.error(`Error revalidando sesión para el usuario ${userId}:`, error);
+        return { success: false, error: 'No se pudo revalidar la sesión.' };
+    }
+}
+
 
 /**
  * Cierra la sesión del usuario.

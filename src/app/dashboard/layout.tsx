@@ -24,6 +24,7 @@ export default async function DashboardLayout({
   }
   
   // 2. Obtener los datos iniciales (proyectos) en el servidor.
+  // Esto se ejecuta en cada navegación/recarga dentro del dashboard, asegurando datos frescos.
   const projects = await getProjects();
 
   return (
