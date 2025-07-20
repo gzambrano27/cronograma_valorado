@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
 import { login } from '@/lib/auth-actions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,9 +9,27 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { SubmitButton } from '@/components/layout/submit-button';
+import { useRouter } from 'next/navigation';
+import { useSession } from '@/hooks/use-session';
 
 export default function LoginPage() {
-  const [state, formAction] = useActionState(login, undefined);
+  const router = useRouter();
+  const { setSession, session } = useSession();
+  const [state, formAction, isPending] = useActionState(login, undefined);
+
+  useEffect(() => {
+    if (state?.success && state.user) {
+      setSession({ isLoggedIn: true, user: state.user });
+      router.replace('/dashboard');
+    }
+  }, [state, setSession, router]);
+  
+  // If user is already logged in, redirect to dashboard
+  useEffect(() => {
+      if (session.isLoggedIn) {
+          router.replace('/dashboard');
+      }
+  }, [session, router]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
@@ -47,7 +65,7 @@ export default function LoginPage() {
                 <AlertDescription>{state.error}</AlertDescription>
               </Alert>
             )}
-            <SubmitButton className="w-full h-11 text-base">Iniciar Sesión</SubmitButton>
+            <SubmitButton className="w-full h-11 text-base" isPending={isPending}>Iniciar Sesión</SubmitButton>
           </form>
         </CardContent>
       </Card>

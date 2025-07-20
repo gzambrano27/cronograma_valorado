@@ -39,6 +39,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useRouter } from 'next/navigation';
 
 
 function MobileSidebarTrigger() {
@@ -66,12 +67,19 @@ interface AppShellProps {
 
 export default function AppShell({ children, allProjects, selectedCompanies, onCompanyChange }: AppShellProps) {
   const pathname = usePathname();
-  const { session } = useSession();
+  const { session, setSession } = useSession();
+  const router = useRouter();
   
   const user = session?.user;
 
   const isDashboardPage = pathname === "/dashboard";
   const title = "ProjectValuator";
+
+  const handleLogout = () => {
+    logout();
+    setSession({ isLoggedIn: false });
+    router.replace('/login');
+  };
 
   const filteredProjectsForSidebar = React.useMemo(() => {
     if (!selectedCompanies || selectedCompanies.length === 0) {
@@ -187,14 +195,10 @@ export default function AppShell({ children, allProjects, selectedCompanies, onC
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <form action={logout}>
-                    <DropdownMenuItem asChild>
-                       <button type="submit" className="w-full">
-                          <LogOut className="mr-2 h-4 w-4" />
-                          Cerrar sesión
-                       </button>
-                    </DropdownMenuItem>
-                  </form>
+                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Cerrar sesión
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}

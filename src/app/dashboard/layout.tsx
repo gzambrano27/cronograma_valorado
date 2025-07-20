@@ -1,34 +1,59 @@
 
-import type { Project } from '@/lib/types';
+'use client';
+
 import { getProjects } from "@/lib/data";
-import { getSession } from '@/lib/session';
-import AuthLayoutClient from '@/components/layout/auth-layout-client';
-import { checkDbConnection } from '@/lib/db';
 import { ConnectionError } from '@/components/layout/connection-error';
 import { DashboardProvider } from '@/hooks/use-dashboard-context';
+import AuthLayoutClient from "@/components/layout/auth-layout-client";
+import { checkDbConnection } from "@/lib/db";
+import { useEffect, useState } from "react";
+import type { Project } from "@/lib/types";
+import { useRouter } from "next/navigation";
+import { useSession } from "@/hooks/use-session";
 
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [isDbConnected, setIsDbConnected] = useState<boolean | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const router = useRouter();
+  const { session, isLoading } = useSession();
+
+  useEffect(() => {
+    const checkConnection = async () => {
+      const connected = await checkDbConnection();
+      setIsDbConnected(connected);
+      if (connected) {
+        const fetchedProjects = await getProjects();
+        setProjects(fetchedProjects);
+      }
+    };
+    checkConnection();
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading && !session.isLoggedIn) {
+      router.replace('/login');
+    }
+  }, [isLoading, session.isLoggedIn, router]);
+
+  if (isLoading || isDbConnected === null) {
+    return <div className="flex h-screen items-center justify-center">Cargando...</div>;
+  }
   
-  const isDbConnected = await checkDbConnection();
   if (!isDbConnected) {
     return <ConnectionError />;
   }
 
-  // getSession now returns a plain object, safe to pass to client components
-  const session = await getSession();
-  
-  // Note: Redirection logic is now handled by the middleware.
-  // This layout can assume a logged-in user is present.
-
-  const allProjects = await getProjects();
+  if (!session.isLoggedIn) {
+    return null; // or a loading spinner, as the redirect will happen
+  }
 
   return (
-    <DashboardProvider allProjects={allProjects}>
-      <AuthLayoutClient session={session}>
+    <DashboardProvider allProjects={projects}>
+      <AuthLayoutClient>
           {children}
       </AuthLayoutClient>
     </DashboardProvider>

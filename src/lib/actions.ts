@@ -1,7 +1,7 @@
 
 'use server';
 
-import type { Project, Task, TaskValidation, AppConfig, DailyConsumption, RawTask } from './types';
+import type { Project, Task, TaskValidation, AppConfig, DailyConsumption, RawTask, LoginResult } from './types';
 import fs from 'fs/promises';
 import path from 'path';
 import { z } from 'zod';
@@ -9,6 +9,8 @@ import { getAppConfig } from './data';
 import { eachDayOfInterval, format } from 'date-fns';
 import { query } from './db';
 import { revalidatePath } from 'next/cache';
+import { getOdooClient } from './odoo-client';
+import { getTranslatedName, checkUserIsManager } from './auth-actions';
 
 const configPath = path.join(process.cwd(), 'src', 'lib', 'config.json');
 
@@ -214,7 +216,7 @@ export async function validateTask(formData: FormData) {
     };
 
     await query(`
-      INSERT INTO "externo_task_validations" ("task_id", "date", "image_url", "location")
+      INSERT INTO "externo_task_validations" ("taskid", "date", "image_url", "location")
       VALUES ($1, $2, $3, $4)
     `, [newValidation.taskId, newValidation.date.toISOString(), newValidation.imageUrl, newValidation.location]);
 

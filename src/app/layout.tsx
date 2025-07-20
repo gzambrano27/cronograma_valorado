@@ -28,11 +28,8 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          {/* The SessionProvider no longer needs an initial value here.
-              It will be populated by the AuthLayoutClient for the dashboard,
-              or will be empty for public pages like /login. */}
           <SessionProvider>
-              {children}
+            {children}
             <Toaster />
           </SessionProvider>
         </ThemeProvider>

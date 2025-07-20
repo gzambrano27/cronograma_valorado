@@ -2,21 +2,14 @@
 'use client'
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from '@/hooks/use-session';
 
 export default function Home() {
     const router = useRouter();
-    const { session } = useSession();
 
     useEffect(() => {
-        // This component only runs on the client, so it's safe to use router here.
-        // The middleware has already handled initial redirection if necessary.
-        if (session.isLoggedIn) {
-            router.replace('/dashboard');
-        } else {
-            router.replace('/login');
-        }
-    }, [router, session.isLoggedIn]);
+      // Logic moved to login page to handle session check
+      router.replace('/login');
+    }, [router]);
 
     // Display a loading state while redirecting
     return (

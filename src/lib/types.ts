@@ -1,4 +1,5 @@
 
+
 export type Company = {
   id: number;
   name: string;
@@ -16,6 +17,12 @@ export type SessionUser = {
 export interface SessionData {
   isLoggedIn: boolean;
   user?: SessionUser;
+}
+
+export type LoginResult = {
+  success: boolean;
+  user?: SessionUser;
+  error?: string;
 }
 
 export type DailyConsumption = {

@@ -1,29 +1,18 @@
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getIronSession } from 'iron-session';
-import { sessionOptions, type SessionData } from './lib/session-config';
 
-const protectedRoutes = ['/dashboard'];
+// This middleware is now much simpler. It only handles basic routing.
+// Authentication checks are now primarily handled on the client-side
+// or in the specific page/layout that needs protection.
 
 export const middleware = async (req: NextRequest) => {
-  // We need to get the session directly here for route protection.
-  const session = await getIronSession<SessionData>(req.cookies, sessionOptions);
-  const { isLoggedIn } = session;
   const { pathname } = req.nextUrl;
-  
-  // If user is logged in and tries to access login page, redirect to dashboard
-  if (isLoggedIn && pathname.startsWith('/login')) {
-      return NextResponse.redirect(new URL('/dashboard', req.url));
-  }
 
-  // If user is not logged in and tries to access a protected route, redirect to login
-  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
-  if (!isLoggedIn && isProtectedRoute) {
-    return NextResponse.redirect(new URL('/login', req.url));
-  }
+  // You can add logic here for redirects that don't depend on session state,
+  // for example, redirecting from a legacy URL to a new one.
   
-  // If no redirection is needed, just continue to the requested path.
+  // The main responsibility is just to pass the request along.
   return NextResponse.next();
 };
 

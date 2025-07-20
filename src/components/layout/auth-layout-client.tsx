@@ -2,35 +2,27 @@
 'use client';
 import AppShell from '@/components/layout/app-shell';
 import { useDashboard } from '@/hooks/use-dashboard-context';
-import type { Company, SessionData } from '@/lib/types';
+import type { Company } from '@/lib/types';
 import React, { useEffect, useState } from 'react';
 import { useSession } from '@/hooks/use-session';
 
-const LOCAL_STORAGE_KEY = 'selectedCompanies';
+const LOCAL_STORAGE_KEY_COMPANIES = 'selectedCompanies';
 
 export default function AuthLayoutClient({
   children,
-  session: serverSession
 }: Readonly<{
   children: React.ReactNode;
-  session: SessionData; // This is now a plain object from the server
 }>) {
-  const user = serverSession?.user;
+  const { session } = useSession();
+  const user = session.user;
   const { allProjects, selectedCompanies, setSelectedCompanies } = useDashboard();
-  const { setSession } = useSession(); // Get the setter from the global context
   
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   
-  // Set the session in the global context provider once on initial load
-  useEffect(() => {
-    setSession(serverSession);
-  }, [serverSession, setSession]);
-
-
   useEffect(() => {
     if (user?.allowedCompanies && user.company && isInitialLoad) {
       try {
-        const storedCompanies = localStorage.getItem(LOCAL_STORAGE_KEY);
+        const storedCompanies = localStorage.getItem(LOCAL_STORAGE_KEY_COMPANIES);
         if (storedCompanies) {
           const parsedCompanies = JSON.parse(storedCompanies);
           const validStoredCompanies = parsedCompanies.filter((sc: Company) => 
@@ -55,20 +47,15 @@ export default function AuthLayoutClient({
     }
   }, [user, isInitialLoad, setSelectedCompanies]);
 
-
   useEffect(() => {
-    if (!isInitialLoad) {
+    if (!isInitialLoad && selectedCompanies.length > 0) {
       try {
-          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(selectedCompanies));
+          localStorage.setItem(LOCAL_STORAGE_KEY_COMPANIES, JSON.stringify(selectedCompanies));
       } catch (error) {
           console.error("Failed to save selected companies to localStorage", error);
       }
     }
   }, [selectedCompanies, isInitialLoad]);
-
-  if (isInitialLoad) {
-     return <div className="flex h-screen items-center justify-center">Cargando...</div>;
-  }
 
   return (
     <AppShell 
