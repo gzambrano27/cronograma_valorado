@@ -26,7 +26,7 @@ export default function AuthLayoutClient({
     if (isLoading) {
       return; // Wait for the session to load
     }
-    if (!session.isLoggedIn) {
+    if (!session.isLoggedIn && pathname !== '/login') {
       router.replace('/login');
     }
   }, [session.isLoggedIn, isLoading, router, pathname]);

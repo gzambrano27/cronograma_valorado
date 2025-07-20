@@ -26,6 +26,7 @@ export default function LoginPage() {
           console.error("Failed to save session to localStorage", error);
           // Handle potential storage errors, e.g., private browsing mode
       }
+      // Use replace to avoid the login page being in the history stack
       router.replace('/dashboard');
     }
   }, [state, router]);
