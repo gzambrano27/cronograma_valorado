@@ -78,7 +78,7 @@ export default function AppShell({ children, allProjects, selectedCompanies, onC
 
   // Determina si estamos dentro de la aplicación de "Cronograma Valorado"
   const isProjectsApp = pathname.startsWith("/dashboard/projects-overview");
-  const title = isProjectsApp ? "Cronograma Valorado" : "Menú Principal";
+  const title = "Menú";
 
   const handleLogout = () => {
     setSession({ isLoggedIn: false });
