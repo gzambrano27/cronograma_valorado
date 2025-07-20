@@ -162,7 +162,10 @@ export async function getTasksByProjectId(id: number): Promise<Task[]> {
     const userIdsArray = Array.from(userIds);
     const userPlaceholders = userIdsArray.map((_, i) => `$${i + 1}`).join(',');
     const usersData = await query<{ id: number, name: any }>(
-        `SELECT id, name FROM res_users WHERE id IN (${userPlaceholders})`,
+        `SELECT u.id, p.name 
+         FROM res_users u
+         JOIN res_partner p ON u.partner_id = p.id
+         WHERE u.id IN (${userPlaceholders})`,
         userIdsArray
     );
 
