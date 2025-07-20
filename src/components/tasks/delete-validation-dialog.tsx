@@ -14,6 +14,7 @@ import {
 import { deleteValidation } from "@/lib/actions";
 import { useTransition } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 interface DeleteValidationDialogProps {
   validationId: number;
@@ -35,6 +36,7 @@ export function DeleteValidationDialog({
 }: DeleteValidationDialogProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleDelete = async () => {
     startTransition(async () => {
@@ -46,6 +48,7 @@ export function DeleteValidationDialog({
             description: "La validación ha sido eliminada exitosamente.",
           });
           onSuccess();
+          router.refresh();
         }
       } catch (error) {
         toast({

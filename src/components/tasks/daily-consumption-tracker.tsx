@@ -24,11 +24,10 @@ import { useRouter } from "next/navigation";
 
 interface DailyConsumptionTrackerProps {
   task: Task;
-  onSuccess: () => void;
 }
 
 
-export function DailyConsumptionTracker({ task, onSuccess }: DailyConsumptionTrackerProps) {
+export function DailyConsumptionTracker({ task }: DailyConsumptionTrackerProps) {
   const { toast } = useToast();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -84,7 +83,7 @@ export function DailyConsumptionTracker({ task, onSuccess }: DailyConsumptionTra
             "PPP", { locale: es }
           )} ha sido actualizado.`,
         });
-        onSuccess();
+        router.refresh();
       } catch (error) {
         toast({
           variant: "destructive",

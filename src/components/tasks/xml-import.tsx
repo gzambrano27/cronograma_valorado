@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { importTasksFromXML } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 
-export function XmlImport({ projectId, onSuccess }: { projectId: number, onSuccess: () => void }) {
+export function XmlImport({ projectId }: { projectId: number }) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
     const { toast } = useToast();
@@ -27,7 +27,7 @@ export function XmlImport({ projectId, onSuccess }: { projectId: number, onSucce
                             title: "Importación Exitosa",
                             description: "Las tareas del archivo XML han sido importadas.",
                         });
-                        onSuccess();
+                        router.refresh();
                     }
                 } catch (error: any) {
                     toast({

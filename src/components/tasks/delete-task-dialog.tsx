@@ -14,13 +14,13 @@ import {
 import { deleteTask } from "@/lib/actions";
 import { useTransition } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 interface DeleteTaskDialogProps {
   taskId: number;
   projectId: number;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
 }
 
 /**
@@ -31,10 +31,10 @@ export function DeleteTaskDialog({
   projectId,
   open,
   onOpenChange,
-  onSuccess,
 }: DeleteTaskDialogProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleDelete = async () => {
     startTransition(async () => {
@@ -45,7 +45,7 @@ export function DeleteTaskDialog({
             title: "Tarea Eliminada",
             description: "La tarea ha sido eliminada exitosamente del proyecto.",
           });
-          onSuccess();
+          router.refresh();
         }
       } catch (error) {
         toast({

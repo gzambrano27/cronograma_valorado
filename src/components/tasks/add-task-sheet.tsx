@@ -34,7 +34,7 @@ function SubmitButton() {
     );
 }
 
-export function AddTaskSheet({ projectId, onSuccess }: { projectId: number, onSuccess: () => void }) {
+export function AddTaskSheet({ projectId }: { projectId: number }) {
   const [open, setOpen] = React.useState(false)
   const { toast } = useToast()
   const router = useRouter();

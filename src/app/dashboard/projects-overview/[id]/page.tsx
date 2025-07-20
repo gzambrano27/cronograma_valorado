@@ -1,7 +1,7 @@
 
 
 'use client'
-import { notFound, useParams, useRouter } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import { getProjects, getTasksByProjectId, generateSCurveData } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TaskTable } from "@/components/tasks/task-table";
@@ -18,7 +18,6 @@ import { useSession } from "@/hooks/use-session";
 
 export default function ProjectPage() {
   const params = useParams();
-  const router = useRouter();
   const id = parseInt(params.id as string, 10);
   const [project, setProject] = useState<Project | null>(null);
   const [projectTasks, setProjectTasks] = useState<Task[]>([]);
@@ -26,8 +25,8 @@ export default function ProjectPage() {
   const { session } = useSession();
   const isManager = session.user?.isManager ?? false;
 
-  // La recarga de datos ahora es manejada por Next.js a través de revalidatePath y router.refresh()
-  // Esta función se mantiene para la carga inicial de datos.
+  // Carga inicial de datos del lado del cliente.
+  // Next.js se encargará de las actualizaciones a través de revalidatePath y router.refresh().
   const loadInitialData = useCallback(async () => {
     if (isNaN(id)) {
         notFound();
@@ -61,11 +60,6 @@ export default function ProjectPage() {
         loadInitialData();
     }
   }, [id, loadInitialData]);
-
-  // Esta función será llamada por los componentes hijos para refrescar los datos.
-  const handleSuccess = () => {
-    router.refresh();
-  };
   
   if (!project) {
     return (
@@ -88,8 +82,8 @@ export default function ProjectPage() {
           {project.name}
         </h1>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          <XmlImport projectId={id} onSuccess={handleSuccess} />
-          <AddTaskSheet projectId={project.id} onSuccess={handleSuccess} />
+          <XmlImport projectId={id} />
+          <AddTaskSheet projectId={project.id} />
         </div>
       </div>
 
@@ -177,7 +171,7 @@ export default function ProjectPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <TaskTable data={projectTasks} onSuccess={handleSuccess} />
+          <TaskTable data={projectTasks} />
         </CardContent>
       </Card>
     </div>

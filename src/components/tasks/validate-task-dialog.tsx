@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { validateTask } from "@/lib/actions";
 import type { Task } from "@/lib/types";
 import { UploadCloud, MapPin, Loader2, X, RotateCw } from "lucide-react";
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
@@ -51,19 +51,19 @@ export function ValidateTaskDialog({
   task,
   open,
   onOpenChange,
-  onSuccess,
 }: {
   task: Task;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [location, setLocation] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { session } = useSession();
+  const router = useRouter();
   const hasValidations = task.validations && task.validations.length > 0;
   const userId = session.user?.id;
 
@@ -107,13 +107,14 @@ export function ValidateTaskDialog({
         toast({ variant: "destructive", title: "Error", description: "No se pudo identificar al usuario." });
         return;
     }
+    setIsSubmitting(true);
     try {
       await validateTask(formData);
       toast({
           title: "Tarea Validada",
           description: "La imagen y la ubicación han sido guardadas correctamente.",
       });
-      onSuccess();
+      router.refresh();
       onOpenChange(false);
     } catch (error: any) {
        toast({
@@ -121,6 +122,8 @@ export function ValidateTaskDialog({
         title: "Error al validar",
         description: error.message || "No se pudo guardar la validación.",
       });
+    } finally {
+        setIsSubmitting(false);
     }
   };
   
@@ -193,7 +196,7 @@ export function ValidateTaskDialog({
           </div>
           <DialogFooter>
              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-             <SubmitButton disabled={!location || !imagePreview} />
+             <SubmitButton disabled={!location || !imagePreview || isSubmitting} />
           </DialogFooter>
         </form>
       </DialogContent>

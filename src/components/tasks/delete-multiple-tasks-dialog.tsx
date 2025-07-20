@@ -16,6 +16,7 @@ import { useTransition } from "react";
 import { useToast } from "@/hooks/use-toast";
 import type { Task } from "@/lib/types";
 import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
 
 interface DeleteMultipleTasksDialogProps {
   tasks: Task[];
@@ -35,6 +36,7 @@ export function DeleteMultipleTasksDialog({
 }: DeleteMultipleTasksDialogProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const router = useRouter();
 
   const taskIds = tasks.map(t => t.id);
   const projectId = tasks[0]?.projectId;
@@ -58,6 +60,7 @@ export function DeleteMultipleTasksDialog({
             description: "Las tareas seleccionadas han sido eliminadas correctamente.",
           });
           onSuccess();
+          router.refresh();
         }
       } catch (error) {
         toast({
