@@ -9,6 +9,11 @@ import { checkDbConnection } from "@/lib/db";
 import { SessionProvider } from "@/hooks/use-session";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 
+// Forza el renderizado dinámico para todas las rutas dentro de este layout.
+// Esto asegura que los datos se obtienen de la base de datos en cada solicitud,
+// manteniendo la información (como el progreso del proyecto) siempre actualizada.
+export const dynamic = 'force-dynamic';
+
 // Este es el layout principal para el área de dashboard después de la autenticación.
 // Es un Server Component por defecto, lo que permite realizar la carga de datos inicial en el servidor.
 
