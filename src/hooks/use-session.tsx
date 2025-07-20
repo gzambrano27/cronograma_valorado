@@ -2,7 +2,7 @@
 'use client';
 
 import type { SessionData } from '@/lib/types';
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
 
@@ -53,7 +53,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         }
     }, [pathname, router]);
 
-    const setSession = (newSession: SessionData) => {
+    const setSession = useCallback((newSession: SessionData) => {
         setSessionState(newSession);
         try {
             if (newSession.isLoggedIn) {
@@ -69,7 +69,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         } catch (error) {
             console.error("Failed to save session to localStorage", error);
         }
-    };
+    }, []);
     
     return <SessionContext.Provider value={{ session, setSession, isLoading }}>{children}</SessionContext.Provider>
 }
