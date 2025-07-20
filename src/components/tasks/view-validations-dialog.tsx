@@ -20,7 +20,7 @@ import type { Task, TaskValidation } from "@/lib/types";
 import Image from "next/image";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { MapPin, Calendar, Trash2 } from "lucide-react";
+import { MapPin, Calendar, Trash2, User } from "lucide-react";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { DeleteValidationDialog } from "./delete-validation-dialog";
@@ -99,12 +99,16 @@ export function ViewValidationsDialog({
                                     <span className="sr-only">Eliminar Validación</span>
                                 </Button>
                             </div>
-                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 rounded-b-lg">
-                              <div className="flex items-center gap-2 text-white text-sm">
+                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 rounded-b-lg text-white">
+                              <div className="flex items-center gap-2 text-sm">
+                                <User className="h-4 w-4" />
+                                <span>Subido por: <strong>{validation.username || 'Desconocido'}</strong></span>
+                              </div>
+                              <div className="flex items-center gap-2 text-sm mt-1">
                                 <Calendar className="h-4 w-4" />
                                 <span>{format(new Date(validation.date), "PPP p", { locale: es })}</span>
                               </div>
-                              <div className="flex items-center gap-2 text-white text-sm mt-1">
+                              <div className="flex items-center gap-2 text-sm mt-1">
                                   <MapPin className="h-4 w-4" />
                                   <a
                                     href={`https://www.google.com/maps/search/?api=1&query=${validation.location}`}

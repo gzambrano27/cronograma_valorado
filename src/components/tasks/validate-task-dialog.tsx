@@ -21,6 +21,7 @@ import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "../ui/skeleton";
 import dynamic from "next/dynamic";
+import { useSession } from "@/hooks/use-session";
 
 // Importación dinámica del componente de mapa para evitar errores de SSR,
 // ya que depende de objetos del navegador como `window`.
@@ -61,7 +62,9 @@ export function ValidateTaskDialog({
   const [location, setLocation] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { toast } = useToast();
+  const { session } = useSession();
   const hasValidations = task.validations && task.validations.length > 0;
+  const username = session.user?.name || 'Desconocido';
 
   // Callback para manejar la selección de ubicación desde el mapa.
   const handleLocationSelect = useCallback((loc: { lat: number; lng: number }) => {
@@ -141,6 +144,7 @@ export function ValidateTaskDialog({
             {/* Inputs ocultos para enviar datos adicionales con el formulario */}
             <input type="hidden" name="taskId" value={task.id} />
             <input type="hidden" name="projectId" value={task.projectId} />
+            <input type="hidden" name="username" value={username} />
             {location && <input type="hidden" name="location" value={location} />}
 
             <div className="space-y-2">

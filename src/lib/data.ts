@@ -42,6 +42,7 @@ function processTask(rawTask: RawTask): Task {
       date: new Date(v.date),
       imageUrl: v.imageurl,
       location: v.location,
+      username: v.username,
     })),
   };
 }

@@ -118,7 +118,7 @@ export async function createTask(projectId: number, formData: FormData) {
   `, [projectId, name, quantity, value, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption)]);
 
   // Revalida las rutas para que Next.js actualice la caché y muestre los nuevos datos.
-  revalidatePath(`/dashboard/projects/${projectId}`);
+  revalidatePath(`/dashboard/projects-overview/${projectId}`);
   revalidatePath(`/dashboard`);
   return { success: true };
 }
@@ -126,7 +126,7 @@ export async function createTask(projectId: number, formData: FormData) {
 // Acción para eliminar una tarea.
 export async function deleteTask(taskId: number, projectId: number) {
     await query(`DELETE FROM "externo_tasks" WHERE id = $1`, [taskId]);
-    revalidatePath(`/dashboard/projects/${projectId}`);
+    revalidatePath(`/dashboard/projects-overview/${projectId}`);
     revalidatePath(`/dashboard`);
     return { success: true };
 }
@@ -141,7 +141,7 @@ export async function deleteMultipleTasks(taskIds: number[], projectId: number |
     }
     const placeholders = taskIds.map((_, i) => `$${i + 1}`).join(',');
     await query(`DELETE FROM "externo_tasks" WHERE id IN (${placeholders})`, taskIds);
-    revalidatePath(`/dashboard/projects/${projectId}`);
+    revalidatePath(`/dashboard/projects-overview/${projectId}`);
     revalidatePath(`/dashboard`);
     return { success: true };
 }
@@ -189,7 +189,7 @@ export async function updateTaskConsumption(taskId: number, date: string, consum
         WHERE id = $4
     `, [JSON.stringify(dailyConsumption), totalConsumed, newStatus, taskId]);
 
-    revalidatePath(`/dashboard/projects/${taskData.projectid}`);
+    revalidatePath(`/dashboard/projects-overview/${taskData.projectid}`);
     revalidatePath(`/dashboard`);
     return { success: true };
 }
@@ -199,6 +199,7 @@ const ValidateTaskSchema = z.object({
   taskId: z.coerce.number(),
   projectId: z.coerce.number(),
   location: z.string(),
+  username: z.string().min(1, 'El nombre de usuario es requerido.'),
 });
 
 // Acción para añadir una validación (imagen y ubicación) a una tarea.
@@ -207,6 +208,7 @@ export async function validateTask(formData: FormData) {
         taskId: formData.get('taskId'),
         projectId: formData.get('projectId'),
         location: formData.get('location'),
+        username: formData.get('username'),
     });
 
     if (!validatedFields.success) {
@@ -214,7 +216,7 @@ export async function validateTask(formData: FormData) {
         throw new Error('Datos de validación inválidos.');
     }
 
-    const { taskId, projectId, location } = validatedFields.data;
+    const { taskId, projectId, location, username } = validatedFields.data;
     const imageFile = formData.get('image') as File | null;
 
     if (!imageFile || imageFile.size === 0) {
@@ -227,18 +229,18 @@ export async function validateTask(formData: FormData) {
     const imageUrl = `data:${imageFile.type};base64,${buffer.toString('base64')}`;
 
     await query(`
-      INSERT INTO "externo_task_validations" ("taskid", "date", "imageurl", "location")
-      VALUES ($1, $2, $3, $4)
-    `, [taskId, new Date().toISOString(), imageUrl, location]);
+      INSERT INTO "externo_task_validations" ("taskid", "date", "imageurl", "location", "username")
+      VALUES ($1, $2, $3, $4, $5)
+    `, [taskId, new Date().toISOString(), imageUrl, location, username]);
 
-    revalidatePath(`/dashboard/projects/${projectId}`);
+    revalidatePath(`/dashboard/projects-overview/${projectId}`);
     return { success: true };
 }
 
 // Acción para eliminar una validación.
 export async function deleteValidation(validationId: number, projectId: number) {
     await query(`DELETE FROM "externo_task_validations" WHERE id = $1`, [validationId]);
-    revalidatePath(`/dashboard/projects/${projectId}`);
+    revalidatePath(`/dashboard/projects-overview/${projectId}`);
     return { success: true };
 }
 
@@ -341,7 +343,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
     `, [task.projectId, task.name, task.quantity, task.value, task.startDate.toISOString(), task.endDate.toISOString(), JSON.stringify(task.dailyConsumption)]);
   }
 
-  revalidatePath(`/dashboard/projects/${projectId}`);
+  revalidatePath(`/dashboard/projects-overview/${projectId}`);
   revalidatePath(`/dashboard`);
   return { success: true, message: `${newTasks.length} tareas importadas.` };
 }
