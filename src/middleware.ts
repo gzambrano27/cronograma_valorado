@@ -7,33 +7,24 @@ import { sessionOptions, type SessionData } from './lib/session-config';
 const protectedRoutes = ['/dashboard'];
 
 export const middleware = async (req: NextRequest) => {
+  // We need to get the session directly here for route protection.
   const session = await getIronSession<SessionData>(req.cookies, sessionOptions);
-  const { user } = session;
+  const { isLoggedIn } = session;
   const { pathname } = req.nextUrl;
   
   // If user is logged in and tries to access login page, redirect to dashboard
-  if (user && pathname.startsWith('/login')) {
+  if (isLoggedIn && pathname.startsWith('/login')) {
       return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 
   // If user is not logged in and tries to access a protected route, redirect to login
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
-  if (!user && isProtectedRoute) {
+  if (!isLoggedIn && isProtectedRoute) {
     return NextResponse.redirect(new URL('/login', req.url));
   }
-
-  // For all server-side requests to protected routes, pass session data via headers
-  // This avoids components needing to call `cookies()` themselves.
-  const requestHeaders = new Headers(req.headers);
-  if (user) {
-    requestHeaders.set('x-session-data', JSON.stringify({ user }));
-  }
-
-  return NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
+  
+  // If no redirection is needed, just continue to the requested path.
+  return NextResponse.next();
 };
 
 export const config = {
