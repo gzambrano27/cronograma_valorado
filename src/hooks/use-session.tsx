@@ -31,19 +31,16 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
                 const parsedSession: SessionData = JSON.parse(storedSession);
                 setSessionState(parsedSession);
                 
-                // If user is logged in but on the login page, redirect them
                 if (parsedSession.isLoggedIn && pathname === '/login') {
                     router.replace('/dashboard');
                 }
             } else {
-                // If no session and user is trying to access a protected route
                 if (pathname.startsWith('/dashboard')) {
                     router.replace('/login');
                 }
             }
         } catch (error) {
             console.error("Failed to parse session from localStorage", error);
-            // On error, assume logged out and redirect if necessary
             localStorage.removeItem(LOCAL_STORAGE_KEY_SESSION);
             if (pathname.startsWith('/dashboard')) {
                 router.replace('/login');
@@ -59,12 +56,9 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
             if (newSession.isLoggedIn) {
                 const sessionString = JSON.stringify(newSession);
                 localStorage.setItem(LOCAL_STORAGE_KEY_SESSION, sessionString);
-                // Also set a simple cookie for server-side checks if needed in the future,
-                // but primary auth is client-side.
-                document.cookie = `userSession=${sessionString}; path=/; max-age=604800; SameSite=Lax`; // 7 days
+                document.cookie = `userSession=${sessionString}; path=/; max-age=604800; SameSite=Lax`; 
             } else {
                 localStorage.removeItem(LOCAL_STORAGE_KEY_SESSION);
-                // Expire the cookie
                 document.cookie = 'userSession=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
             }
         } catch (error) {
@@ -72,6 +66,11 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         }
     }, []);
     
+    // Do not render children until loading is complete to prevent hydration mismatch
+    if (isLoading) {
+        return null;
+    }
+
     return <SessionContext.Provider value={{ session, setSession, isLoading }}>{children}</SessionContext.Provider>
 }
 
