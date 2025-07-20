@@ -14,7 +14,7 @@ import { useSession } from '@/hooks/use-session';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { setSession, session } = useSession();
+  const { setSession, session, isLoading } = useSession();
   const [state, formAction, isPending] = useActionState(login, undefined);
 
   useEffect(() => {
@@ -25,10 +25,20 @@ export default function LoginPage() {
   }, [state, setSession]);
 
   useEffect(() => {
-    if (session.isLoggedIn) {
+    // Redirect if user is already logged in
+    if (!isLoading && session.isLoggedIn) {
       router.replace('/dashboard');
     }
-  }, [session, router]);
+  }, [session, isLoading, router]);
+  
+  // Don't render the form while session is loading or if already logged in
+  if (isLoading || session.isLoggedIn) {
+    return (
+        <div className="flex h-screen items-center justify-center">
+            <p>Cargando...</p>
+        </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">

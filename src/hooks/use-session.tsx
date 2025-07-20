@@ -3,8 +3,6 @@
 
 import type { SessionData } from '@/lib/types';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-
 
 type SessionContextType = {
     session: SessionData;
@@ -21,8 +19,6 @@ const LOCAL_STORAGE_KEY_SESSION = 'userSession';
 export const SessionProvider = ({ children }: { children: React.ReactNode }) => {
     const [session, setSessionState] = useState<SessionData>(defaultSession);
     const [isLoading, setIsLoading] = useState(true);
-    const router = useRouter();
-    const pathname = usePathname();
 
     useEffect(() => {
         try {
@@ -54,20 +50,8 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         }
     }, []);
 
-    useEffect(() => {
-        if (!isLoading) {
-            const isAuthPage = pathname === '/login';
-            if (session.isLoggedIn && isAuthPage) {
-                router.replace('/dashboard');
-            } else if (!session.isLoggedIn && !isAuthPage) {
-                router.replace('/login');
-            }
-        }
-    }, [session.isLoggedIn, isLoading, pathname, router]);
-
-    if (isLoading) {
-        return null;
-    }
+    // The router logic is now removed from here.
+    // Redirection is handled by the page components themselves.
 
     return <SessionContext.Provider value={{ session, setSession, isLoading }}>{children}</SessionContext.Provider>
 }

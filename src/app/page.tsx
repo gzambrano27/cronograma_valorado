@@ -2,16 +2,22 @@
 'use client'
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from '@/hooks/use-session';
 
 export default function Home() {
     const router = useRouter();
+    const { session, isLoading } = useSession();
 
     useEffect(() => {
-      // Logic moved to login page to handle session check
-      router.replace('/login');
-    }, [router]);
+      if (!isLoading) {
+        if (session.isLoggedIn) {
+          router.replace('/dashboard');
+        } else {
+          router.replace('/login');
+        }
+      }
+    }, [isLoading, session.isLoggedIn, router]);
 
-    // Display a loading state while redirecting
     return (
       <div className="flex h-screen items-center justify-center">
         <p>Redirigiendo...</p>
