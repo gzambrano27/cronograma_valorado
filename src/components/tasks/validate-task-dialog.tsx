@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { validateTask } from "@/lib/actions";
 import type { Task } from "@/lib/types";
-import { UploadCloud, MapPin, Loader2 } from "lucide-react";
+import { UploadCloud, MapPin, Loader2, X } from "lucide-react";
 import React, { useState, useRef, useCallback } from "react";
 import { useFormStatus } from "react-dom";
 import Image from "next/image";
@@ -53,6 +53,7 @@ export function ValidateTaskDialog({
   onSuccess: () => void;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [location, setLocation] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { toast } = useToast();
@@ -80,6 +81,13 @@ export function ValidateTaskDialog({
       reader.readAsDataURL(file);
     }
   };
+  
+  const clearImage = () => {
+    setImagePreview(null);
+    if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+    }
+  }
 
   const action = async (formData: FormData) => {
     try {
@@ -105,7 +113,7 @@ export function ValidateTaskDialog({
         onOpenChange(isOpen);
         if (!isOpen) {
             // Reset state when closing
-            setImagePreview(null);
+            clearImage();
             setLocation(null);
         }
     }}>
@@ -126,12 +134,18 @@ export function ValidateTaskDialog({
 
             <div className="space-y-2">
                 <Label htmlFor="image">Imagen de Evidencia</Label>
-                <div className="relative flex items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted">
-                    <Input id="image" name="image" type="file" accept="image/*" className="absolute w-full h-full opacity-0 cursor-pointer" onChange={handleImageChange} required />
+                <div className="relative flex items-center justify-center w-full h-48 border-2 border-dashed rounded-lg group hover:bg-muted">
+                    <Input ref={fileInputRef} id="image" name="image" type="file" accept="image/*" className="absolute w-full h-full opacity-0 cursor-pointer" onChange={handleImageChange} required={!imagePreview} />
                     {imagePreview ? (
-                        <Image src={imagePreview} alt="Previsualización" fill objectFit="contain" className="rounded-lg p-1" />
+                       <>
+                        <Image src={imagePreview} alt="Previsualización" fill style={{objectFit: "contain"}} className="rounded-lg p-1" />
+                         <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 z-10 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity" onClick={clearImage}>
+                            <X className="h-4 w-4" />
+                            <span className="sr-only">Cambiar imagen</span>
+                        </Button>
+                       </>
                     ) : (
-                        <div className="text-center">
+                        <div className="text-center pointer-events-none">
                             <UploadCloud className="w-8 h-8 mx-auto text-muted-foreground" />
                             <p className="mt-2 text-sm text-muted-foreground">Arrastra y suelta o haz clic para subir</p>
                         </div>
