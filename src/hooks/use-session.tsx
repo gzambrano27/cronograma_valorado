@@ -59,7 +59,8 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
             if (newSession.isLoggedIn) {
                 const sessionString = JSON.stringify(newSession);
                 localStorage.setItem(LOCAL_STORAGE_KEY_SESSION, sessionString);
-                // Also set a simple cookie for server-side checks
+                // Also set a simple cookie for server-side checks if needed in the future,
+                // but primary auth is client-side.
                 document.cookie = `userSession=${sessionString}; path=/; max-age=604800; SameSite=Lax`; // 7 days
             } else {
                 localStorage.removeItem(LOCAL_STORAGE_KEY_SESSION);
