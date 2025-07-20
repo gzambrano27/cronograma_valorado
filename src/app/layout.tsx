@@ -22,17 +22,17 @@ export default function RootLayout({
          <meta name="description" content="Una aplicación para valorar y gestionar el cronograma de proyectos." />
       </head>
       <body className="font-body antialiased">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          <SessionProvider>
+        <SessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem={false}
+            disableTransitionOnChange
+          >
             {children}
             <Toaster />
-          </SessionProvider>
-        </ThemeProvider>
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

@@ -41,13 +41,14 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
 
     useEffect(() => {
         if (!isLoading) {
-            if (session.isLoggedIn && pathname === '/login') {
+            const isAuthPage = pathname === '/login';
+            if (session.isLoggedIn && isAuthPage) {
                 router.replace('/dashboard');
-            } else if (!session.isLoggedIn && pathname.startsWith('/dashboard')) {
+            } else if (!session.isLoggedIn && !isAuthPage) {
                 router.replace('/login');
             }
         }
-    }, [session, isLoading, pathname, router]);
+    }, [session.isLoggedIn, isLoading, pathname, router]);
 
     const setSession = useCallback((newSession: SessionData) => {
         setSessionState(newSession);
@@ -55,10 +56,8 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
             if (newSession.isLoggedIn) {
                 const sessionString = JSON.stringify(newSession);
                 localStorage.setItem(LOCAL_STORAGE_KEY_SESSION, sessionString);
-                document.cookie = `userSession=${sessionString}; path=/; max-age=604800; SameSite=Lax`; 
             } else {
                 localStorage.removeItem(LOCAL_STORAGE_KEY_SESSION);
-                document.cookie = 'userSession=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
             }
         } catch (error) {
             console.error("Failed to save session to localStorage", error);
