@@ -6,24 +6,12 @@ import { z } from 'zod';
 import { getOdooClient } from './odoo-client';
 import type { Company, UserGroupInfo, LoginResult } from './types';
 import { query } from './db';
+import { getTranslatedName } from './utils';
 
 const LoginSchema = z.object({
   email: z.string().min(1, 'Por favor ingrese su usuario.'),
   password: z.string().min(1, 'La contraseña es requerida.'),
 });
-
-export const getTranslatedName = (nameField: any): string => {
-  if (typeof nameField === 'string') {
-    return nameField;
-  }
-  if (typeof nameField === 'object' && nameField !== null && !Array.isArray(nameField)) {
-    return nameField.es_EC || nameField.en_US || 'N/A';
-  }
-  if (Array.isArray(nameField) && nameField.length > 1) {
-    return getTranslatedName(nameField[1]);
-  }
-  return 'N/A';
-};
 
 export async function checkUserIsManager(userId: number): Promise<boolean> {
   const userGroups = await query<UserGroupInfo>(`
@@ -126,7 +114,7 @@ export async function login(prevState: LoginResult | undefined, formData: FormDa
   }
 }
 
-export function logout() {
+export async function logout() {
   // This is now a client-side operation handled in useSession hook
   // by clearing localStorage. This function can be kept for semantics
   // but doesn't need to be a server action.

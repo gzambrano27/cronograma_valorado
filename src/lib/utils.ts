@@ -17,3 +17,16 @@ export function formatCurrency(amount: number, minimumFractionDigits = 2) {
     maximumFractionDigits: 2,
   }).format(amount);
 }
+
+export const getTranslatedName = (nameField: any): string => {
+  if (typeof nameField === 'string') {
+    return nameField;
+  }
+  if (typeof nameField === 'object' && nameField !== null && !Array.isArray(nameField)) {
+    return nameField.es_EC || nameField.en_US || 'N/A';
+  }
+  if (Array.isArray(nameField) && nameField.length > 1) {
+    return getTranslatedName(nameField[1]);
+  }
+  return 'N/A';
+};

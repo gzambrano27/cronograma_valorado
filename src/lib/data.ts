@@ -1,3 +1,4 @@
+
 'use server';
 import type { Project, Task, SCurveData, AppConfig, TaskValidation, RawTask, RawTaskValidation, RawProject } from './types';
 import fs from 'fs/promises';
@@ -5,6 +6,7 @@ import path from 'path';
 import { eachDayOfInterval, format, startOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { query } from './db';
+import { getTranslatedName } from './utils';
 
 // Helper to convert DB numeric string types to numbers
 const toFloat = (value: string | number | null): number => {
@@ -53,20 +55,6 @@ export async function getAppConfig(): Promise<AppConfig> {
 }
 
 export async function getProjects(): Promise<Project[]> {
-    // Helper function to extract translated names from Odoo's JSONB format
-    const getTranslatedName = (nameField: any): string => {
-        if (typeof nameField === 'string') {
-            return nameField;
-        }
-        if (typeof nameField === 'object' && nameField !== null && !Array.isArray(nameField)) {
-            return nameField.es_EC || nameField.en_US || 'N/A';
-        }
-        if (Array.isArray(nameField) && nameField.length > 1) {
-            return getTranslatedName(nameField[1]);
-        }
-        return 'N/A';
-    };
-
     const sqlQuery = `
       WITH ProjectTaskMetrics AS (
         SELECT
