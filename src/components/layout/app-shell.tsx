@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Building2, Cog, Briefcase, GanttChartSquare, PanelLeft, LogOut } from "lucide-react";
+import { Building2, Cog, Briefcase, GanttChartSquare, PanelLeft, LogOut, LayoutDashboard, FolderKanban } from "lucide-react";
 import React from "react";
 
 import type { Company, Project, SessionUser } from "@/lib/types";
@@ -64,6 +64,11 @@ interface AppShellProps {
     onCompanyChange: (companies: Company[]) => void;
 }
 
+/**
+ * Componente principal que define la estructura de la aplicación (Sidebar + Contenido).
+ * Renderiza una barra lateral diferente dependiendo de si el usuario está en el 
+ * "Centro de Aplicaciones" o dentro de una aplicación específica.
+ */
 export default function AppShell({ children, allProjects, selectedCompanies, onCompanyChange }: AppShellProps) {
   const pathname = usePathname();
   const { session, setSession } = useSession();
@@ -71,8 +76,9 @@ export default function AppShell({ children, allProjects, selectedCompanies, onC
   
   const user = session?.user;
 
-  const isDashboardPage = pathname === "/dashboard";
-  const title = "Menú";
+  // Determina si estamos dentro de la aplicación de "Cronograma Valorado"
+  const isProjectsApp = pathname.startsWith("/dashboard/projects");
+  const title = isProjectsApp ? "Cronograma Valorado" : "Menú Principal";
 
   const handleLogout = () => {
     setSession({ isLoggedIn: false });
@@ -102,64 +108,110 @@ export default function AppShell({ children, allProjects, selectedCompanies, onC
             </div>
           </SidebarHeader>
           <SidebarContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  size="sm"
-                  isActive={isDashboardPage}
-                  tooltip={{ children: "Panel Principal" }}
-                >
-                  <Link href={`/dashboard`}>
-                    <GanttChartSquare className="h-4 w-4 shrink-0" />
-                    <span className="truncate">
-                      Panel Principal
-                    </span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
-              {filteredProjectsForSidebar.map((project, index) => (
-                <SidebarMenuItem key={project.id}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <SidebarMenuButton
-                        asChild
-                        size="sm"
-                        isActive={pathname === `/dashboard/projects/${project.id}`}
-                        tooltip={{ children: project.name }}
-                      >
-                        <Link href={`/dashboard/projects/${project.id}`}>
-                          <div className="relative">
-                            <Briefcase className="h-4 w-4 shrink-0" />
-                            <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
-                              {index + 1}
-                            </span>
-                          </div>
-                          <span>
-                            {project.name}
-                          </span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </TooltipTrigger>
-                    <TooltipContent
-                      side="right"
-                      align="start"
-                      className="group-data-[state=expanded]/sidebar:block hidden"
+            {/* Renderizado condicional del menú de la barra lateral */}
+            {isProjectsApp ? (
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      size="sm"
+                      isActive={pathname === "/dashboard"}
+                      tooltip={{ children: "Centro de Aplicaciones" }}
                     >
-                      {project.name}
-                    </TooltipContent>
-                  </Tooltip>
-                </SidebarMenuItem>
-              ))}
-              {filteredProjectsForSidebar.length === 0 && (
-                 <SidebarMenuItem>
-                    <span className="flex items-center gap-2 p-2 text-sm text-sidebar-foreground/70">
-                        No hay proyectos.
-                    </span>
-                 </SidebarMenuItem>
-              )}
-            </SidebarMenu>
+                      <Link href={`/dashboard`}>
+                        <LayoutDashboard className="h-4 w-4 shrink-0" />
+                        <span className="truncate">
+                          Panel Principal
+                        </span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                     <SidebarMenuButton
+                      asChild
+                      size="sm"
+                      isActive={pathname === "/dashboard/projects-overview"}
+                      tooltip={{ children: "Vista General de Proyectos" }}
+                    >
+                      <Link href={`/dashboard/projects-overview`}>
+                        <FolderKanban className="h-4 w-4 shrink-0" />
+                        <span className="truncate">
+                          Proyectos
+                        </span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
+                  {filteredProjectsForSidebar.map((project) => (
+                    <SidebarMenuItem key={project.id}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <SidebarMenuButton
+                            asChild
+                            size="sm"
+                            isActive={pathname === `/dashboard/projects/${project.id}`}
+                            tooltip={{ children: project.name }}
+                          >
+                            <Link href={`/dashboard/projects/${project.id}`}>
+                              <Briefcase className="h-4 w-4 shrink-0" />
+                              <span>
+                                {project.name}
+                              </span>
+                            </Link>
+                          </SidebarMenuButton>
+                        </TooltipTrigger>
+                        <TooltipContent
+                          side="right"
+                          align="start"
+                          className="group-data-[state=expanded]/sidebar:block hidden"
+                        >
+                          {project.name}
+                        </TooltipContent>
+                      </Tooltip>
+                    </SidebarMenuItem>
+                  ))}
+                  {filteredProjectsForSidebar.length === 0 && (
+                     <SidebarMenuItem>
+                        <span className="flex items-center gap-2 p-2 text-sm text-sidebar-foreground/70">
+                            No hay proyectos.
+                        </span>
+                     </SidebarMenuItem>
+                  )}
+                </SidebarMenu>
+            ) : (
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                          asChild
+                          size="sm"
+                          isActive={pathname === "/dashboard/projects-overview"}
+                          tooltip={{ children: "Cronograma Valorado" }}
+                        >
+                          <Link href={`/dashboard/projects-overview`}>
+                              <GanttChartSquare className="h-4 w-4 shrink-0" />
+                              <span className="truncate">
+                                Proyectos
+                              </span>
+                          </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton
+                            asChild
+                            size="sm"
+                            isActive={pathname === "/settings"}
+                            tooltip={{ children: "Configuración" }}
+                        >
+                            <Link href={`/settings`}>
+                                <Cog className="h-4 w-4 shrink-0" />
+                                <span className="truncate">
+                                    Configuración
+                                </span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            )}
           </SidebarContent>
         </Sidebar>
         <SidebarMain>

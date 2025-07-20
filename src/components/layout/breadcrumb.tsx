@@ -8,12 +8,13 @@ import type { Project } from '@/lib/types';
 import { useDashboard } from '@/hooks/use-dashboard-context';
 
 interface BreadcrumbProps {
-  // projects prop is no longer needed
+  // La prop projects ya no es necesaria
 }
 
 const translations: Record<string, string> = {
   dashboard: 'Panel Principal',
   projects: 'Proyectos',
+  'projects-overview': 'Proyectos',
   settings: 'Configuración',
 };
 
@@ -38,23 +39,27 @@ export function Breadcrumb({}: BreadcrumbProps) {
         path += `/${segment}`;
         const isLast = index === segments.length - 1;
         
-        if (segment === 'dashboard' && segments.length === 1) {
-             return {
-                name: translations[segment] || segment,
-                href: path,
-                isLast: true,
-            };
-        }
+        let name = translations[segment] || segment;
+        let href = path;
 
-        if (segment === 'projects' && segments[index + 1]) {
-            const projectId = parseInt(segments[index + 1], 10);
-            return {
-                name: translations[segment] || segment,
-                href: '/dashboard', // Projects level should link back to dashboard overview for now
-                isLast: false,
-            };
+        // Caso especial para la vista general de proyectos
+        if (segment === 'projects-overview') {
+          return { name, href: path, isLast };
         }
         
+        // Si estamos en un proyecto específico, el breadcrumb de "Proyectos" debe apuntar a la vista general.
+        if (segment === 'projects' && segments[index + 1]) {
+            const projectId = parseInt(segments[index + 1], 10);
+            if (!isNaN(projectId)) {
+              return {
+                  name: name,
+                  href: '/dashboard/projects-overview', // Enlace a la vista general
+                  isLast: false,
+              };
+            }
+        }
+        
+        // Si el segmento es un ID de proyecto
         if (!isNaN(parseInt(segment)) && segments[index - 1] === 'projects') {
              return {
                 name: getProjectName(parseInt(segment, 10)),
@@ -63,16 +68,12 @@ export function Breadcrumb({}: BreadcrumbProps) {
             };
         }
         
-        return {
-            name: translations[segment] || segment,
-            href: path,
-            isLast: isLast,
-        };
+        return { name, href, isLast };
     });
 
-    // Remove the 'dashboard' segment if it's not the only one
-    const finalCrumbs = crumbs.filter((crumb, index) => {
-        if (crumb.name.toLowerCase() === 'dashboard' && crumbs.length > 1) {
+    // Eliminar el segmento 'dashboard' si no es la única miga de pan.
+    const finalCrumbs = crumbs.filter((crumb) => {
+        if (crumb.name.toLowerCase() === 'panel principal' && crumbs.length > 1) {
             return false;
         }
         return true;
@@ -89,7 +90,7 @@ export function Breadcrumb({}: BreadcrumbProps) {
         <li>
           <Link href="/dashboard" className="transition-colors hover:text-foreground">
             <Home className="h-4 w-4" />
-            <span className="sr-only">Menú Principal</span>
+            <span className="sr-only">Panel Principal</span>
           </Link>
         </li>
         {breadcrumbs.map((crumb, index) => (
