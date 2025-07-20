@@ -1,25 +1,27 @@
 
 'use server'
 
-import { getIronSession } from 'iron-session'
-import { cookies } from 'next/headers'
-import { sessionOptions, type SessionData } from './session-config'
-import { cache } from 'react'
+import { headers } from 'next/headers'
+import type { SessionData } from './session-config';
 
-// Using React's `cache` function to memoize the session data for the duration of a single request.
-// This ensures that `cookies()` is only called once per request, resolving the Next.js dynamic usage error.
-export const getSession = cache(async (): Promise<SessionData> => {
-  const session = await getIronSession<SessionData>(cookies(), sessionOptions);
+// NOTE: This is a modified getSession that reads from request headers set by the middleware.
+// It does NOT access cookies directly to avoid the "Dynamic server usage" error.
+export async function getSession(): Promise<SessionData> {
+  const headersList = headers();
+  const sessionDataHeader = headersList.get('x-session-data');
 
-  // If the session object doesn't exist or isn't logged in, return a default state.
-  // This avoids having to check for `session.isLoggedIn` elsewhere.
-  if (!session.isLoggedIn) {
-    return { isLoggedIn: false };
+  if (sessionDataHeader) {
+    try {
+      const sessionData = JSON.parse(sessionDataHeader);
+      return {
+          isLoggedIn: true,
+          user: sessionData.user,
+      };
+    } catch (error) {
+        console.error("Failed to parse session data from header", error);
+        return { isLoggedIn: false };
+    }
   }
 
-  // Return a plain, serializable object for Client Components.
-  return {
-    isLoggedIn: session.isLoggedIn,
-    user: session.user,
-  };
-});
+  return { isLoggedIn: false };
+};

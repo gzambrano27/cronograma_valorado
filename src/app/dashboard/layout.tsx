@@ -6,7 +6,6 @@ import AuthLayoutClient from '@/components/layout/auth-layout-client';
 import { checkDbConnection } from '@/lib/db';
 import { ConnectionError } from '@/components/layout/connection-error';
 import { DashboardProvider } from '@/hooks/use-dashboard-context';
-import { redirect } from 'next/navigation';
 
 export default async function DashboardLayout({
   children,
@@ -19,11 +18,11 @@ export default async function DashboardLayout({
     return <ConnectionError />;
   }
 
+  // getSession now reads from headers, it's safe to call
   const session = await getSession();
-
-  if (!session.isLoggedIn) {
-    redirect('/login');
-  }
+  
+  // Note: Redirection logic is now handled by the middleware.
+  // This layout can assume a logged-in user is present.
 
   const allProjects = await getProjects();
 
