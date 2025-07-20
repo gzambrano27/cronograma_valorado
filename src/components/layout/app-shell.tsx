@@ -27,7 +27,6 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from "../ui/tooltip";
-import { logout } from "@/lib/auth-actions";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { CompanySwitcher } from "./company-switcher";
 import { useSession } from "@/hooks/use-session";
@@ -76,7 +75,6 @@ export default function AppShell({ children, allProjects, selectedCompanies, onC
   const title = "ProjectValuator";
 
   const handleLogout = () => {
-    logout();
     setSession({ isLoggedIn: false });
     router.replace('/login');
   };

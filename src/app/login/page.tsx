@@ -19,7 +19,10 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (state?.success && state.user) {
-      setSession({ isLoggedIn: true, user: state.user });
+      const newSession = { isLoggedIn: true, user: state.user };
+      setSession(newSession);
+      // Also set a cookie for server-side checks
+      document.cookie = `userSession=${JSON.stringify(newSession)}; path=/;`;
       router.replace('/dashboard');
     }
   }, [state, setSession, router]);
