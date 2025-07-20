@@ -1,3 +1,4 @@
+
 'use server'
 
 import { getIronSession } from 'iron-session';
@@ -11,10 +12,14 @@ export const getSession = cache(async (): Promise<SessionData> => {
   const session = await getIronSession<SessionData>(cookies(), sessionOptions);
 
   // If the session object doesn't exist or isn't logged in, return a default state.
-  // This avoids having to check for `session.isLoggedIn` elsewhere.
   if (!session.isLoggedIn) {
     return { isLoggedIn: false };
   }
 
-  return session;
+  // IMPORTANT: Return a plain object, not the iron-session object itself.
+  // This prevents the "Only plain objects can be passed to Client Components" error.
+  return {
+    isLoggedIn: session.isLoggedIn,
+    user: session.user,
+  };
 });

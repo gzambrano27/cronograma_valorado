@@ -9,10 +9,12 @@ type SessionContextType = {
     setSession: React.Dispatch<React.SetStateAction<SessionData>>;
 };
 
+const defaultSession: SessionData = { isLoggedIn: false };
+
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
-export const SessionProvider = ({ children, initialSession }: { children: React.ReactNode, initialSession: SessionData }) => {
-    const [session, setSession] = useState<SessionData>(initialSession);
+export const SessionProvider = ({ children }: { children: React.ReactNode }) => {
+    const [session, setSession] = useState<SessionData>(defaultSession);
     
     return <SessionContext.Provider value={{ session, setSession }}>{children}</SessionContext.Provider>
 }

@@ -2,24 +2,32 @@
 'use client';
 import AppShell from '@/components/layout/app-shell';
 import { useDashboard } from '@/hooks/use-dashboard-context';
-import type { Company, Project, SessionData } from '@/lib/types';
-import React from 'react';
+import type { Company, SessionData } from '@/lib/types';
+import React, { useEffect, useState } from 'react';
+import { useSession } from '@/hooks/use-session';
 
 const LOCAL_STORAGE_KEY = 'selectedCompanies';
 
 export default function AuthLayoutClient({
   children,
-  session
+  session: serverSession
 }: Readonly<{
   children: React.ReactNode;
-  session: SessionData;
+  session: SessionData; // This is now a plain object from the server
 }>) {
-  const user = session?.user;
+  const user = serverSession?.user;
   const { allProjects, selectedCompanies, setSelectedCompanies } = useDashboard();
+  const { setSession } = useSession(); // Get the setter from the global context
   
-  const [isInitialLoad, setIsInitialLoad] = React.useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   
-  React.useEffect(() => {
+  // Set the session in the global context provider once on initial load
+  useEffect(() => {
+    setSession(serverSession);
+  }, [serverSession, setSession]);
+
+
+  useEffect(() => {
     if (user?.allowedCompanies && user.company && isInitialLoad) {
       try {
         const storedCompanies = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -48,7 +56,7 @@ export default function AuthLayoutClient({
   }, [user, isInitialLoad, setSelectedCompanies]);
 
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isInitialLoad) {
       try {
           localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(selectedCompanies));

@@ -4,16 +4,13 @@ import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from '@/components/layout/theme-provider';
 import React from 'react';
 import { SessionProvider } from '@/hooks/use-session';
-import { getSession } from '@/lib/session';
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   
-  const session = await getSession();
-
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
@@ -31,7 +28,10 @@ export default async function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <SessionProvider initialSession={session}>
+          {/* The SessionProvider no longer needs an initial value here.
+              It will be populated by the AuthLayoutClient for the dashboard,
+              or will be empty for public pages like /login. */}
+          <SessionProvider>
               {children}
             <Toaster />
           </SessionProvider>
