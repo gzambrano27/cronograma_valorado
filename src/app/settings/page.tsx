@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +6,10 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal } from "lucide-react";
 
 
+/**
+ * Página de Configuración.
+ * Actualmente, muestra información sobre el modo de conexión a la base de datos.
+ */
 export default function SettingsPage() {
 
     return (

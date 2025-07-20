@@ -5,6 +5,10 @@ import { AlertTriangle, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 
+/**
+ * Componente que se muestra cuando la aplicación no puede conectarse a la base de datos.
+ * Proporciona un mensaje de error claro y una opción para reintentar la conexión.
+ */
 export function ConnectionError() {
 
   const handleReload = () => {
@@ -25,7 +29,7 @@ export function ConnectionError() {
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
-            Por favor, asegúrese de que el servidor de la base de datos PostgreSQL esté en ejecución y que las credenciales en el archivo `.env` sean correctas.
+            Por favor, asegúrese de que el servidor de la base de datos esté en ejecución y que las credenciales en el archivo de configuración sean correctas.
           </p>
         </CardContent>
         <CardFooter>

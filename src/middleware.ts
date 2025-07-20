@@ -2,21 +2,24 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// This middleware is now much simpler. It only handles basic routing.
-// Authentication checks are now primarily handled on the client-side
-// or in the specific page/layout that needs protection.
+// El middleware en Next.js se ejecuta antes de que una solicitud se complete.
+// Es útil para redirecciones, reescritura de URLs, añadir cabeceras, etc.
 
+// En esta aplicación, el middleware es muy simple.
+// La lógica de autenticación se maneja principalmente en el lado del cliente
+// y en los layouts específicos que requieren protección.
 export const middleware = async (req: NextRequest) => {
   const { pathname } = req.nextUrl;
 
-  // You can add logic here for redirects that don't depend on session state,
-  // for example, redirecting from a legacy URL to a new one.
+  // Aquí se podría añadir lógica para redirecciones que no dependen del estado
+  // de la sesión, como por ejemplo, de una URL antigua a una nueva.
   
-  // The main responsibility is just to pass the request along.
+  // La responsabilidad principal es simplemente pasar la solicitud.
   return NextResponse.next();
 };
 
+// El `matcher` define las rutas en las que se ejecutará este middleware.
+// Esta configuración excluye rutas de archivos estáticos y de la API.
 export const config = {
-  // Matcher for all routes except static assets and API routes
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico|images|manifest.json).*)'],
 };

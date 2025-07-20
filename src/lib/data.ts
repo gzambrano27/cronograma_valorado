@@ -8,14 +8,17 @@ import { es } from 'date-fns/locale';
 import { query } from './db';
 import { getTranslatedName } from './utils';
 
-// Helper to convert DB numeric string types to numbers
+// NOTA: Este archivo contiene funciones para acceder y transformar los datos de la aplicación.
+// Todas las funciones aquí se ejecutan en el servidor.
+
+// Helper para convertir tipos NUMERIC de la BD (que vienen como string) a números.
 const toFloat = (value: string | number | null): number => {
     if (value === null) return 0;
     if (typeof value === 'number') return value;
     return parseFloat(value) || 0;
 };
 
-// Helper function to process tasks
+// Helper para procesar una tarea cruda de la BD a un objeto Task tipado.
 function processTask(rawTask: RawTask): Task {
   return {
     id: parseInt(rawTask.id, 10),
@@ -43,19 +46,22 @@ function processTask(rawTask: RawTask): Task {
   };
 }
 
+// Obtiene la configuración de la aplicación desde un archivo JSON.
 export async function getAppConfig(): Promise<AppConfig> {
   const filePath = path.join(process.cwd(), 'src', 'lib', 'config.json');
   try {
     const jsonData = await fs.readFile(filePath, 'utf-8');
     return JSON.parse(jsonData) as AppConfig;
   } catch (error) {
-    console.error("Could not read config.json", error);
+    console.error("No se pudo leer config.json", error);
     return { endpointUrl: "" };
   }
 }
 
+// Obtiene todos los proyectos de la base de datos con métricas agregadas.
 export async function getProjects(): Promise<Project[]> {
     const sqlQuery = `
+      -- CTE (Common Table Expression) para calcular métricas por proyecto.
       WITH ProjectTaskMetrics AS (
         SELECT
           projectid,
@@ -68,6 +74,7 @@ export async function getProjects(): Promise<Project[]> {
         GROUP BY
           projectid
       )
+      -- Consulta principal que une los proyectos con sus métricas.
       SELECT
         pp.id,
         pp.name,
@@ -91,6 +98,7 @@ export async function getProjects(): Promise<Project[]> {
         res_company rc ON pp.company_id = rc.id
       LEFT JOIN
         res_partner rp ON pp.partner_id = rp.id
+      -- Excluye proyectos internos.
       WHERE (pp.name->>'en_US' != 'Interno' AND pp.name->>'es_EC' != 'Interno') OR pp.name->>'en_US' IS NULL
       ORDER BY
         pp.name;
@@ -112,14 +120,17 @@ export async function getProjects(): Promise<Project[]> {
     }));
 }
 
+// Obtiene todas las tareas de todos los proyectos.
 export async function getTasks(): Promise<Task[]> {
   const tasks_raw = await query<RawTask>(`SELECT * FROM "externo_tasks"`);
   return tasks_raw.map(processTask);
 }
 
+// Obtiene las tareas de un proyecto específico por su ID.
 export async function getTasksByProjectId(id: number): Promise<Task[]> {
     const tasks_raw = await query<RawTask>(`
       SELECT t.*,
+        -- Subconsulta para agregar las validaciones de cada tarea como un array JSON.
         (
           SELECT json_agg(v.*)
           FROM "externo_task_validations" v
@@ -132,6 +143,7 @@ export async function getTasksByProjectId(id: number): Promise<Task[]> {
     return tasks_raw.map(processTask);
 }
 
+// Genera los datos para el gráfico de Curva "S".
 export async function generateSCurveData(tasks: Task[], totalProjectValue: number): Promise<SCurveData[]> {
     if (tasks.length === 0 || totalProjectValue <= 0) {
       return [];
@@ -142,6 +154,7 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
     let minDate: Date | null = null;
     let maxDate: Date | null = null;
 
+    // Agrupa los valores planificados y reales por fecha.
     tasks.forEach(task => {
       if (task.dailyConsumption) {
         task.dailyConsumption.forEach(dc => {
@@ -172,6 +185,7 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
     let cumulativePlanned = 0;
     let cumulativeActual = 0;
 
+    // Calcula los valores acumulados para cada día en el rango.
     for (const day of dateRange) {
       const dayTimestamp = day.getTime();
       const dailyValues = valuesByDate.get(dayTimestamp) || { planned: 0, actual: 0 };
@@ -192,6 +206,7 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
       });
     }
 
+    // Añade un punto de inicio en cero si es necesario.
     if (minDate > new Date()) {
        const dayBefore = new Date(minDate.getTime() - 86400000);
         finalCurve.unshift({
@@ -204,6 +219,7 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
         });
     }
 
+    // Redondea los valores para una mejor presentación.
     return finalCurve.map(point => ({
       ...point,
       planned: Math.round(point.planned * 100) / 100,
@@ -211,5 +227,3 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
       deviation: Math.round(point.deviation * 100) / 100,
     }));
 }
-
-    

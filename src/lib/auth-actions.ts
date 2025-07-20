@@ -8,11 +8,18 @@ import type { Company, UserGroupInfo, LoginResult } from './types';
 import { query } from './db';
 import { getTranslatedName } from './utils';
 
+// Esquema de validación para el formulario de login.
 const LoginSchema = z.object({
-  email: z.string().min(1, 'Por favor ingrese su usuario.'),
+  email: z.string().min(1, 'Por favor, ingrese su usuario.'),
   password: z.string().min(1, 'La contraseña es requerida.'),
 });
 
+/**
+ * Verifica si un usuario pertenece al grupo de 'Gerente' en la categoría 'Apus'.
+ * Esto se usa para determinar si un usuario tiene permisos de manager en la aplicación.
+ * @param userId - El ID del usuario en Odoo.
+ * @returns - True si el usuario es manager, false en caso contrario.
+ */
 export async function checkUserIsManager(userId: number): Promise<boolean> {
   const userGroups = await query<UserGroupInfo>(`
     SELECT
@@ -39,6 +46,13 @@ export async function checkUserIsManager(userId: number): Promise<boolean> {
   );
 }
 
+/**
+ * Server Action para manejar el inicio de sesión del usuario.
+ * Se autentica contra Odoo y devuelve los detalles del usuario si es exitoso.
+ * @param prevState - Estado anterior de la acción (no se usa aquí).
+ * @param formData - Datos del formulario de login.
+ * @returns - Un objeto `LoginResult` con el resultado de la operación.
+ */
 export async function login(prevState: LoginResult | undefined, formData: FormData): Promise<LoginResult> {
   const validatedFields = LoginSchema.safeParse(Object.fromEntries(formData.entries()));
 
@@ -105,17 +119,20 @@ export async function login(prevState: LoginResult | undefined, formData: FormDa
     }
     const odooUrl = process.env.ODOO_URL || 'URL no configurada';
     if (error.message && error.message.includes('ECONNREFUSED')) {
-      return { success: false, error: `No se pudo conectar al servidor de Odoo en ${odooUrl}. Verifique la URL o el servidor.` };
+      return { success: false, error: `No se pudo conectar al servidor de Odoo en ${odooUrl}. Verifique la URL y el estado del servidor.` };
     }
     if (error.faultString) {
       return { success: false, error: `Error de Odoo: ${error.faultString}` };
     }
-    return { success: false, error: 'Ocurrió un error inesperado al conectar con Odoo.' };
+    return { success: false, error: 'Ocurrió un error inesperado al intentar conectar con Odoo.' };
   }
 }
 
+/**
+ * Cierra la sesión del usuario.
+ * La lógica principal se maneja en el cliente (limpiando localStorage),
+ * pero esta función existe por semántica.
+ */
 export async function logout() {
-  // This is now a client-side operation handled in useSession hook
-  // by clearing localStorage. This function can be kept for semantics
-  // but doesn't need to be a server action.
+  // La lógica de cierre de sesión es principalmente del lado del cliente.
 }

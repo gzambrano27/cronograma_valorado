@@ -2,14 +2,20 @@
 'use client'
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from '@/hooks/use-session';
 
-// This is now a simple redirector page.
-// It redirects everyone to the login page by default.
-// The dashboard layout will handle auth checks for protected routes.
+/**
+ * Página de inicio de la aplicación.
+ * Actúa como un punto de entrada que redirige al usuario a la página de login
+ * o al dashboard si ya tiene una sesión activa.
+ */
 export default function Home() {
     const router = useRouter();
 
     useEffect(() => {
+        // Redirige siempre a la página de login.
+        // La lógica de sesión en el layout del dashboard se encargará de
+        // redirigir a los usuarios ya autenticados.
         router.replace('/login');
     }, [router]);
 

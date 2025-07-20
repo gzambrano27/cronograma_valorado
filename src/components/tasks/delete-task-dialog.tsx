@@ -11,7 +11,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Button } from "../ui/button";
 import { deleteTask } from "@/lib/actions";
 import { useTransition } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -24,6 +23,9 @@ interface DeleteTaskDialogProps {
   onSuccess: () => void;
 }
 
+/**
+ * Diálogo de confirmación para eliminar una única tarea.
+ */
 export function DeleteTaskDialog({
   taskId,
   projectId,
@@ -60,10 +62,10 @@ export function DeleteTaskDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>¿Estás realmente seguro?</AlertDialogTitle>
+          <AlertDialogTitle>¿Está realmente seguro?</AlertDialogTitle>
           <AlertDialogDescription>
             Esta acción no se puede deshacer. Esto eliminará permanentemente la
-            tarea de nuestros servidores.
+            tarea de la base de datos.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

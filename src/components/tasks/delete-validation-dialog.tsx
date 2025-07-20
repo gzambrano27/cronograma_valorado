@@ -11,7 +11,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Button } from "../ui/button";
 import { deleteValidation } from "@/lib/actions";
 import { useTransition } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -24,6 +23,9 @@ interface DeleteValidationDialogProps {
   onSuccess: () => void;
 }
 
+/**
+ * Diálogo de confirmación para eliminar una validación de tarea.
+ */
 export function DeleteValidationDialog({
   validationId,
   projectId,
@@ -60,7 +62,7 @@ export function DeleteValidationDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>¿Estás realmente seguro?</AlertDialogTitle>
+          <AlertDialogTitle>¿Está realmente seguro?</AlertDialogTitle>
           <AlertDialogDescription>
             Esta acción no se puede deshacer. Esto eliminará permanentemente la
             validación de la tarea.

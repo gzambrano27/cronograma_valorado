@@ -1,36 +1,43 @@
 
+// Este archivo define los tipos de datos principales utilizados en toda la aplicación.
+// Usar TypeScript y definir tipos claros ayuda a prevenir errores y mejora la mantenibilidad.
 
 export type Company = {
   id: number;
   name: string;
 };
 
+// Define la estructura de los datos del usuario que se guardan en la sesión.
 export type SessionUser = {
   id: number;
   name: string;
   email: string;
-  company: Company;
-  allowedCompanies: Company[];
-  isManager: boolean;
+  company: Company; // Compañía principal del usuario.
+  allowedCompanies: Company[]; // Todas las compañías a las que tiene acceso.
+  isManager: boolean; // Indica si el usuario tiene permisos de gerente.
 };
 
+// Estructura completa de la sesión.
 export interface SessionData {
   isLoggedIn: boolean;
   user?: SessionUser;
 }
 
+// Tipo de respuesta para la acción de login.
 export type LoginResult = {
   success: boolean;
   user?: SessionUser;
   error?: string;
 }
 
+// Representa el desglose de consumo diario para una tarea.
 export type DailyConsumption = {
   date: Date;
   plannedQuantity: number;
   consumedQuantity: number;
 };
 
+// Tipo crudo para las validaciones de tareas, tal como vienen de la BD.
 export type RawTaskValidation = {
   id: string;
   taskid: string;
@@ -39,6 +46,7 @@ export type RawTaskValidation = {
   location: string;
 }
 
+// Tipo procesado para las validaciones de tareas.
 export type TaskValidation = {
   id: number;
   taskId: number;
@@ -47,9 +55,10 @@ export type TaskValidation = {
   location: string;
 };
 
+// Tipo crudo para los proyectos, con métricas agregadas.
 export type RawProject = {
   id: number;
-  name: any;
+  name: any; // El nombre puede ser un objeto JSON con traducciones.
   companyId: number;
   company: any;
   client?: any;
@@ -60,6 +69,7 @@ export type RawProject = {
   progress: string;
 }
 
+// Tipo procesado para los proyectos, con valores numéricos y nombres limpios.
 export type Project = {
   id: number;
   name: string;
@@ -73,6 +83,7 @@ export type Project = {
   progress: number;
 };
 
+// Tipo crudo para las tareas, tal como vienen de la BD.
 export type RawTask = {
   id: string;
   projectid: string;
@@ -87,13 +98,14 @@ export type RawTask = {
   dailyconsumption?: DailyConsumption[];
 };
 
+// Tipo procesado para las tareas.
 export type Task = {
   id: number;
   projectId: number;
   name:string;
   quantity: number;
   consumedQuantity: number;
-  value: number; // This is PVP (Precio de Venta al Público) or Unit Price
+  value: number; // Precio de Venta al Público (PVP) o Precio Unitario.
   startDate: Date;
   endDate: Date;
   validations?: TaskValidation[];
@@ -101,21 +113,22 @@ export type Task = {
   dailyConsumption?: DailyConsumption[];
 };
 
+// Estructura de datos para el gráfico de Curva "S".
 export type SCurveData = {
   date: string;
-  planned: number;
-  actual: number;
-  cumulativePlannedValue: number;
-  cumulativeActualValue: number;
-  deviation: number;
-  dotPlanned?: number;
-  dotActual?: number;
+  planned: number; // Porcentaje planificado acumulado.
+  actual: number; // Porcentaje real acumulado.
+  cumulativePlannedValue: number; // Valor planificado acumulado.
+  cumulativeActualValue: number; // Valor real acumulado.
+  deviation: number; // Desviación entre planificado y real.
 };
 
+// Configuración de la aplicación.
 export type AppConfig = {
   endpointUrl: string;
 };
 
+// Información de los grupos de usuario de Odoo.
 export type UserGroupInfo = {
     usuario: string;
     categoria_id: number;
@@ -123,5 +136,3 @@ export type UserGroupInfo = {
     grupo_id: number;
     nombre_grupo: any;
 }
-
-    

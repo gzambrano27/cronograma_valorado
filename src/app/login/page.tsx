@@ -11,23 +11,28 @@ import { AlertCircle } from 'lucide-react';
 import { SubmitButton } from '@/components/layout/submit-button';
 import { useRouter } from 'next/navigation';
 
+/**
+ * Página de inicio de sesión.
+ * Permite a los usuarios autenticarse para acceder a la aplicación.
+ */
 export default function LoginPage() {
   const router = useRouter();
+  // `useActionState` gestiona el estado del formulario y la acción del servidor `login`.
   const [state, formAction, isPending] = useActionState(login, undefined);
 
   useEffect(() => {
-    // When the login server action is successful, the state will be updated.
-    // We then save the session to localStorage and redirect to the dashboard.
+    // Este efecto se ejecuta cuando el estado de la acción del formulario cambia.
+    // Si el inicio de sesión es exitoso, guarda la sesión y redirige al dashboard.
     if (state?.success && state.user) {
       const newSession = { isLoggedIn: true, user: state.user };
       try {
+          // Guarda la sesión en el almacenamiento local del navegador.
           localStorage.setItem('userSession', JSON.stringify(newSession));
+          // Redirige al dashboard, reemplazando la página de login en el historial.
+          router.replace('/dashboard');
       } catch (error) {
-          console.error("Failed to save session to localStorage", error);
-          // Handle potential storage errors, e.g., private browsing mode
+          console.error("Error al guardar la sesión en localStorage", error);
       }
-      // Use replace to avoid the login page being in the history stack
-      router.replace('/dashboard');
     }
   }, [state, router]);
 
@@ -36,6 +41,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md border-0 shadow-none sm:border sm:shadow-lg">
         <CardHeader className="text-center">
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            {/* Icono de la aplicación */}
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h3v3H7z"/><path d="M14 7h3v3h-3z"/><path d="M7 14h3v3H7z"/><path d="M14 14h3v3h-3z"/>
             </svg>
@@ -59,6 +65,7 @@ export default function LoginPage() {
               <Label htmlFor="password">Contraseña</Label>
               <Input id="password" name="password" type="password" placeholder="••••••••" required className="h-11" />
             </div>
+            {/* Muestra un mensaje de error si el inicio de sesión falla */}
             {state?.error && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />

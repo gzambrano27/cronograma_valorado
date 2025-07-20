@@ -12,12 +12,18 @@ import { revalidatePath } from 'next/cache';
 import { getOdooClient } from './odoo-client';
 import { getTranslatedName, checkUserIsManager } from './auth-actions';
 
+// NOTA: Este archivo contiene "Server Actions" de Next.js.
+// Estas funciones se ejecutan en el servidor y pueden ser llamadas directamente
+// desde componentes de cliente, simplificando las mutaciones de datos.
+
 const configPath = path.join(process.cwd(), 'src', 'lib', 'config.json');
 
+// Función para escribir en el archivo de configuración.
 async function writeConfig(config: AppConfig): Promise<void> {
   await fs.writeFile(configPath, JSON.stringify(config, null, 2), 'utf-8');
 }
 
+// Acción para actualizar la configuración de la aplicación.
 export async function updateSettings(formData: FormData) {
   const url = formData.get('url') as string;
 
@@ -34,17 +40,20 @@ export async function updateSettings(formData: FormData) {
   return { success: true };
 }
 
+// Esquema de validación para los datos de una tarea usando Zod.
 const TaskSchema = z.object({
     name: z.string().min(3, { message: 'El nombre debe tener al menos 3 caracteres.' }),
     quantity: z.coerce.number().min(0, { message: 'La cantidad no puede ser negativa.' }),
-    value: z.coerce.number().min(0, { message: 'El valor no puede ser negativa.' }),
+    value: z.coerce.number().min(0, { message: 'El valor no puede ser negativo.' }),
     startDate: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: 'Fecha de inicio inválida.' }),
     endDate: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: 'Fecha de fin inválida.' }),
 });
 
+// Crea el desglose de consumo diario para una tarea.
 function createDailyConsumption(startDate: Date, endDate: Date, totalQuantity: number): DailyConsumption[] {
     if (totalQuantity === 0) return [];
 
+    // Asegura que las fechas estén en UTC para evitar problemas de zona horaria.
     const startUTC = new Date(Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()));
     const endUTC = new Date(Date.UTC(endDate.getFullYear(), endDate.getMonth(), endDate.getDate()));
 
@@ -59,6 +68,7 @@ function createDailyConsumption(startDate: Date, endDate: Date, totalQuantity: n
 
     const consumptionBreakdown = dates.map((date, index) => {
         let plannedQtyForDay: number;
+        // Para el último día, asigna el resto para evitar errores de redondeo.
         if (index === totalDays - 1) {
             plannedQtyForDay = totalQuantity - distributedQuantity;
         } else {
@@ -77,6 +87,7 @@ function createDailyConsumption(startDate: Date, endDate: Date, totalQuantity: n
 }
 
 
+// Acción para crear una nueva tarea en la base de datos.
 export async function createTask(projectId: number, formData: FormData) {
   const validatedFields = TaskSchema.safeParse({
     name: formData.get('name'),
@@ -106,11 +117,13 @@ export async function createTask(projectId: number, formData: FormData) {
     VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7)
   `, [projectId, name, quantity, value, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption)]);
 
+  // Revalida las rutas para que Next.js actualice la caché y muestre los nuevos datos.
   revalidatePath(`/dashboard/projects/${projectId}`);
   revalidatePath(`/dashboard`);
   return { success: true };
 }
 
+// Acción para eliminar una tarea.
 export async function deleteTask(taskId: number, projectId: number) {
     await query(`DELETE FROM "externo_tasks" WHERE id = $1`, [taskId]);
     revalidatePath(`/dashboard/projects/${projectId}`);
@@ -118,12 +131,13 @@ export async function deleteTask(taskId: number, projectId: number) {
     return { success: true };
 }
 
+// Acción para eliminar múltiples tareas.
 export async function deleteMultipleTasks(taskIds: number[], projectId: number | undefined) {
     if (!taskIds || taskIds.length === 0) {
-        return { success: false, message: 'No task IDs provided.'};
+        return { success: false, message: 'No se proporcionaron IDs de tarea.'};
     }
     if (projectId === undefined) {
-        return { success: false, message: 'Project ID is missing.' };
+        return { success: false, message: 'Falta el ID del proyecto.' };
     }
     const placeholders = taskIds.map((_, i) => `$${i + 1}`).join(',');
     await query(`DELETE FROM "externo_tasks" WHERE id IN (${placeholders})`, taskIds);
@@ -132,6 +146,7 @@ export async function deleteMultipleTasks(taskIds: number[], projectId: number |
     return { success: true };
 }
 
+// Acción para actualizar el consumo diario de una tarea.
 export async function updateTaskConsumption(taskId: number, date: string, consumedQuantity: number) {
     const result = await query<RawTask>(`SELECT * FROM "externo_tasks" WHERE id = $1`, [taskId]);
     const taskData = result[0];
@@ -179,12 +194,14 @@ export async function updateTaskConsumption(taskId: number, date: string, consum
     return { success: true };
 }
 
+// Esquema de validación para la validación de tareas.
 const ValidateTaskSchema = z.object({
   taskId: z.coerce.number(),
   projectId: z.coerce.number(),
   location: z.string(),
 });
 
+// Acción para añadir una validación (imagen y ubicación) a una tarea.
 export async function validateTask(formData: FormData) {
     const validatedFields = ValidateTaskSchema.safeParse({
         taskId: formData.get('taskId'),
@@ -204,33 +221,28 @@ export async function validateTask(formData: FormData) {
         throw new Error('La imagen de evidencia es requerida.');
     }
 
+    // Convierte la imagen a un Data URI (base64) para almacenarla en la BD.
     const bytes = await imageFile.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const imageUrl = `data:${imageFile.type};base64,${buffer.toString('base64')}`;
 
-    const newValidation: Omit<TaskValidation, 'id'> = {
-      date: new Date(),
-      imageUrl: imageUrl,
-      location: location,
-      taskId: taskId,
-    };
-
     await query(`
       INSERT INTO "externo_task_validations" ("taskid", "date", "imageurl", "location")
       VALUES ($1, $2, $3, $4)
-    `, [newValidation.taskId, newValidation.date.toISOString(), newValidation.imageUrl, newValidation.location]);
+    `, [taskId, new Date().toISOString(), imageUrl, location]);
 
     revalidatePath(`/dashboard/projects/${projectId}`);
     return { success: true };
 }
 
+// Acción para eliminar una validación.
 export async function deleteValidation(validationId: number, projectId: number) {
     await query(`DELETE FROM "externo_task_validations" WHERE id = $1`, [validationId]);
     revalidatePath(`/dashboard/projects/${projectId}`);
     return { success: true };
 }
 
-
+// Acción para importar tareas desde un archivo XML de MS Project.
 export async function importTasksFromXML(projectId: number, formData: FormData) {
   const { XMLParser } = await import('fast-xml-parser');
 
@@ -333,5 +345,3 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   revalidatePath(`/dashboard`);
   return { success: true, message: `${newTasks.length} tareas importadas.` };
 }
-
-    

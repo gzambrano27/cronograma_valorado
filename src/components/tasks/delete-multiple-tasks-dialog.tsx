@@ -24,6 +24,9 @@ interface DeleteMultipleTasksDialogProps {
   onSuccess: () => void;
 }
 
+/**
+ * Diálogo de confirmación para eliminar múltiples tareas seleccionadas.
+ */
 export function DeleteMultipleTasksDialog({
   tasks,
   open,
@@ -41,7 +44,7 @@ export function DeleteMultipleTasksDialog({
       toast({
         variant: "destructive",
         title: "Error",
-        description: "No se pudo determinar el proyecto.",
+        description: "No se pudo determinar el proyecto de las tareas.",
       });
       return;
     }
@@ -52,7 +55,7 @@ export function DeleteMultipleTasksDialog({
         if (result?.success) {
           toast({
             title: "Tareas Eliminadas",
-            description: "Las tareas seleccionadas han sido eliminadas.",
+            description: "Las tareas seleccionadas han sido eliminadas correctamente.",
           });
           onOpenChange(false);
           onSuccess();
@@ -61,7 +64,7 @@ export function DeleteMultipleTasksDialog({
         toast({
           variant: "destructive",
           title: "Error",
-          description: "No se pudieron eliminar las tareas.",
+          description: "Ocurrió un error al eliminar las tareas.",
         });
       }
     });
@@ -71,9 +74,9 @@ export function DeleteMultipleTasksDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>¿Estás realmente seguro?</AlertDialogTitle>
+          <AlertDialogTitle>¿Está seguro de que desea continuar?</AlertDialogTitle>
           <AlertDialogDescription>
-            Esta acción no se puede deshacer. Esto eliminará permanentemente 
+            Esta acción no se puede deshacer. Se eliminarán permanentemente 
             {` ${tasks.length} `} 
             tarea(s) del proyecto.
           </AlertDialogDescription>

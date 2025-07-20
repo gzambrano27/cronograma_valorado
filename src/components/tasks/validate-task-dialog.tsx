@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { validateTask } from "@/lib/actions";
 import type { Task } from "@/lib/types";
-import { UploadCloud, MapPin, Loader2, X } from "lucide-react";
+import { UploadCloud, MapPin, Loader2, X, RotateCw } from "lucide-react";
 import React, { useState, useRef, useCallback } from "react";
 import { useFormStatus } from "react-dom";
 import Image from "next/image";
@@ -22,7 +22,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "../ui/skeleton";
 import dynamic from "next/dynamic";
 
-// Dynamic import for MapPicker to disable SSR, which prevents the "window is not defined" error.
+// Importación dinámica del componente de mapa para evitar errores de SSR,
+// ya que depende de objetos del navegador como `window`.
 const MapPicker = dynamic(
   () => import("./map-picker").then((mod) => mod.MapPicker),
   {
@@ -41,6 +42,9 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
     );
 }
 
+/**
+ * Diálogo para validar una tarea subiendo una imagen y registrando una ubicación.
+ */
 export function ValidateTaskDialog({
   task,
   open,
@@ -59,10 +63,12 @@ export function ValidateTaskDialog({
   const { toast } = useToast();
   const hasValidations = task.validations && task.validations.length > 0;
 
+  // Callback para manejar la selección de ubicación desde el mapa.
   const handleLocationSelect = useCallback((loc: { lat: number; lng: number }) => {
     setLocation(`${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}`);
   }, []);
 
+  // Callback para manejar errores de geolocalización.
   const handleLocationError = useCallback((message: string) => {
     toast({
         variant: "destructive",
@@ -71,6 +77,7 @@ export function ValidateTaskDialog({
     });
   }, [toast]);
 
+  // Maneja el cambio del input de archivo para generar una previsualización.
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -82,6 +89,7 @@ export function ValidateTaskDialog({
     }
   };
   
+  // Limpia la imagen seleccionada.
   const clearImage = () => {
     setImagePreview(null);
     if (fileInputRef.current) {
@@ -89,12 +97,13 @@ export function ValidateTaskDialog({
     }
   }
 
+  // Llama a la acción del servidor para guardar la validación.
   const action = async (formData: FormData) => {
     try {
       await validateTask(formData);
       toast({
           title: "Tarea Validada",
-          description: "La imagen y ubicación han sido guardadas.",
+          description: "La imagen y la ubicación han sido guardadas correctamente.",
       });
       onSuccess();
       onOpenChange(false);
@@ -107,16 +116,17 @@ export function ValidateTaskDialog({
     }
   };
   
+  // Resetea el estado del formulario al cerrarse.
+  const handleOpenChange = (isOpen: boolean) => {
+      onOpenChange(isOpen);
+      if (!isOpen) {
+          clearImage();
+          setLocation(null);
+      }
+  };
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => {
-        onOpenChange(isOpen);
-        if (!isOpen) {
-            // Reset state when closing
-            clearImage();
-            setLocation(null);
-        }
-    }}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md">
         <form ref={formRef} action={action}>
           <DialogHeader>
@@ -128,20 +138,21 @@ export function ValidateTaskDialog({
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
+            {/* Inputs ocultos para enviar datos adicionales con el formulario */}
             <input type="hidden" name="taskId" value={task.id} />
             <input type="hidden" name="projectId" value={task.projectId} />
             {location && <input type="hidden" name="location" value={location} />}
 
             <div className="space-y-2">
                 <Label htmlFor="image">Imagen de Evidencia</Label>
-                <div className="relative flex items-center justify-center w-full h-48 border-2 border-dashed rounded-lg group hover:bg-muted">
-                    <Input ref={fileInputRef} id="image" name="image" type="file" accept="image/*" className="absolute w-full h-full opacity-0 cursor-pointer" onChange={handleImageChange} required={!imagePreview} />
+                <div className="relative flex items-center justify-center w-full h-48 border-2 border-dashed rounded-lg group hover:bg-muted transition-colors">
+                    <Input ref={fileInputRef} id="image" name="image" type="file" accept="image/*" className="absolute w-full h-full opacity-0 cursor-pointer z-10" onChange={handleImageChange} required={!imagePreview} />
                     {imagePreview ? (
                        <>
-                        <Image src={imagePreview} alt="Previsualización" fill style={{objectFit: "contain"}} className="rounded-lg p-1" />
-                         <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 z-10 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity" onClick={clearImage}>
-                            <X className="h-4 w-4" />
-                            <span className="sr-only">Cambiar imagen</span>
+                        <Image src={imagePreview} alt="Previsualización de la imagen" fill style={{objectFit: "contain"}} className="rounded-lg p-1" />
+                         <Button type="button" variant="secondary" size="sm" className="absolute top-2 right-2 z-20 h-8 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => fileInputRef.current?.click()}>
+                            <RotateCw className="h-4 w-4 mr-2" />
+                            Cambiar
                         </Button>
                        </>
                     ) : (

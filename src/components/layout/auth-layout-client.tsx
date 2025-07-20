@@ -9,6 +9,11 @@ import { usePathname, useRouter } from 'next/navigation';
 
 const LOCAL_STORAGE_KEY_COMPANIES = 'selectedCompanies';
 
+/**
+ * Componente "guardián" del lado del cliente.
+ * Se encarga de proteger las rutas del dashboard, gestionando la sesión del usuario
+ * y los datos de contexto como las compañías seleccionadas.
+ */
 export default function AuthLayoutClient({
   children,
 }: Readonly<{
@@ -20,36 +25,42 @@ export default function AuthLayoutClient({
   const user = session.user;
   const { allProjects, selectedCompanies, setSelectedCompanies } = useDashboard();
   
+  // Estado para controlar la carga inicial de las compañías desde localStorage.
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
+    // Mientras la sesión carga, no hacer nada.
     if (isLoading) {
-      return; // Wait for the session to load
+      return; 
     }
+    // Si la carga ha terminado y el usuario no está logueado, redirigir al login.
     if (!session.isLoggedIn && pathname !== '/login') {
       router.replace('/login');
     }
   }, [session.isLoggedIn, isLoading, router, pathname]);
   
   useEffect(() => {
+    // Al cargar el componente y si el usuario existe, intenta cargar las compañías
+    // seleccionadas desde localStorage para mantener la persistencia.
     if (user?.allowedCompanies && user.company && isInitialLoad) {
       try {
         const storedCompanies = localStorage.getItem(LOCAL_STORAGE_KEY_COMPANIES);
         if (storedCompanies) {
           const parsedCompanies = JSON.parse(storedCompanies);
+          // Valida que las compañías guardadas sigan siendo permitidas para el usuario.
           const validStoredCompanies = parsedCompanies.filter((sc: Company) => 
             user.allowedCompanies.some(ac => ac.id === sc.id)
           );
           if (validStoredCompanies.length > 0) {
             setSelectedCompanies(validStoredCompanies);
           } else {
-             setSelectedCompanies([user.company]);
+             setSelectedCompanies([user.company]); // Fallback a la compañía por defecto.
           }
         } else {
-          setSelectedCompanies([user.company]);
+          setSelectedCompanies([user.company]); // Si no hay nada guardado, usa la de por defecto.
         }
       } catch (error) {
-        console.error("Failed to process selected companies from localStorage", error);
+        console.error("Error al procesar las compañías desde localStorage", error);
         setSelectedCompanies([user.company]);
       }
       setIsInitialLoad(false);
@@ -60,23 +71,26 @@ export default function AuthLayoutClient({
   }, [user, isInitialLoad, setSelectedCompanies]);
 
   useEffect(() => {
+    // Guarda las compañías seleccionadas en localStorage cada vez que cambian.
     if (!isInitialLoad && selectedCompanies.length > 0) {
       try {
           localStorage.setItem(LOCAL_STORAGE_KEY_COMPANIES, JSON.stringify(selectedCompanies));
       } catch (error) {
-          console.error("Failed to save selected companies to localStorage", error);
+          console.error("Error al guardar las compañías en localStorage", error);
       }
     }
   }, [selectedCompanies, isInitialLoad]);
 
+  // Muestra un estado de carga mientras se verifica la sesión.
   if (isLoading || !session.isLoggedIn) {
      return (
         <div className="flex h-screen items-center justify-center">
-            <p>Cargando sesión...</p>
+            <p>Verificando sesión...</p>
         </div>
     );
   }
 
+  // Una vez verificado, renderiza el layout principal de la aplicación (AppShell).
   return (
     <AppShell 
         allProjects={allProjects}
