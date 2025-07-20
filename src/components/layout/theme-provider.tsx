@@ -12,6 +12,8 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   }, [])
 
   if (!mounted) {
+    // Render nothing on the server and on the initial client-side render.
+    // This avoids a hydration mismatch.
     return null
   }
 

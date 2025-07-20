@@ -18,9 +18,10 @@ const LOCAL_STORAGE_KEY_SESSION = 'userSession';
 
 export const SessionProvider = ({ children }: { children: ReactNode }) => {
     const [session, setSessionState] = useState<SessionData>(defaultSession);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true); // Start as loading
 
     useEffect(() => {
+        // This effect runs only on the client after mount
         try {
             const storedSession = localStorage.getItem(LOCAL_STORAGE_KEY_SESSION);
             if (storedSession) {
@@ -32,7 +33,7 @@ export const SessionProvider = ({ children }: { children: ReactNode }) => {
             localStorage.removeItem(LOCAL_STORAGE_KEY_SESSION);
             setSessionState(defaultSession);
         } finally {
-            setIsLoading(false);
+            setIsLoading(false); // Set loading to false after checking localStorage
         }
     }, []);
 
@@ -51,7 +52,8 @@ export const SessionProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const value = { session, setSession, isLoading };
-
+    
+    // Do not render children until the session has been loaded from localStorage
     return (
         <SessionContext.Provider value={value}>
             {children}
