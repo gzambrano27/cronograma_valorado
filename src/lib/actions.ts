@@ -199,7 +199,7 @@ const ValidateTaskSchema = z.object({
   taskId: z.coerce.number(),
   projectId: z.coerce.number(),
   location: z.string(),
-  username: z.string().min(1, 'El nombre de usuario es requerido.'),
+  userId: z.coerce.number().min(1, 'El ID de usuario es requerido.'),
 });
 
 // Acción para añadir una validación (imagen y ubicación) a una tarea.
@@ -208,7 +208,7 @@ export async function validateTask(formData: FormData) {
         taskId: formData.get('taskId'),
         projectId: formData.get('projectId'),
         location: formData.get('location'),
-        username: formData.get('username'),
+        userId: formData.get('userId'),
     });
 
     if (!validatedFields.success) {
@@ -216,7 +216,7 @@ export async function validateTask(formData: FormData) {
         throw new Error('Datos de validación inválidos.');
     }
 
-    const { taskId, projectId, location, username } = validatedFields.data;
+    const { taskId, projectId, location, userId } = validatedFields.data;
     const imageFile = formData.get('image') as File | null;
 
     if (!imageFile || imageFile.size === 0) {
@@ -229,9 +229,9 @@ export async function validateTask(formData: FormData) {
     const imageUrl = `data:${imageFile.type};base64,${buffer.toString('base64')}`;
 
     await query(`
-      INSERT INTO "externo_task_validations" ("taskid", "date", "imageurl", "location", "username")
+      INSERT INTO "externo_task_validations" ("taskid", "date", "imageurl", "location", "userid")
       VALUES ($1, $2, $3, $4, $5)
-    `, [taskId, new Date().toISOString(), imageUrl, location, username]);
+    `, [taskId, new Date().toISOString(), imageUrl, location, userId]);
 
     revalidatePath(`/dashboard/projects-overview/${projectId}`);
     return { success: true };

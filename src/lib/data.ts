@@ -42,7 +42,7 @@ function processTask(rawTask: RawTask): Task {
       date: new Date(v.date),
       imageUrl: v.imageurl,
       location: v.location,
-      username: v.username,
+      userId: v.userid ? parseInt(v.userid, 10) : undefined,
     })),
   };
 }
@@ -129,7 +129,7 @@ export async function getTasks(): Promise<Task[]> {
 
 // Obtiene las tareas de un proyecto específico por su ID.
 export async function getTasksByProjectId(id: number): Promise<Task[]> {
-    const tasks_raw = await query<RawTask>(`
+    const rawTasks = await query<RawTask>(`
       SELECT t.*,
         -- Subconsulta para agregar las validaciones de cada tarea como un array JSON.
         (
@@ -141,7 +141,48 @@ export async function getTasksByProjectId(id: number): Promise<Task[]> {
       WHERE t.projectid = $1
       ORDER BY t.startdate, t.id
     `, [id]);
-    return tasks_raw.map(processTask);
+
+    const tasks = rawTasks.map(processTask);
+    
+    // Obtener todos los userIds únicos de todas las validaciones de todas las tareas
+    const userIds = new Set<number>();
+    tasks.forEach(task => {
+        task.validations?.forEach(v => {
+            if (v.userId) {
+                userIds.add(v.userId);
+            }
+        });
+    });
+
+    if (userIds.size === 0) {
+        return tasks;
+    }
+
+    // Consultar los nombres de los usuarios
+    const userIdsArray = Array.from(userIds);
+    const userPlaceholders = userIdsArray.map((_, i) => `$${i + 1}`).join(',');
+    const usersData = await query<{ id: number, name: any }>(
+        `SELECT id, name FROM res_users WHERE id IN (${userPlaceholders})`,
+        userIdsArray
+    );
+
+    const userMap = new Map<number, string>();
+    usersData.forEach(user => {
+        userMap.set(user.id, getTranslatedName(user.name));
+    });
+
+    // Mapear los nombres de usuario de vuelta a las validaciones
+    tasks.forEach(task => {
+        if (task.validations) {
+            task.validations.forEach(validation => {
+                if (validation.userId) {
+                    validation.username = userMap.get(validation.userId);
+                }
+            });
+        }
+    });
+    
+    return tasks;
 }
 
 // Genera los datos para el gráfico de Curva "S".

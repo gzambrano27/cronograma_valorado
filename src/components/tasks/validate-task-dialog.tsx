@@ -64,7 +64,7 @@ export function ValidateTaskDialog({
   const { toast } = useToast();
   const { session } = useSession();
   const hasValidations = task.validations && task.validations.length > 0;
-  const username = session.user?.name || 'Desconocido';
+  const userId = session.user?.id;
 
   // Callback para manejar la selección de ubicación desde el mapa.
   const handleLocationSelect = useCallback((loc: { lat: number; lng: number }) => {
@@ -102,6 +102,10 @@ export function ValidateTaskDialog({
 
   // Llama a la acción del servidor para guardar la validación.
   const action = async (formData: FormData) => {
+    if (!userId) {
+        toast({ variant: "destructive", title: "Error", description: "No se pudo identificar al usuario." });
+        return;
+    }
     try {
       await validateTask(formData);
       toast({
@@ -144,7 +148,7 @@ export function ValidateTaskDialog({
             {/* Inputs ocultos para enviar datos adicionales con el formulario */}
             <input type="hidden" name="taskId" value={task.id} />
             <input type="hidden" name="projectId" value={task.projectId} />
-            <input type="hidden" name="username" value={username} />
+            {userId && <input type="hidden" name="userId" value={userId} />}
             {location && <input type="hidden" name="location" value={location} />}
 
             <div className="space-y-2">

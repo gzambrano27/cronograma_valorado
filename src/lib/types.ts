@@ -44,7 +44,7 @@ export type RawTaskValidation = {
   date: string;
   imageurl: string;
   location: string;
-  username?: string;
+  userid?: string;
 }
 
 // Tipo procesado para las validaciones de tareas.
@@ -54,7 +54,8 @@ export type TaskValidation = {
   date: Date;
   imageUrl: string;
   location: string;
-  username?: string;
+  userId?: number;
+  username?: string; // Se añade dinámicamente después de la consulta
 };
 
 // Tipo crudo para los proyectos, con métricas agregadas.
