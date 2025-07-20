@@ -13,7 +13,6 @@ interface BreadcrumbProps {
 
 const translations: Record<string, string> = {
   dashboard: 'Panel Principal',
-  projects: 'Proyectos',
   'projects-overview': 'Proyectos',
   settings: 'Configuración',
 };
@@ -41,26 +40,9 @@ export function Breadcrumb({}: BreadcrumbProps) {
         
         let name = translations[segment] || segment;
         let href = path;
-
-        // Caso especial para la vista general de proyectos
-        if (segment === 'projects-overview') {
-          return { name, href: path, isLast };
-        }
-        
-        // Si estamos en un proyecto específico, el breadcrumb de "Proyectos" debe apuntar a la vista general.
-        if (segment === 'projects' && segments[index + 1]) {
-            const projectId = parseInt(segments[index + 1], 10);
-            if (!isNaN(projectId)) {
-              return {
-                  name: name,
-                  href: '/dashboard/projects-overview', // Enlace a la vista general
-                  isLast: false,
-              };
-            }
-        }
         
         // Si el segmento es un ID de proyecto
-        if (!isNaN(parseInt(segment)) && segments[index - 1] === 'projects') {
+        if (!isNaN(parseInt(segment)) && segments[index - 1] === 'projects-overview') {
              return {
                 name: getProjectName(parseInt(segment, 10)),
                 href: path,
@@ -109,3 +91,4 @@ export function Breadcrumb({}: BreadcrumbProps) {
     </nav>
   );
 }
+

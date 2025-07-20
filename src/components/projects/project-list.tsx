@@ -140,7 +140,7 @@ export default function ProjectList({ projects, view, onSuccess }: ProjectListPr
         {projects.map((project) => {
           const progressPercentage = project.progress;
           return (
-            <Link href={`/dashboard/projects/${project.id}`} key={project.id} className="focus:outline-none focus:ring-2 focus:ring-ring rounded-lg">
+            <Link href={`/dashboard/projects-overview/${project.id}`} key={project.id} className="focus:outline-none focus:ring-2 focus:ring-ring rounded-lg">
               <Card className="flex flex-col transition-all duration-300 group hover:shadow-xl border h-full">
                 <CardHeader className="p-4 pb-2 relative">
                     <CardTitle className="font-headline mb-1 group-hover:text-primary transition-colors text-lg line-clamp-2 h-14">{project.name}</CardTitle>
@@ -219,7 +219,7 @@ export default function ProjectList({ projects, view, onSuccess }: ProjectListPr
                   table.getRowModel().rows.map((row) => (
                     <TableRow
                       key={row.id}
-                      onClick={() => router.push(`/dashboard/projects/${row.original.id}`)}
+                      onClick={() => router.push(`/dashboard/projects-overview/${row.original.id}`)}
                       className="cursor-pointer"
                     >
                       {row.getVisibleCells().map((cell) => (
@@ -245,3 +245,4 @@ export default function ProjectList({ projects, view, onSuccess }: ProjectListPr
     </div>
   );
 }
+

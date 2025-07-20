@@ -77,7 +77,7 @@ export default function AppShell({ children, allProjects, selectedCompanies, onC
   const user = session?.user;
 
   // Determina si estamos dentro de la aplicación de "Cronograma Valorado"
-  const isProjectsApp = pathname.startsWith("/dashboard/projects");
+  const isProjectsApp = pathname.startsWith("/dashboard/projects-overview");
   const title = isProjectsApp ? "Cronograma Valorado" : "Menú Principal";
 
   const handleLogout = () => {
@@ -149,10 +149,10 @@ export default function AppShell({ children, allProjects, selectedCompanies, onC
                           <SidebarMenuButton
                             asChild
                             size="sm"
-                            isActive={pathname === `/dashboard/projects/${project.id}`}
+                            isActive={pathname === `/dashboard/projects-overview/${project.id}`}
                             tooltip={{ children: project.name }}
                           >
-                            <Link href={`/dashboard/projects/${project.id}`}>
+                            <Link href={`/dashboard/projects-overview/${project.id}`}>
                               <Briefcase className="h-4 w-4 shrink-0" />
                               <span>
                                 {project.name}
