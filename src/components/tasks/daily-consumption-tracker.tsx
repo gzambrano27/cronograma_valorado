@@ -19,6 +19,7 @@ import { es } from "date-fns/locale";
 import { updateTaskConsumption } from "@/lib/actions";
 import { formatCurrency } from "@/lib/utils";
 import { useSession } from "@/hooks/use-session";
+import { useRouter } from "next/navigation";
 
 
 interface DailyConsumptionTrackerProps {
@@ -29,6 +30,7 @@ interface DailyConsumptionTrackerProps {
 
 export function DailyConsumptionTracker({ task, onSuccess }: DailyConsumptionTrackerProps) {
   const { toast } = useToast();
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const { session } = useSession();
   const isManager = session.user?.isManager ?? false;

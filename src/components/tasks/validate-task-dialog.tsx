@@ -22,6 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "../ui/skeleton";
 import dynamic from "next/dynamic";
 import { useSession } from "@/hooks/use-session";
+import { useRouter } from "next/navigation";
 
 // Importación dinámica del componente de mapa para evitar errores de SSR,
 // ya que depende de objetos del navegador como `window`.

@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Upload, Loader2 } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
 import { importTasksFromXML } from '@/lib/actions';
+import { useRouter } from 'next/navigation';
 
 export function XmlImport({ projectId, onSuccess }: { projectId: number, onSuccess: () => void }) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
     const { toast } = useToast();
+    const router = useRouter();
     const [isPending, startTransition] = useTransition();
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

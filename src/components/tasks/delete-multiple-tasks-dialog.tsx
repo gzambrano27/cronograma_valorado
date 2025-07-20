@@ -57,7 +57,6 @@ export function DeleteMultipleTasksDialog({
             title: "Tareas Eliminadas",
             description: "Las tareas seleccionadas han sido eliminadas correctamente.",
           });
-          onOpenChange(false);
           onSuccess();
         }
       } catch (error) {
@@ -66,6 +65,8 @@ export function DeleteMultipleTasksDialog({
           title: "Error",
           description: "Ocurrió un error al eliminar las tareas.",
         });
+      } finally {
+        onOpenChange(false);
       }
     });
   };

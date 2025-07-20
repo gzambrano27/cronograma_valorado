@@ -45,7 +45,6 @@ export function DeleteTaskDialog({
             title: "Tarea Eliminada",
             description: "La tarea ha sido eliminada exitosamente del proyecto.",
           });
-          onOpenChange(false);
           onSuccess();
         }
       } catch (error) {
@@ -54,6 +53,8 @@ export function DeleteTaskDialog({
           title: "Error",
           description: "No se pudo eliminar la tarea.",
         });
+      } finally {
+        onOpenChange(false);
       }
     });
   };

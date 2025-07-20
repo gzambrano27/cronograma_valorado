@@ -45,7 +45,6 @@ export function DeleteValidationDialog({
             title: "Validación Eliminada",
             description: "La validación ha sido eliminada exitosamente.",
           });
-          onOpenChange(false);
           onSuccess();
         }
       } catch (error) {
@@ -54,6 +53,8 @@ export function DeleteValidationDialog({
           title: "Error",
           description: "No se pudo eliminar la validación.",
         });
+      } finally {
+        onOpenChange(false);
       }
     });
   };
