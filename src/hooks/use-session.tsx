@@ -2,7 +2,7 @@
 'use client';
 
 import type { SessionData } from '@/lib/types';
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 
 type SessionContextType = {
     session: SessionData;
@@ -16,7 +16,7 @@ const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_KEY_SESSION = 'userSession';
 
-export const SessionProvider = ({ children }: { children: React.ReactNode }) => {
+export const SessionProvider = ({ children }: { children: ReactNode }) => {
     const [session, setSessionState] = useState<SessionData>(defaultSession);
     const [isLoading, setIsLoading] = useState(true);
 
