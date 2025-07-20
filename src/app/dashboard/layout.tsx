@@ -6,8 +6,6 @@ import { ConnectionError } from '@/components/layout/connection-error';
 import { DashboardProvider } from '@/hooks/use-dashboard-context';
 import AuthLayoutClient from "@/components/layout/auth-layout-client";
 import { checkDbConnection } from "@/lib/db";
-import { SessionProvider } from "@/hooks/use-session";
-import { ThemeProvider } from "@/components/layout/theme-provider";
 
 // This is a pure Server Component by default.
 // All data fetching happens on the server before rendering.
@@ -27,19 +25,10 @@ export default async function DashboardLayout({
   const projects = await getProjects();
 
   return (
-    <SessionProvider>
-        <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem={false}
-            disableTransitionOnChange
-        >
-            <DashboardProvider allProjects={projects}>
-              <AuthLayoutClient>
-                  {children}
-              </AuthLayoutClient>
-            </DashboardProvider>
-        </ThemeProvider>
-    </SessionProvider>
+    <DashboardProvider allProjects={projects}>
+      <AuthLayoutClient>
+          {children}
+      </AuthLayoutClient>
+    </DashboardProvider>
   );
 }

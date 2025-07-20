@@ -2,6 +2,8 @@
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import React from 'react';
+import { SessionProvider } from '@/hooks/use-session';
+import { ThemeProvider } from '@/components/layout/theme-provider';
 
 export default function RootLayout({
   children,
@@ -20,7 +22,16 @@ export default function RootLayout({
          <meta name="description" content="Una aplicación para valorar y gestionar el cronograma de proyectos." />
       </head>
       <body className="font-body antialiased">
-        {children}
+        <SessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem={false}
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </SessionProvider>
         <Toaster />
       </body>
     </html>
