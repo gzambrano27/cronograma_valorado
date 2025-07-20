@@ -23,7 +23,7 @@ export default function AuthLayoutClient({
 
   useEffect(() => {
     if (isLoading) {
-      return; // Espera a que la sesión se cargue
+      return; // Wait for the session to load
     }
     if (!session.isLoggedIn) {
       router.replace('/login');
