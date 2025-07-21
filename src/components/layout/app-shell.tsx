@@ -184,7 +184,7 @@ export default function AppShell({ children, allProjects, selectedCompanies, onC
                       <SidebarMenuButton
                           asChild
                           size="sm"
-                          isActive={pathname === "/dashboard/projects-overview"}
+                          isActive={pathname.startsWith("/dashboard/projects-overview")}
                           tooltip={{ children: "Cronograma Valorado" }}
                         >
                           <Link href={`/dashboard/projects-overview`}>
@@ -199,10 +199,10 @@ export default function AppShell({ children, allProjects, selectedCompanies, onC
                         <SidebarMenuButton
                             asChild
                             size="sm"
-                            isActive={pathname === "/settings"}
+                            isActive={pathname === "/dashboard/settings"}
                             tooltip={{ children: "Configuración" }}
                         >
-                            <Link href={`/settings`}>
+                            <Link href={`/dashboard/settings`}>
                                 <Cog className="h-4 w-4 shrink-0" />
                                 <span className="truncate">
                                     Configuración
@@ -221,7 +221,7 @@ export default function AppShell({ children, allProjects, selectedCompanies, onC
             <div className="flex-1" />
             {user && <CompanySwitcher user={user} selectedCompanies={selectedCompanies} onCompanyChange={onCompanyChange} />}
             <ThemeToggle />
-            <Link href="/settings" passHref>
+            <Link href="/dashboard/settings" passHref>
               <Button variant="ghost" size="icon" aria-label="Configuración">
                 <Cog className="h-5 w-5" />
               </Button>
