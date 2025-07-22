@@ -140,7 +140,7 @@ export default function ProjectList({ projects, view }: ProjectListProps) {
           const progressPercentage = project.progress;
           return (
             <Link href={`/dashboard/projects-overview/${project.id}`} key={project.id} className="focus:outline-none focus:ring-2 focus:ring-ring rounded-lg">
-              <Card className="flex flex-col transition-all duration-300 group hover:shadow-xl border h-full">
+              <Card className="flex flex-col transition-all duration-300 group hover:shadow-md border h-full">
                 <CardHeader className="p-4 pb-2 relative">
                     <CardTitle className="font-headline mb-1 group-hover:text-primary transition-colors text-lg line-clamp-2 h-14">{project.name}</CardTitle>
                     <div className="flex flex-col gap-2 text-sm text-muted-foreground">

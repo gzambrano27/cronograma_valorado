@@ -17,7 +17,7 @@ export function ConnectionError() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-muted/40 p-4">
-      <Card className="w-full max-w-md text-center border-destructive/50 shadow-lg shadow-destructive/10">
+      <Card className="w-full max-w-md text-center border-destructive/50 shadow-md shadow-destructive/10">
         <CardHeader>
           <div className="mx-auto bg-destructive/10 p-4 rounded-full w-fit">
             <AlertTriangle className="h-12 w-12 text-destructive" />
