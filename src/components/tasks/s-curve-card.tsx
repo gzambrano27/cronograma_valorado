@@ -30,19 +30,51 @@ export function SCurveCard({ data }: SCurveCardProps) {
   const chartRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  const handleExport = () => {
-    const svg = chartRef.current?.querySelector('svg');
-    if (!svg) {
+  const handleExport = async () => {
+    const svgElement = chartRef.current?.querySelector('svg');
+    if (!svgElement) {
       toast({
-        variant: "destructive",
-        title: "Error al exportar",
-        description: "No se pudo encontrar el gráfico para exportar.",
+        variant: 'destructive',
+        title: 'Error al exportar',
+        description: 'No se pudo encontrar el gráfico para exportar.',
       });
       return;
     }
 
-    // Serializar el SVG a un string
-    const svgData = new XMLSerializer().serializeToString(svg);
+    // Clonar el SVG para no modificar el original en la página
+    const svgClone = svgElement.cloneNode(true) as SVGSVGElement;
+
+    // Obtener las reglas de estilo CSS de los documentos
+    const styleSheets = Array.from(document.styleSheets);
+    let allCssRules = '';
+    styleSheets.forEach(sheet => {
+      try {
+        // Algunas hojas de estilo (ej. de Google Fonts) pueden dar error de CORS
+        if (sheet.cssRules) {
+          Array.from(sheet.cssRules).forEach(rule => {
+            allCssRules += rule.cssText;
+          });
+        }
+      } catch (e) {
+        console.warn('No se pudo leer una hoja de estilos:', e);
+      }
+    });
+
+    // Crear un elemento <style> para inyectar en el SVG
+    const styleElement = document.createElement('style');
+    styleElement.textContent = allCssRules;
+
+    // Añadir el <defs> si no existe, y luego el <style>
+    let defs = svgClone.querySelector('defs');
+    if (!defs) {
+      defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      svgClone.prepend(defs);
+    }
+    defs.appendChild(styleElement);
+
+
+    // Serializar el SVG clonado a un string
+    const svgData = new XMLSerializer().serializeToString(svgClone);
     // Crear un Blob (objeto de archivo en memoria)
     const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
     // Crear una URL para el Blob
