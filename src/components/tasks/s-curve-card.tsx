@@ -41,60 +41,58 @@ export function SCurveCard({ data }: SCurveCardProps) {
       return;
     }
 
-    // Clonar el SVG para no modificar el original en la página
-    const svgClone = svgElement.cloneNode(true) as SVGSVGElement;
+    try {
+        const svgString = new XMLSerializer().serializeToString(svgElement);
+        const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(svgBlob);
 
-    // Obtener las reglas de estilo CSS de los documentos
-    const styleSheets = Array.from(document.styleSheets);
-    let allCssRules = '';
-    styleSheets.forEach(sheet => {
-      try {
-        // Algunas hojas de estilo (ej. de Google Fonts) pueden dar error de CORS
-        if (sheet.cssRules) {
-          Array.from(sheet.cssRules).forEach(rule => {
-            allCssRules += rule.cssText;
-          });
+        const image = new Image();
+        image.onload = () => {
+            const canvas = document.createElement('canvas');
+            const scale = 2; // Aumentar escala para mayor resolución
+            canvas.width = (svgElement.clientWidth || 600) * scale;
+            canvas.height = (svgElement.clientHeight || 300) * scale;
+            const ctx = canvas.getContext('2d');
+
+            if (ctx) {
+                 // Dibuja un fondo blanco para evitar transparencias
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--card').trim() || '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+                const pngUrl = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.href = pngUrl;
+                link.download = 'curva-s-avance.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                URL.revokeObjectURL(url);
+                toast({
+                    title: "Exportación Completa",
+                    description: "La imagen del gráfico ha sido descargada.",
+                });
+            }
+        };
+        image.onerror = () => {
+             URL.revokeObjectURL(url);
+             toast({
+                variant: 'destructive',
+                title: 'Error al cargar el gráfico',
+                description: 'No se pudo procesar la imagen del gráfico para la exportación.',
+             });
         }
-      } catch (e) {
-        console.warn('No se pudo leer una hoja de estilos:', e);
-      }
-    });
+        image.src = url;
 
-    // Crear un elemento <style> para inyectar en el SVG
-    const styleElement = document.createElement('style');
-    styleElement.textContent = allCssRules;
-
-    // Añadir el <defs> si no existe, y luego el <style>
-    let defs = svgClone.querySelector('defs');
-    if (!defs) {
-      defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-      svgClone.prepend(defs);
+    } catch (error) {
+        console.error("Error exporting chart:", error);
+        toast({
+            variant: "destructive",
+            title: "Error inesperado",
+            description: "Ocurrió un error durante la exportación del gráfico."
+        })
     }
-    defs.appendChild(styleElement);
-
-
-    // Serializar el SVG clonado a un string
-    const svgData = new XMLSerializer().serializeToString(svgClone);
-    // Crear un Blob (objeto de archivo en memoria)
-    const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-    // Crear una URL para el Blob
-    const url = URL.createObjectURL(blob);
-    
-    // Crear un enlace temporal para la descarga
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'curva-s-avance.svg';
-    document.body.appendChild(link);
-    link.click();
-    
-    // Limpieza
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    
-    toast({
-        title: "Exportación iniciada",
-        description: "La descarga del gráfico ha comenzado.",
-    });
   };
 
   return (
