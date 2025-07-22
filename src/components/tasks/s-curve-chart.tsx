@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -76,111 +77,114 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-export function SCurveChart({ data }: SCurveChartProps) {
-  const [opacities, setOpacities] = React.useState({
-    planned: 1,
-    actual: 1,
-  });
+export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
+  ({ data }, ref) => {
+    const [opacities, setOpacities] = React.useState({
+      planned: 1,
+      actual: 1,
+    });
 
-  const handleLegendClick = (data: any) => {
-    const { dataKey } = data;
-    if (dataKey === 'planned' || dataKey === 'actual') {
-        setOpacities(prev => ({
-            ...prev,
-            [dataKey]: prev[dataKey] === 1 ? 0.2 : 1,
-        }));
-    }
-  };
-  
-  const yAxisTicks = Array.from({ length: 21 }, (_, i) => i * 5); // 0, 5, ..., 100
+    const handleLegendClick = (data: any) => {
+      const { dataKey } = data;
+      if (dataKey === 'planned' || dataKey === 'actual') {
+          setOpacities(prev => ({
+              ...prev,
+              [dataKey]: prev[dataKey] === 1 ? 0.2 : 1,
+          }));
+      }
+    };
+    
+    const yAxisTicks = Array.from({ length: 21 }, (_, i) => i * 5); // 0, 5, ..., 100
 
-  return (
-    <ChartContainer config={chartConfig} className="min-h-[250px] w-full h-full">
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart
-          accessibilityLayer
-          data={data}
-          margin={{
-            top: 10,
-            right: 30,
-            left: 0,
-            bottom: 0,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <XAxis
-            dataKey="date"
-            tickLine={false}
-            axisLine={false}
-            tickMargin={8}
-            className="text-xs"
-          />
-          <YAxis
-            tickLine={false}
-            axisLine={false}
-            tickMargin={8}
-            tickFormatter={(value) => `${value}%`}
-            domain={[0, 100]}
-            ticks={yAxisTicks}
-            className="text-xs"
-          />
-          <defs>
-            <linearGradient id="fillPlanned" x1="0" y1="0" x2="0" y2="1">
-              <stop
-                offset="5%"
-                stopColor="var(--color-planned)"
-                stopOpacity={0.4}
-              />
-              <stop
-                offset="95%"
-                stopColor="var(--color-planned)"
-                stopOpacity={0.1}
-              />
-            </linearGradient>
-            <linearGradient id="fillActual" x1="0" y1="0" x2="0" y2="1">
-              <stop
-                offset="5%"
-                stopColor="var(--color-actual)"
-                stopOpacity={0.4}
-              />
-              <stop
-                offset="95%"
-                stopColor="var(--color-actual)"
-                stopOpacity={0.1}
-              />
-            </linearGradient>
-          </defs>
-          <Tooltip
-            cursor={{ strokeDasharray: '3 3' }}
-            content={<CustomTooltip />}
-          />
-          <Legend onClick={handleLegendClick} wrapperStyle={{paddingTop: '1rem', fontSize: '12px'}}/>
-          <Area
-            dataKey="planned"
-            type="monotone"
-            fill="url(#fillPlanned)"
-            stroke="var(--color-planned)"
-            strokeWidth={2}
-            strokeOpacity={opacities.planned}
-            fillOpacity={opacities.planned === 1 ? 0.4 : 0.1}
-            activeDot={{ r: 6 }}
-            dot={false}
-            name={chartConfig.planned.label}
-          />
-          <Area
-            dataKey="actual"
-            type="monotone"
-            fill="url(#fillActual)"
-            stroke="var(--color-actual)"
-            strokeWidth={2}
-            strokeOpacity={opacities.actual}
-            fillOpacity={opacities.actual === 1 ? 0.4 : 0.1}
-            activeDot={{ r: 6 }}
-            dot={false}
-            name={chartConfig.actual.label}
-          />
-        </AreaChart>
-      </ResponsiveContainer>
-    </ChartContainer>
-  )
-}
+    return (
+      <ChartContainer config={chartConfig} className="min-h-[250px] w-full h-full" ref={ref}>
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart
+            accessibilityLayer
+            data={data}
+            margin={{
+              top: 10,
+              right: 30,
+              left: 0,
+              bottom: 0,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis
+              dataKey="date"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              className="text-xs"
+            />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={(value) => `${value}%`}
+              domain={[0, 100]}
+              ticks={yAxisTicks}
+              className="text-xs"
+            />
+            <defs>
+              <linearGradient id="fillPlanned" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-planned)"
+                  stopOpacity={0.4}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-planned)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+              <linearGradient id="fillActual" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-actual)"
+                  stopOpacity={0.4}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-actual)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+            </defs>
+            <Tooltip
+              cursor={{ strokeDasharray: '3 3' }}
+              content={<CustomTooltip />}
+            />
+            <Legend onClick={handleLegendClick} wrapperStyle={{paddingTop: '1rem', fontSize: '12px'}}/>
+            <Area
+              dataKey="planned"
+              type="monotone"
+              fill="url(#fillPlanned)"
+              stroke="var(--color-planned)"
+              strokeWidth={2}
+              strokeOpacity={opacities.planned}
+              fillOpacity={opacities.planned === 1 ? 0.4 : 0.1}
+              activeDot={{ r: 6 }}
+              dot={false}
+              name={chartConfig.planned.label}
+            />
+            <Area
+              dataKey="actual"
+              type="monotone"
+              fill="url(#fillActual)"
+              stroke="var(--color-actual)"
+              strokeWidth={2}
+              strokeOpacity={opacities.actual}
+              fillOpacity={opacities.actual === 1 ? 0.4 : 0.1}
+              activeDot={{ r: 6 }}
+              dot={false}
+              name={chartConfig.actual.label}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </ChartContainer>
+    )
+  }
+);
+SCurveChart.displayName = 'SCurveChart';
