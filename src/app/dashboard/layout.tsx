@@ -36,7 +36,7 @@ export default async function DashboardLayout({
     <SessionProvider>
         <ThemeProvider
             attribute="class"
-            defaultTheme="dark"
+            defaultTheme="light"
             enableSystem={false}
             disableTransitionOnChange
         >
@@ -44,7 +44,7 @@ export default async function DashboardLayout({
               {/* AuthLayoutClient es un componente de cliente que gestiona la sesión y protege las rutas */}
               <AuthLayoutClient>
                   {children}
-              </AuthLayoutClient>
+              </Auth-layout-client>
             </DashboardProvider>
         </ThemeProvider>
     </SessionProvider>
