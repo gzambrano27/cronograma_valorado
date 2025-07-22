@@ -3,7 +3,7 @@
 
 import 'server-only';
 import { z } from 'zod';
-import { getOdooClient } from './odoo-client';
+import { OdooClient, getOdooClient } from './odoo-client';
 import type { Company, UserGroupInfo, LoginResult, SessionUser } from './types';
 import { query } from './db';
 import { getTranslatedName } from './utils';
@@ -130,13 +130,13 @@ export async function login(prevState: LoginResult | undefined, formData: FormDa
 
 /**
  * Revalida la sesión de un usuario para comprobar si sus permisos han cambiado.
- * Específicamente, vuelve a comprobar si es "Gerente".
+ * **DEPRECATED**: This approach is not secure as it requires passing credentials.
+ * Permissions are now set at login and persisted in the client session.
  * @param userId - El ID del usuario a revalidar.
  * @returns - Un objeto `LoginResult` con los datos actualizados del usuario.
  */
-export async function revalidateSession(userId: number): Promise<LoginResult> {
+export async function revalidateSession(userId: number, odooClient: OdooClient): Promise<LoginResult> {
     try {
-        const odooClient = getOdooClient();
         const userDetails = await odooClient.executeKw<any[]>('res.users', 'search_read',
             [[['id', '=', userId]]],
             { fields: ['name', 'login', 'partner_id', 'company_id', 'company_ids'] }

@@ -80,11 +80,7 @@ export class OdooClient {
     }
 }
 
-let odooClientInstance: OdooClient | null = null;
-
+// Devuelve siempre una nueva instancia para evitar problemas de estado.
 export function getOdooClient(uid?: number, password?: string) {
-  if (!odooClientInstance) {
-      odooClientInstance = new OdooClient(uid, password);
-  }
-  return odooClientInstance;
+  return new OdooClient(uid, password);
 }
