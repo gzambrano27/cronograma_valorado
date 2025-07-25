@@ -49,13 +49,13 @@ export function SCurveProgressCard({ data }: SCurveProgressCardProps) {
               <DialogTitle className="font-headline">Curva "S" de Avance Valorado (Vista Ampliada)</DialogTitle>
             </DialogHeader>
             <div className="flex-grow min-h-0">
-              <SCurveChart data={data} showCostBreakdown={false} />
+               <SCurveChart data={data} />
             </div>
           </DialogContent>
         </Dialog>
       </CardHeader>
       <CardContent className="pl-2 h-[300px]" ref={chartRef}>
-        <SCurveChart data={data} showCostBreakdown={false} />
+        <SCurveChart data={data} />
       </CardContent>
     </Card>
   );
