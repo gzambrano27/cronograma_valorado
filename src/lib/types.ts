@@ -93,13 +93,15 @@ export type RawTask = {
   name:string;
   quantity: string;
   consumedquantity: string;
-  value: string; // Corresponde al campo 'precio' en la lógica de la app.
+  precio: string; // Corresponde al campo 'precio' en la lógica de la app.
   cost: string;
   startdate: string;
   enddate: string;
   validations?: RawTaskValidation[];
   status: 'pendiente' | 'en-progreso' | 'completado';
   dailyconsumption?: DailyConsumption[];
+  partner_id?: string;
+  partner_name?: any;
 };
 
 // Tipo procesado para las tareas.
@@ -116,6 +118,8 @@ export type Task = {
   validations?: TaskValidation[];
   status: 'pendiente' | 'en-progreso' | 'completado';
   dailyConsumption?: DailyConsumption[];
+  partnerId?: number;
+  partnerName?: string;
 };
 
 // Estructura de datos para el gráfico de Curva "S".
@@ -140,4 +144,9 @@ export type UserGroupInfo = {
     nombre_categoria: any;
     grupo_id: number;
     nombre_grupo: any;
+}
+
+export type Partner = {
+    id: number;
+    name: string;
 }

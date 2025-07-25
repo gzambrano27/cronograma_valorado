@@ -1,6 +1,6 @@
 
 'use server';
-import type { Project, Task, SCurveData, AppConfig, TaskValidation, RawTask, RawTaskValidation, RawProject } from './types';
+import type { Project, Task, SCurveData, AppConfig, TaskValidation, RawTask, RawTaskValidation, RawProject, Partner } from './types';
 import fs from 'fs/promises';
 import path from 'path';
 import { eachDayOfInterval, format, startOfDay } from 'date-fns';
@@ -26,7 +26,7 @@ function processTask(rawTask: RawTask): Task {
     name: rawTask.name,
     quantity: toFloat(rawTask.quantity),
     consumedQuantity: toFloat(rawTask.consumedquantity),
-    precio: toFloat(rawTask.value), // El campo de la BD es 'value', lo mapeamos a 'precio'
+    precio: toFloat(rawTask.precio), // El campo de la BD es 'precio'
     cost: toFloat(rawTask.cost),
     startDate: new Date(rawTask.startdate),
     endDate: new Date(rawTask.enddate),
@@ -45,6 +45,8 @@ function processTask(rawTask: RawTask): Task {
       location: v.location,
       userId: v.userid ? parseInt(v.userid, 10) : undefined,
     })),
+    partnerId: rawTask.partner_id ? parseInt(rawTask.partner_id, 10) : undefined,
+    partnerName: rawTask.partner_name ? getTranslatedName(rawTask.partner_name) : undefined,
   };
 }
 
@@ -67,8 +69,8 @@ export async function getProjects(): Promise<Project[]> {
       WITH ProjectTaskMetrics AS (
         SELECT
           projectid,
-          SUM(quantity * value) AS total_value,
-          SUM(consumedquantity * value) AS consumed_value,
+          SUM(quantity * precio) AS total_value,
+          SUM(consumedquantity * precio) AS consumed_value,
           COUNT(id) AS task_count,
           COUNT(id) FILTER (WHERE status = 'completado') AS completed_tasks
         FROM
@@ -131,7 +133,9 @@ export async function getTasks(): Promise<Task[]> {
 // Obtiene las tareas de un proyecto específico por su ID.
 export async function getTasksByProjectId(id: number): Promise<Task[]> {
     const rawTasks = await query<RawTask>(`
-      SELECT t.*,
+      SELECT 
+        t.*,
+        p.name as partner_name,
         -- Subconsulta para agregar las validaciones de cada tarea como un array JSON.
         (
           SELECT json_agg(v.*)
@@ -139,6 +143,7 @@ export async function getTasksByProjectId(id: number): Promise<Task[]> {
           WHERE v.taskid = t.id
         ) as validations
       FROM "externo_tasks" t
+      LEFT JOIN res_partner p ON t.partner_id = p.id
       WHERE t.projectid = $1
       ORDER BY t.startdate, t.id
     `, [id]);
@@ -271,5 +276,19 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
       planned: Math.round(point.planned * 100) / 100,
       actual: Math.round(point.actual * 100) / 100,
       deviation: Math.round(point.deviation * 100) / 100,
+    }));
+}
+
+
+export async function getPartners(): Promise<Partner[]> {
+    const partners = await query<{id: number, name: any}>(`
+        SELECT id, name
+        FROM res_partner
+        WHERE is_company = true OR type = 'contact'
+        ORDER BY name
+    `);
+    return partners.map(p => ({
+        id: p.id,
+        name: getTranslatedName(p.name)
     }));
 }

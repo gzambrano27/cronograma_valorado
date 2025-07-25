@@ -19,10 +19,13 @@ import { Calendar } from "../ui/calendar"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import React, { useEffect, useRef, useActionState } from "react"
+import React, { useEffect, useRef, useActionState, useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { useFormStatus } from "react-dom"
 import { createTask } from "@/lib/actions"
+import { getPartners } from "@/lib/data"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
+import type { Partner } from "@/lib/types"
 
 function SubmitButton() {
     const { pending } = useFormStatus();
@@ -37,9 +40,20 @@ export function AddTaskSheet({ projectId, onSuccess }: { projectId: number, onSu
   const [open, setOpen] = React.useState(false)
   const { toast } = useToast()
   const formRef = useRef<HTMLFormElement>(null);
+  const [partners, setPartners] = useState<Partner[]>([]);
 
   const [startDate, setStartDate] = React.useState<Date>()
   const [endDate, setEndDate] = React.useState<Date>()
+
+  useEffect(() => {
+    async function loadPartners() {
+        if(open) {
+            const fetchedPartners = await getPartners();
+            setPartners(fetchedPartners);
+        }
+    }
+    loadPartners();
+  }, [open]);
 
   const createTaskWithSuccess = async (_prevState: any, formData: FormData) => {
     if (startDate) {
@@ -101,6 +115,21 @@ export function AddTaskSheet({ projectId, onSuccess }: { projectId: number, onSu
                 <div className="space-y-2">
                     <Label htmlFor="name">Nombre de la Tarea</Label>
                     <Input id="name" name="name" placeholder="Ej: Vaciado de hormigón" required />
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="partnerId">Proveedor/Responsable</Label>
+                    <Select name="partnerId">
+                        <SelectTrigger>
+                            <SelectValue placeholder="Seleccione un proveedor" />
+                        </SelectTrigger>
+                        <SelectContent>
+                           {partners.map(partner => (
+                               <SelectItem key={partner.id} value={String(partner.id)}>
+                                   {partner.name}
+                               </SelectItem>
+                           ))}
+                        </SelectContent>
+                    </Select>
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="quantity">Cantidad</Label>

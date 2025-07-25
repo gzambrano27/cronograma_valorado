@@ -139,6 +139,11 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
       size: 350,
     },
     {
+      accessorKey: "partnerName",
+      header: "Proveedor",
+      cell: ({ row }) => <div className="capitalize">{row.getValue("partnerName") || '-'}</div>,
+    },
+    {
       accessorKey: "status",
       header: "Estado",
       cell: ({ row }) => {
@@ -267,6 +272,7 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
 
 const columnTranslations: Record<string, string> = {
     name: "Tarea",
+    partnerName: "Proveedor",
     status: "Estado",
     quantity: "Cant. Planificada",
     consumedQuantity: "Cant. Consumida",
@@ -307,6 +313,7 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
         difference: false,
         startDate: false,
         endDate: false,
+        partnerName: false,
     };
     if (isManager) {
         mobileVisibility.precio = false;

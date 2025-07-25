@@ -48,6 +48,7 @@ const TaskSchema = z.object({
     precio: z.coerce.number().min(0, { message: 'El precio no puede ser negativo.' }),
     startDate: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: 'Fecha de inicio inválida.' }),
     endDate: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: 'Fecha de fin inválida.' }),
+    partnerId: z.coerce.number().optional(),
 });
 
 // Crea el desglose de consumo diario para una tarea.
@@ -97,13 +98,14 @@ export async function createTask(projectId: number, formData: FormData): Promise
     precio: formData.get('precio'),
     startDate: formData.get('startDate'),
     endDate: formData.get('endDate'),
+    partnerId: formData.get('partnerId'),
   });
 
   if (!validatedFields.success) {
     return { success: false, message: 'Datos de la tarea inválidos.' };
   }
 
-  const { name, quantity, cost, precio, startDate, endDate } = validatedFields.data;
+  const { name, quantity, cost, precio, startDate, endDate, partnerId } = validatedFields.data;
 
   const start = new Date(startDate);
   const end = new Date(endDate);
@@ -116,9 +118,9 @@ export async function createTask(projectId: number, formData: FormData): Promise
     const dailyConsumption = createDailyConsumption(start, end, quantity);
   
     await query(`
-      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "cost", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
-      VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', 0, $8)
-    `, [projectId, name, quantity, precio, cost, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption)]);
+      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "precio", "cost", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption", "partner_id")
+      VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', 0, $8, $9)
+    `, [projectId, name, quantity, precio, cost, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption), partnerId]);
   
     // Revalida las rutas para que Next.js actualice la caché y muestre los nuevos datos.
     revalidatePath(`/dashboard/projects-overview/${projectId}`);
@@ -166,7 +168,7 @@ export async function updateTaskConsumption(taskId: number, date: string, consum
     const task = {
         ...taskData,
         quantity: parseFloat(taskData.quantity),
-        precio: parseFloat(taskData.value)
+        precio: parseFloat(taskData.precio)
     }
 
     const dailyConsumption = (taskData.dailyconsumption || []).map(dc => ({
@@ -353,7 +355,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
 
   for (const task of newTasks) {
     await query(`
-      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "cost", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
+      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "precio", "cost", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
       VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', 0, $8)
     `, [task.projectId, task.name, task.quantity, task.precio, task.cost, task.startDate.toISOString(), task.endDate.toISOString(), JSON.stringify(task.dailyConsumption)]);
   }
@@ -362,5 +364,3 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   revalidatePath(`/dashboard`);
   return { success: true, message: `${newTasks.length} tareas importadas.` };
 }
-
-    
