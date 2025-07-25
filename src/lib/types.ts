@@ -93,7 +93,7 @@ export type RawTask = {
   name:string;
   quantity: string;
   consumedquantity: string;
-  precio: string; // Corresponde al campo 'precio' en la lógica de la app.
+  value: string; // Corresponde al campo 'value' en la BD, que es el PVP.
   cost: string;
   startdate: string;
   enddate: string;

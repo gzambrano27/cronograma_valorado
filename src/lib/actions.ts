@@ -118,7 +118,7 @@ export async function createTask(projectId: number, formData: FormData): Promise
     const dailyConsumption = createDailyConsumption(start, end, quantity);
   
     await query(`
-      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "precio", "cost", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption", "partner_id")
+      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "cost", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption", "partner_id")
       VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', 0, $8, $9)
     `, [projectId, name, quantity, precio, cost, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption), partnerId]);
   
@@ -168,7 +168,7 @@ export async function updateTaskConsumption(taskId: number, date: string, consum
     const task = {
         ...taskData,
         quantity: parseFloat(taskData.quantity),
-        precio: parseFloat(taskData.precio)
+        precio: parseFloat(taskData.value)
     }
 
     const dailyConsumption = (taskData.dailyconsumption || []).map(dc => ({
@@ -355,7 +355,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
 
   for (const task of newTasks) {
     await query(`
-      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "precio", "cost", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
+      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "cost", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
       VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', 0, $8)
     `, [task.projectId, task.name, task.quantity, task.precio, task.cost, task.startDate.toISOString(), task.endDate.toISOString(), JSON.stringify(task.dailyConsumption)]);
   }

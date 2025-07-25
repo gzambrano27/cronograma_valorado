@@ -26,7 +26,7 @@ function processTask(rawTask: RawTask): Task {
     name: rawTask.name,
     quantity: toFloat(rawTask.quantity),
     consumedQuantity: toFloat(rawTask.consumedquantity),
-    precio: toFloat(rawTask.precio), // El campo de la BD es 'precio'
+    precio: toFloat(rawTask.value), // El campo de la BD es 'value'
     cost: toFloat(rawTask.cost),
     startDate: new Date(rawTask.startdate),
     endDate: new Date(rawTask.enddate),
@@ -69,8 +69,8 @@ export async function getProjects(): Promise<Project[]> {
       WITH ProjectTaskMetrics AS (
         SELECT
           projectid,
-          SUM(quantity * precio) AS total_value,
-          SUM(consumedquantity * precio) AS consumed_value,
+          SUM(quantity * value) AS total_value,
+          SUM(consumedquantity * value) AS consumed_value,
           COUNT(id) AS task_count,
           COUNT(id) FILTER (WHERE status = 'completado') AS completed_tasks
         FROM
