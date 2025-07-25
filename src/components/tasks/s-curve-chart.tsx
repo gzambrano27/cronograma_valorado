@@ -49,6 +49,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
              }
         }
         
+        // No mostrar items con valor 0, excepto 'Planificado'
         if (name !== 'Planificado' && (!value || value === 0)) return null;
 
         return (
@@ -170,16 +171,6 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
                 <stop offset="5%" stopColor="var(--color-actual)" stopOpacity={0.4} />
                 <stop offset="95%" stopColor="var(--color-actual)" stopOpacity={0.1} />
               </linearGradient>
-              {providerKeys.map((key) => {
-                  const providerConfig = chartConfig[key];
-                  if (!providerConfig) return null;
-                  return (
-                    <linearGradient key={`fill-grad-${key}`} id={`fill-${key}`} x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={providerConfig.color} stopOpacity={0.3} />
-                      <stop offset="95%" stopColor={providerConfig.color} stopOpacity={0.05} />
-                    </linearGradient>
-                  )
-              })}
             </defs>
             <Tooltip
               cursor={{ strokeDasharray: '3 3' }}
@@ -216,8 +207,9 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
                         key={key}
                         dataKey={key}
                         type="monotone"
-                        fill={`url(#fill-${key})`}
+                        fill={providerConfig.color}
                         stroke={providerConfig.color}
+                        fillOpacity={0.3}
                         strokeWidth={2}
                         activeDot={{ r: 6 }}
                         dot={false}
