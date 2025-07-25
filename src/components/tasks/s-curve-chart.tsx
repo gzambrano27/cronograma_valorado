@@ -86,12 +86,14 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
 };
 
 const providerColors = [
-    "hsl(262.1 83.3% 57.8%)", // violet-500
-    "hsl(221.2 83.2% 53.3%)", // blue-500
-    "hsl(172.2 68.5% 42.4%)", // teal-500
-    "hsl(314.3 86.8% 54.3%)", // pink-500
-    "hsl(24.6 95% 53.1%)",   // orange-500
-    "hsl(142.1 76.2% 36.3%)", // green-600
+  "hsl(262.1 83.3% 57.8%)", // violet-500
+  "hsl(221.2 83.2% 53.3%)", // blue-500
+  "hsl(172.2 68.5% 42.4%)", // teal-500
+  "hsl(314.3 86.8% 54.3%)", // pink-500
+  "hsl(24.6 95% 53.1%)",   // orange-500
+  "hsl(142.1 76.2% 36.3%)", // green-600
+  "hsl(210, 40%, 50%)",    // un azul diferente
+  "hsl(350, 65%, 55%)"     // un rojo suave
 ];
 
 export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
@@ -202,12 +204,12 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
               dot={false}
               name={chartConfig.planned.label}
             />
-            <Area
+             <Area
                 dataKey="actual"
                 type="monotone"
-                fill="url(#fillActual)"
-                stroke="var(--color-actual)"
-                strokeWidth={2}
+                fill={showCostBreakdown ? "url(#fillActual)" : "transparent"}
+                stroke={showCostBreakdown ? "var(--color-actual)" : "transparent"}
+                strokeWidth={showCostBreakdown ? 2 : 0}
                 activeDot={{ r: 6 }}
                 dot={false}
                 name={chartConfig.actual.label}
@@ -225,7 +227,7 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
                         strokeWidth={2}
                         activeDot={{ r: 6 }}
                         dot={false}
-                        name={providerConfig.label}
+                        name={providerConfig.label as string}
                     />
                 )
             })}
