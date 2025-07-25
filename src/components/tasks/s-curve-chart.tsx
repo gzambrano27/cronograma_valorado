@@ -23,50 +23,59 @@ import { formatCurrency } from "@/lib/utils"
 
 interface SCurveChartProps {
   data: SCurveData[]
+  showCostBreakdown?: boolean
 }
 
-const chartConfig = {
-  planned: {
-    label: "Avance Planificado",
-    color: "hsl(var(--muted-foreground))",
-  },
-  actual: {
-    label: "Avance Real",
-    color: "hsl(var(--primary))",
-  },
-} satisfies ChartConfig
+// Genera colores distintos para los proveedores
+const providerColors = [
+  "hsl(var(--chart-1))",
+  "hsl(var(--chart-2))",
+  "hsl(var(--chart-3))",
+  "hsl(var(--chart-4))",
+  "hsl(var(--chart-5))",
+  "hsl(262.1 83.3% 57.8%)", // purple
+  "hsl(314.3 79.9% 56.1%)", // pink
+];
+const getColor = (index: number) => providerColors[index % providerColors.length];
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload as SCurveData;
-    const plannedPercent = data.planned.toFixed(2);
-    const actualPercent = data.actual.toFixed(2);
-    const deviation = data.deviation.toFixed(2);
+    const isCostView = 'providers' in data;
+
+    const tooltipItems = payload.map((p, index) => {
+        const name = p.name;
+        const value = p.value;
+        const color = p.color;
+
+        let cumulativeValue = 0;
+        if(name === 'Planificado') cumulativeValue = data.cumulativePlannedValue;
+        else if(name === 'Real') cumulativeValue = data.cumulativeActualValue;
+
+        return (
+            <div key={index} className="flex justify-between items-center gap-4">
+                <span className="flex items-center">
+                    <div className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: color }} />
+                    {name}:
+                </span>
+                <span className="font-mono font-semibold">{`${value.toFixed(2)}%`}
+                 {isCostView && ` (${formatCurrency(cumulativeValue, 0)})`}
+                </span>
+            </div>
+        )
+    });
     
     return (
       <div className="p-4 bg-background/95 backdrop-blur-sm border rounded-lg shadow-xl text-sm min-w-[250px]">
         <p className="font-bold text-base mb-2">{`Fecha: ${label}`}</p>
         <div className="space-y-1.5">
-            <div className="flex justify-between items-center gap-4">
-                <span className="flex items-center text-muted-foreground">
-                    <div className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: 'var(--color-planned)' }} />
-                    Planificado:
-                </span>
-                <span className="font-mono font-semibold">{`${plannedPercent}% (${formatCurrency(data.cumulativePlannedValue, 0)})`}</span>
-            </div>
-            <div className="flex justify-between items-center gap-4">
-                <span className="flex items-center">
-                    <div className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: 'var(--color-actual)' }} />
-                    Real:
-                </span>
-                <span className="font-mono font-semibold">{`${actualPercent}% (${formatCurrency(data.cumulativeActualValue, 0)})`}</span>
-            </div>
-             <div className="flex justify-between items-center gap-4 pt-2 mt-2 border-t">
+           {tooltipItems}
+           <div className="flex justify-between items-center gap-4 pt-2 mt-2 border-t">
                 <span className="font-semibold">Desviación:</span>
                 <span className={`font-mono font-bold flex items-center ${data.deviation < 0 ? 'text-destructive' : 'text-green-500'}`}>
                   {data.deviation > 0 && <ArrowUp className="h-4 w-4 mr-1" />}
                   {data.deviation < 0 && <ArrowDown className="h-4 w-4 mr-1" />}
-                  {`${deviation}%`}
+                  {`${data.deviation.toFixed(2)}%`}
                 </span>
             </div>
         </div>
@@ -78,22 +87,36 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
-  ({ data }, ref) => {
-    const [opacities, setOpacities] = React.useState({
-      planned: 1,
-      actual: 1,
-    });
-
-    const handleLegendClick = (data: any) => {
-      const { dataKey } = data;
-      if (dataKey === 'planned' || dataKey === 'actual') {
-          setOpacities(prev => ({
-              ...prev,
-              [dataKey]: prev[dataKey] === 1 ? 0.2 : 1,
-          }));
-      }
-    };
+  ({ data, showCostBreakdown = false }, ref) => {
     
+    const chartConfig = React.useMemo(() => {
+        const config: ChartConfig = {
+            planned: {
+                label: "Planificado",
+                color: "hsl(var(--muted-foreground))",
+            },
+            actual: {
+                label: "Real",
+                color: "hsl(var(--primary))",
+            },
+        };
+
+        if (showCostBreakdown && data.length > 0 && data[0].providers) {
+             const providerNames = Object.keys(data[0].providers);
+             providerNames.forEach((name, index) => {
+                 config[name] = {
+                     label: name,
+                     color: getColor(index),
+                 }
+             });
+        }
+        return config;
+    }, [data, showCostBreakdown]);
+    
+    const providerKeys = showCostBreakdown && data.length > 0 && data[0].providers 
+        ? Object.keys(data[0].providers)
+        : [];
+
     const yAxisTicks = Array.from({ length: 21 }, (_, i) => i * 5); // 0, 5, ..., 100
 
     return (
@@ -128,59 +151,61 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
             />
             <defs>
               <linearGradient id="fillPlanned" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-planned)"
-                  stopOpacity={0.4}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-planned)"
-                  stopOpacity={0.1}
-                />
+                <stop offset="5%" stopColor="var(--color-planned)" stopOpacity={0.4} />
+                <stop offset="95%" stopColor="var(--color-planned)" stopOpacity={0.1} />
               </linearGradient>
               <linearGradient id="fillActual" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-actual)"
-                  stopOpacity={0.4}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-actual)"
-                  stopOpacity={0.1}
-                />
+                <stop offset="5%" stopColor="var(--color-actual)" stopOpacity={0.4} />
+                <stop offset="95%" stopColor="var(--color-actual)" stopOpacity={0.1} />
               </linearGradient>
+               {providerKeys.map(key => (
+                    <linearGradient key={key} id={`fill${key.replace(/\s+/g, '')}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={`var(--color-${key})`} stopOpacity={0.4} />
+                        <stop offset="95%" stopColor={`var(--color-${key})`} stopOpacity={0.1} />
+                    </linearGradient>
+               ))}
             </defs>
             <Tooltip
               cursor={{ strokeDasharray: '3 3' }}
               content={<CustomTooltip />}
             />
-            <Legend onClick={handleLegendClick} wrapperStyle={{paddingTop: '1rem', fontSize: '12px'}}/>
+            <Legend wrapperStyle={{paddingTop: '1rem', fontSize: '12px'}}/>
             <Area
               dataKey="planned"
               type="monotone"
               fill="url(#fillPlanned)"
               stroke="var(--color-planned)"
               strokeWidth={2}
-              strokeOpacity={opacities.planned}
-              fillOpacity={opacities.planned === 1 ? 0.4 : 0.1}
               activeDot={{ r: 6 }}
               dot={false}
               name={chartConfig.planned.label}
             />
-            <Area
-              dataKey="actual"
-              type="monotone"
-              fill="url(#fillActual)"
-              stroke="var(--color-actual)"
-              strokeWidth={2}
-              strokeOpacity={opacities.actual}
-              fillOpacity={opacities.actual === 1 ? 0.4 : 0.1}
-              activeDot={{ r: 6 }}
-              dot={false}
-              name={chartConfig.actual.label}
-            />
+            {!showCostBreakdown && (
+                <Area
+                    dataKey="actual"
+                    type="monotone"
+                    fill="url(#fillActual)"
+                    stroke="var(--color-actual)"
+                    strokeWidth={2}
+                    activeDot={{ r: 6 }}
+                    dot={false}
+                    name={chartConfig.actual.label}
+                />
+            )}
+            {showCostBreakdown && providerKeys.map((key) => (
+                <Area
+                    key={key}
+                    dataKey={`providers.${key}`}
+                    type="monotone"
+                    fill={`url(#fill${key.replace(/\s+/g, '')})`}
+                    stroke={`var(--color-${key})`}
+                    strokeWidth={2}
+                    activeDot={{ r: 6 }}
+                    dot={false}
+                    name={chartConfig[key]?.label || key}
+                    stackId="providers"
+                />
+            ))}
           </AreaChart>
         </ResponsiveContainer>
       </ChartContainer>

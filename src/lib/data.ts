@@ -285,86 +285,102 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
 // Genera los datos para el gráfico de Curva "S" de costos.
 export async function generateCostSCurveData(tasks: Task[], totalProjectCost: number): Promise<SCurveData[]> {
     if (tasks.length === 0 || totalProjectCost <= 0) {
-      return [];
+        return [];
     }
 
-    const valuesByDate = new Map<number, { planned: number; actual: number }>();
+    // Mapa para almacenar valores diarios: planned total y actual desglosado por proveedor.
+    const valuesByDate = new Map<number, { planned: number; actual: { [providerName: string]: number } }>();
+    const allProviders = new Set<string>();
 
     let minDate: Date | null = null;
     let maxDate: Date | null = null;
 
-    // Agrupa los valores planificados y reales por fecha.
     tasks.forEach(task => {
-      if (task.dailyConsumption) {
-        task.dailyConsumption.forEach(dc => {
-          const day = startOfDay(new Date(dc.date));
-          const dayTimestamp = day.getTime();
+        if (task.dailyConsumption) {
+            const providerName = task.partnerName || 'Sin Asignar';
+            allProviders.add(providerName);
+            
+            task.dailyConsumption.forEach(dc => {
+                const day = startOfDay(new Date(dc.date));
+                const dayTimestamp = day.getTime();
 
-          if (!valuesByDate.has(dayTimestamp)) {
-            valuesByDate.set(dayTimestamp, { planned: 0, actual: 0 });
-          }
+                if (!valuesByDate.has(dayTimestamp)) {
+                    valuesByDate.set(dayTimestamp, { planned: 0, actual: {} });
+                }
 
-          const currentValues = valuesByDate.get(dayTimestamp)!;
-          currentValues.planned += dc.plannedQuantity * task.cost;
-          currentValues.actual += dc.consumedQuantity * task.cost;
+                const dailyData = valuesByDate.get(dayTimestamp)!;
+                dailyData.planned += dc.plannedQuantity * task.cost;
 
-          if (!minDate || day < minDate) minDate = day;
-          if (!maxDate || day > maxDate) maxDate = day;
-        });
-      }
+                const consumedCost = dc.consumedQuantity * task.cost;
+                if (consumedCost > 0) {
+                    dailyData.actual[providerName] = (dailyData.actual[providerName] || 0) + consumedCost;
+                }
+
+                if (!minDate || day < minDate) minDate = day;
+                if (!maxDate || day > maxDate) maxDate = day;
+            });
+        }
     });
 
-    if (!minDate || !maxDate) {
-      return [];
-    }
+    if (!minDate || !maxDate) return [];
 
     const dateRange = eachDayOfInterval({ start: minDate, end: maxDate });
-
     const finalCurve: SCurveData[] = [];
+    
     let cumulativePlanned = 0;
     let cumulativeActual = 0;
+    const cumulativeProviders: { [providerName: string]: number } = {};
+    Array.from(allProviders).forEach(p => cumulativeProviders[p] = 0);
 
-    // Calcula los valores acumulados para cada día en el rango.
     for (const day of dateRange) {
-      const dayTimestamp = day.getTime();
-      const dailyValues = valuesByDate.get(dayTimestamp) || { planned: 0, actual: 0 };
+        const dayTimestamp = day.getTime();
+        const dailyData = valuesByDate.get(dayTimestamp) || { planned: 0, actual: {} };
 
-      cumulativePlanned += dailyValues.planned;
-      cumulativeActual += dailyValues.actual;
+        cumulativePlanned += dailyData.planned;
 
-      const plannedPercent = (cumulativePlanned / totalProjectCost) * 100;
-      const actualPercent = (cumulativeActual / totalProjectCost) * 100;
+        let dailyActualTotal = 0;
+        for (const provider of allProviders) {
+            const providerCost = dailyData.actual[provider] || 0;
+            cumulativeProviders[provider] += providerCost;
+            dailyActualTotal += providerCost;
+        }
+        cumulativeActual += dailyActualTotal;
 
-      finalCurve.push({
-        date: format(day, "d MMM", { locale: es }),
-        planned: plannedPercent,
-        actual: actualPercent,
-        cumulativePlannedValue: cumulativePlanned,
-        cumulativeActualValue: cumulativeActual,
-        deviation: actualPercent - plannedPercent,
-      });
-    }
+        const plannedPercent = (cumulativePlanned / totalProjectCost) * 100;
+        const actualPercent = (cumulativeActual / totalProjectCost) * 100;
+        
+        const providerPercentages: { [providerName: string]: number } = {};
+        for(const provider in cumulativeProviders) {
+            providerPercentages[provider] = (cumulativeProviders[provider] / totalProjectCost) * 100;
+        }
 
-    // Añade un punto de inicio en cero si es necesario.
-    if (minDate > new Date()) {
-       const dayBefore = new Date(minDate.getTime() - 86400000);
-        finalCurve.unshift({
-          date: format(dayBefore, "d MMM", { locale: es }),
-          planned: 0,
-          actual: 0,
-          cumulativePlannedValue: 0,
-          cumulativeActualValue: 0,
-          deviation: 0,
+        finalCurve.push({
+            date: format(day, "d MMM", { locale: es }),
+            planned: plannedPercent,
+            actual: actualPercent,
+            cumulativePlannedValue: cumulativePlanned,
+            cumulativeActualValue: cumulativeActual,
+            deviation: actualPercent - plannedPercent,
+            providers: providerPercentages,
         });
     }
-
+    
     // Redondea los valores para una mejor presentación.
-    return finalCurve.map(point => ({
-      ...point,
-      planned: Math.round(point.planned * 100) / 100,
-      actual: Math.round(point.actual * 100) / 100,
-      deviation: Math.round(point.deviation * 100) / 100,
-    }));
+    return finalCurve.map(point => {
+        const roundedProviders: { [key: string]: number } = {};
+        if (point.providers) {
+            for(const provider in point.providers) {
+                roundedProviders[provider] = Math.round(point.providers[provider] * 100) / 100;
+            }
+        }
+        return {
+            ...point,
+            planned: Math.round(point.planned * 100) / 100,
+            actual: Math.round(point.actual * 100) / 100,
+            deviation: Math.round(point.deviation * 100) / 100,
+            providers: roundedProviders
+        };
+    });
 }
 
 

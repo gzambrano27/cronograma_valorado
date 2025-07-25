@@ -35,7 +35,7 @@ export function SCurveCard({ valueData, costData }: SCurveCardProps) {
   const activeData = showCostCurve ? costData : valueData;
   const cardTitle = showCostCurve ? 'Curva "S" de Costo' : 'Curva "S" de Avance';
   const cardDescription = showCostCurve 
-    ? "Comparación del costo planificado vs. el costo real."
+    ? "Comparación del costo planificado vs. el costo real por proveedor."
     : "Comparación del avance valorado planificado vs. el avance real.";
 
   return (
@@ -70,14 +70,14 @@ export function SCurveCard({ valueData, costData }: SCurveCardProps) {
                   <DialogTitle className="font-headline">{`${cardTitle} (Vista Ampliada)`}</DialogTitle>
                 </DialogHeader>
                 <div className="flex-grow min-h-0">
-                  <SCurveChart data={activeData} />
+                  <SCurveChart data={activeData} showCostBreakdown={showCostCurve} />
                 </div>
               </DialogContent>
             </Dialog>
         </div>
       </CardHeader>
       <CardContent className="pl-2 h-[300px]" ref={chartRef}>
-        <SCurveChart data={activeData} />
+        <SCurveChart data={activeData} showCostBreakdown={showCostCurve} />
       </CardContent>
     </Card>
   );

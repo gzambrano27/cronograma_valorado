@@ -1,4 +1,5 @@
 
+
 // Este archivo define los tipos de datos principales utilizados en toda la aplicación.
 // Usar TypeScript y definir tipos claros ayuda a prevenir errores y mejora la mantenibilidad.
 
@@ -132,6 +133,7 @@ export type SCurveData = {
   cumulativePlannedValue: number; // Valor planificado acumulado.
   cumulativeActualValue: number; // Valor real acumulado.
   deviation: number; // Desviación entre planificado y real.
+  providers?: { [providerName: string]: number }; // Desglose del valor real por proveedor.
 };
 
 // Configuración de la aplicación.
