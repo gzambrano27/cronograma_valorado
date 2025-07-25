@@ -6,13 +6,16 @@ import { getProjects, getTasksByProjectId, generateSCurveData, generateCostSCurv
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TaskTable } from "@/components/tasks/task-table";
 import { XmlImport } from "@/components/tasks/xml-import";
-import { DollarSign, CheckCircle, ListTodo } from "lucide-react";
+import { DollarSign, CheckCircle, ListTodo, GanttChartSquare, BarChart } from "lucide-react";
 import { AddTaskSheet } from "@/components/tasks/add-task-sheet";
-import { SCurveCard } from "@/components/tasks/s-curve-card";
 import { formatCurrency } from "@/lib/utils";
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Project, Task, SCurveData } from '@/lib/types';
 import { useSession } from "@/hooks/use-session";
+import { SCurveProgressCard } from "@/components/tasks/s-curve-progress-card";
+import { SCurveCostCard } from "@/components/tasks/s-curve-cost-card";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 
 export default function ProjectPage() {
@@ -24,6 +27,7 @@ export default function ProjectPage() {
   const [sCurveCost, setSCurveCost] = useState<SCurveData[]>([]);
   const { session } = useSession();
   const isManager = session.user?.isManager ?? false;
+  const [showCostView, setShowCostView] = useState(false);
 
   // Carga inicial de datos del lado del cliente y función para recargar.
   const loadProjectData = useCallback(async () => {
@@ -73,8 +77,6 @@ export default function ProjectPage() {
   }
 
   const progressPercentage = project.progress;
-  const tasksInProgress = projectTasks.filter(t => t.status === 'en-progreso').length;
-  const tasksPending = projectTasks.filter(t => t.status === 'pendiente').length;
 
   return (
     <div className="space-y-6">
@@ -123,9 +125,28 @@ export default function ProjectPage() {
         </Card>
       </div>
       
-      <div className="grid grid-cols-1 gap-6">
-          {isManager && <SCurveCard valueData={sCurve} costData={sCurveCost} />}
-      </div>
+      {isManager && (
+        <div className="grid grid-cols-1 gap-6">
+            <div className="flex justify-end">
+                 <div className="flex items-center space-x-2 p-2 rounded-lg border bg-card">
+                    <GanttChartSquare className="h-5 w-5 text-muted-foreground"/>
+                    <Label htmlFor="curve-switch" className="text-sm font-medium">Avance</Label>
+                    <Switch
+                        id="curve-switch"
+                        checked={showCostView}
+                        onCheckedChange={setShowCostView}
+                        aria-label="Cambiar entre curva de avance y curva de costo"
+                    />
+                    <Label htmlFor="curve-switch" className="text-sm font-medium">Costo</Label>
+                    <BarChart className="h-5 w-5 text-muted-foreground" />
+                </div>
+            </div>
+            {showCostView 
+                ? <SCurveCostCard data={sCurveCost} />
+                : <SCurveProgressCard data={sCurve} />
+            }
+        </div>
+      )}
 
 
       <Card>
