@@ -26,17 +26,6 @@ interface SCurveChartProps {
   showCostBreakdown?: boolean
 }
 
-// Genera colores distintos para los proveedores
-const providerColors = [
-  "hsl(var(--chart-1))",
-  "hsl(var(--chart-2))",
-  "hsl(var(--chart-3))",
-  "hsl(var(--chart-4))",
-  "hsl(var(--chart-5))",
-  "hsl(262.1 83.3% 57.8%)", // purple
-  "hsl(314.3 79.9% 56.1%)", // pink
-];
-const getColor = (index: number) => providerColors[index % providerColors.length];
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -98,8 +87,18 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
     
     const providerKeys = React.useMemo(() => {
         if (!showCostBreakdown || !data || data.length === 0) return [];
+        // Claves estándar que no representan a un proveedor.
         const standardKeys = ['date', 'planned', 'actual', 'cumulativePlannedValue', 'cumulativeActualValue', 'deviation', 'cumulativeProviders'];
-        return Object.keys(data[0]).filter(key => !standardKeys.includes(key));
+        
+        const providers = new Set<string>();
+        data.forEach(d => {
+            Object.keys(d).forEach(key => {
+                if (!standardKeys.includes(key)) {
+                    providers.add(key);
+                }
+            })
+        });
+        return Array.from(providers);
     }, [data, showCostBreakdown]);
 
     const chartConfig = React.useMemo(() => {
@@ -115,10 +114,14 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
         };
 
         if (showCostBreakdown) {
-             providerKeys.forEach((name, index) => {
+             // Genera un color aleatorio para cada proveedor y lo almacena.
+             providerKeys.forEach((name) => {
+                const hue = Math.floor(Math.random() * 360);
+                const saturation = Math.floor(Math.random() * 20) + 70; // 70-90%
+                const lightness = Math.floor(Math.random() * 20) + 50; // 50-70%
                  config[name] = {
                      label: name,
-                     color: getColor(index),
+                     color: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
                  }
              });
         }
