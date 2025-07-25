@@ -212,10 +212,10 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
           }
         },
         {
-          accessorKey: "value",
+          accessorKey: "precio",
           header: () => <div className="text-right">PVP</div>,
           cell: ({ row }) => {
-            const amount = parseFloat(row.getValue("value"))
+            const amount = parseFloat(row.getValue("precio"))
             return <div className="text-right font-mono">{formatCurrency(amount)}</div>
           },
         },
@@ -223,7 +223,7 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
           id: "subtotalPVPValued",
           header: () => <div className="text-right">Subtotal PVP Valorado</div>,
           cell: ({ row }) => {
-              const subtotal = row.original.quantity * row.original.value;
+              const subtotal = row.original.quantity * row.original.precio;
               return <div className="text-right font-mono">{formatCurrency(subtotal)}</div>;
           }
         },
@@ -231,7 +231,7 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
           id: "subtotalPVPActual",
           header: () => <div className="text-right">Subtotal PVP Real</div>,
           cell: ({ row }) => {
-              const subtotal = row.original.consumedQuantity * row.original.value;
+              const subtotal = row.original.consumedQuantity * row.original.precio;
               return <div className="text-right font-mono">{formatCurrency(subtotal)}</div>;
           }
         },
@@ -274,7 +274,7 @@ const columnTranslations: Record<string, string> = {
     cost: "Costo",
     subtotalCostValued: "Subtotal Costo Valorado",
     subtotalCostActual: "Subtotal Costo Real",
-    value: "PVP",
+    precio: "PVP",
     subtotalPVPValued: "Subtotal PVP Valorado",
     subtotalPVPActual: "Subtotal PVP Real",
     startDate: "Fecha Inicio",
@@ -293,7 +293,6 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
   
   const isMobile = useIsMobile();
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
-    value: false,
     cost: false,
     subtotalCostValued: false,
     subtotalCostActual: false,
@@ -310,7 +309,7 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
         endDate: false,
     };
     if (isManager) {
-        mobileVisibility.value = false;
+        mobileVisibility.precio = false;
         mobileVisibility.cost = false;
         mobileVisibility.subtotalCostValued = false;
         mobileVisibility.subtotalCostActual = false;
@@ -320,7 +319,7 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
 
     const desktopVisibility: VisibilityState = {};
     if (isManager) {
-        desktopVisibility.value = false;
+        desktopVisibility.precio = false;
         desktopVisibility.cost = false;
         desktopVisibility.subtotalCostValued = false;
         desktopVisibility.subtotalCostActual = false;

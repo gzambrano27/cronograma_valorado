@@ -118,7 +118,7 @@ export function DailyConsumptionTracker({ task, onSuccess }: DailyConsumptionTra
             {consumptions.map((consumptionDay) => {
                 const displayDate = adjustDateForDisplay(consumptionDay.date);
                 const dateString = format(displayDate, "yyyy-MM-dd");
-                const consumedValue = consumptionDay.consumedQuantity * task.value;
+                const consumedValue = consumptionDay.consumedQuantity * task.precio;
                 const difference = consumptionDay.consumedQuantity - consumptionDay.plannedQuantity;
                 
                 return (

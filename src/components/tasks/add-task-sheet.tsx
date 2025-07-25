@@ -108,8 +108,8 @@ export function AddTaskSheet({ projectId, onSuccess }: { projectId: number, onSu
                         <Input id="quantity" name="quantity" type="number" placeholder="100" required />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="value">Valor</Label>
-                        <Input id="value" name="value" type="number" placeholder="50000" required />
+                        <Label htmlFor="precio">Precio (PVP)</Label>
+                        <Input id="precio" name="precio" type="number" placeholder="500" required />
                     </div>
                 </div>
                  <div className="grid grid-cols-2 gap-4">

@@ -26,7 +26,7 @@ function processTask(rawTask: RawTask): Task {
     name: rawTask.name,
     quantity: toFloat(rawTask.quantity),
     consumedQuantity: toFloat(rawTask.consumedquantity),
-    value: toFloat(rawTask.value),
+    precio: toFloat(rawTask.value), // El campo de la BD es 'value', lo mapeamos a 'precio'
     cost: toFloat(rawTask.cost),
     startDate: new Date(rawTask.startdate),
     endDate: new Date(rawTask.enddate),
@@ -212,8 +212,8 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
           }
 
           const currentValues = valuesByDate.get(dayTimestamp)!;
-          currentValues.planned += dc.plannedQuantity * task.value;
-          currentValues.actual += dc.consumedQuantity * task.value;
+          currentValues.planned += dc.plannedQuantity * task.precio;
+          currentValues.actual += dc.consumedQuantity * task.precio;
 
           if (!minDate || day < minDate) minDate = day;
           if (!maxDate || day > maxDate) maxDate = day;

@@ -93,7 +93,7 @@ export type RawTask = {
   name:string;
   quantity: string;
   consumedquantity: string;
-  value: string;
+  value: string; // Corresponde al campo 'precio' en la lógica de la app.
   cost: string;
   startdate: string;
   enddate: string;
@@ -109,7 +109,7 @@ export type Task = {
   name:string;
   quantity: number;
   consumedQuantity: number;
-  value: number; // Precio de Venta al Público (PVP) o Precio Unitario.
+  precio: number; // Precio de Venta al Público (PVP) o Precio Unitario.
   cost: number; // Costo unitario
   startDate: Date;
   endDate: Date;
