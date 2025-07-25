@@ -11,6 +11,7 @@ import {
   XAxis,
   YAxis,
   Legend,
+  TooltipProps,
 } from "recharts"
 import { ArrowUp, ArrowDown } from "lucide-react"
 
@@ -20,6 +21,7 @@ import {
 } from "@/components/ui/chart"
 import type { SCurveData } from "@/lib/types"
 import { formatCurrency } from "@/lib/utils"
+import { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent"
 
 interface SCurveChartProps {
   data: SCurveData[]
@@ -27,7 +29,7 @@ interface SCurveChartProps {
 }
 
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload as SCurveData;
     const isCostView = 'cumulativeProviders' in data;
@@ -40,7 +42,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         let cumulativeValue = 0;
         if(name === 'Planificado') cumulativeValue = data.cumulativePlannedValue;
         else if(name === 'Real') cumulativeValue = data.cumulativeActualValue;
-        
+
         if (isCostView && data.cumulativeProviders && name !== 'Planificado' && name !== 'Real') {
              const providerCumulative = Object.entries(data.cumulativeProviders).find(([providerName]) => providerName === name);
              if (providerCumulative) {
@@ -60,7 +62,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
             </div>
         )
     });
-    
+
     return (
       <div className="p-4 bg-background/95 backdrop-blur-sm border rounded-lg shadow-xl text-sm min-w-[250px]">
         <p className="font-bold text-base mb-2">{`Fecha: ${label}`}</p>
@@ -84,11 +86,11 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
   ({ data, showCostBreakdown = false }, ref) => {
-    
+
     const providerKeys = React.useMemo(() => {
         if (!showCostBreakdown || !data || data.length === 0) return [];
         const standardKeys = new Set(['date', 'planned', 'actual', 'cumulativePlannedValue', 'cumulativeActualValue', 'deviation', 'cumulativeProviders']);
-        
+
         const providers = new Set<string>();
         data.forEach(d => {
             Object.keys(d).forEach(key => {
@@ -221,5 +223,3 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
   }
 );
 SCurveChart.displayName = 'SCurveChart';
-
-    
