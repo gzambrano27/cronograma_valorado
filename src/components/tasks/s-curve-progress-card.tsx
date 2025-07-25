@@ -1,6 +1,4 @@
-// This file has been renamed to s-curve-progress-card.tsx to better reflect its purpose.
-// The new s-curve-cost-card.tsx handles the cost breakdown view.
-// This file can be safely deleted in the future if no longer referenced.
+
 'use client';
 
 import {
@@ -51,13 +49,13 @@ export function SCurveProgressCard({ data }: SCurveProgressCardProps) {
               <DialogTitle className="font-headline">Curva "S" de Avance Valorado (Vista Ampliada)</DialogTitle>
             </DialogHeader>
             <div className="flex-grow min-h-0">
-              <SCurveChart data={data} />
+              <SCurveChart data={data} showCostBreakdown={false} />
             </div>
           </DialogContent>
         </Dialog>
       </CardHeader>
       <CardContent className="pl-2 h-[300px]" ref={chartRef}>
-        <SCurveChart data={data} />
+        <SCurveChart data={data} showCostBreakdown={false} />
       </CardContent>
     </Card>
   );
