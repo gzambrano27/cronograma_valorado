@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -36,7 +35,7 @@ export function SCurveCard({ valueData, costData }: SCurveCardProps) {
   const cardTitle = showCostCurve ? 'Curva "S" de Costo' : 'Curva "S" de Avance';
   const cardDescription = showCostCurve 
     ? "Comparación del costo planificado, el costo real total y el desglose por proveedor."
-    : "Comparación del avance valorado planificado vs. el avance real.";
+    : "Comparación del avance valorado planificado vs. el avance valorado real.";
 
   return (
     <Card className="lg:col-span-2">

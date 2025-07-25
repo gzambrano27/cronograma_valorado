@@ -86,15 +86,16 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
 };
 
 const providerColors = [
-  "hsl(262.1 83.3% 57.8%)", // violet-500
-  "hsl(221.2 83.2% 53.3%)", // blue-500
-  "hsl(172.2 68.5% 42.4%)", // teal-500
-  "hsl(314.3 86.8% 54.3%)", // pink-500
-  "hsl(24.6 95% 53.1%)",   // orange-500
-  "hsl(142.1 76.2% 36.3%)", // green-600
-  "hsl(210, 40%, 50%)",    // un azul diferente
-  "hsl(350, 65%, 55%)"     // un rojo suave
+  "hsl(262.1 83.3% 57.8%)",
+  "hsl(221.2 83.2% 53.3%)",
+  "hsl(172.2 68.5% 42.4%)",
+  "hsl(314.3 86.8% 54.3%)",
+  "hsl(24.6 95% 53.1%)",
+  "hsl(142.1 76.2% 36.3%)",
+  "hsl(210, 40%, 50%)",
+  "hsl(350, 65%, 55%)"
 ];
+
 
 export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
   ({ data, showCostBreakdown = false }, ref) => {
@@ -204,33 +205,50 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
               dot={false}
               name={chartConfig.planned.label}
             />
-             <Area
-                dataKey="actual"
-                type="monotone"
-                fill={showCostBreakdown ? "url(#fillActual)" : "transparent"}
-                stroke={showCostBreakdown ? "var(--color-actual)" : "transparent"}
-                strokeWidth={showCostBreakdown ? 2 : 0}
-                activeDot={{ r: 6 }}
-                dot={false}
-                name={chartConfig.actual.label}
-            />
-            {showCostBreakdown && providerKeys.map((key) => {
-                const providerConfig = chartConfig[key];
-                if (!providerConfig) return null;
-                return (
-                    <Area
-                        key={key}
-                        dataKey={key}
-                        type="monotone"
-                        fill={`url(#fill-${key})`}
-                        stroke={providerConfig.color}
-                        strokeWidth={2}
-                        activeDot={{ r: 6 }}
-                        dot={false}
-                        name={providerConfig.label as string}
-                    />
-                )
-            })}
+
+            {showCostBreakdown ? (
+              <>
+                <Area
+                  dataKey="actual"
+                  type="monotone"
+                  fill="transparent"
+                  stroke="var(--color-actual)"
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                  activeDot={{ r: 6 }}
+                  dot={false}
+                  name={chartConfig.actual.label}
+                />
+                {providerKeys.map((key) => {
+                    const providerConfig = chartConfig[key];
+                    if (!providerConfig) return null;
+                    return (
+                        <Area
+                            key={key}
+                            dataKey={key}
+                            type="monotone"
+                            fill={`url(#fill-${key})`}
+                            stroke={providerConfig.color}
+                            strokeWidth={2}
+                            activeDot={{ r: 6 }}
+                            dot={false}
+                            name={providerConfig.label as string}
+                        />
+                    )
+                })}
+              </>
+            ) : (
+              <Area
+                  dataKey="actual"
+                  type="monotone"
+                  fill="url(#fillActual)"
+                  stroke="var(--color-actual)"
+                  strokeWidth={2}
+                  activeDot={{ r: 6 }}
+                  dot={false}
+                  name={chartConfig.actual.label}
+              />
+            )}
           </AreaChart>
         </ResponsiveContainer>
       </ChartContainer>
