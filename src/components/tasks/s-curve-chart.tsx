@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -110,7 +111,7 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
         providerKeys.forEach((name) => {
             const hue = Math.floor(Math.random() * 360);
             const saturation = Math.floor(Math.random() * 30) + 70; // 70-100%
-            const lightness = Math.floor(Math.random() * 20) + 50; // 50-70%
+            const lightness = Math.floor(Math.random() * 20) + 25; // 25-45% (colores oscuros)
             colors.set(name, `hsl(${hue}, ${saturation}%, ${lightness}%)`);
         });
         return colors;
@@ -138,6 +139,18 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
     }, [providerKeys, providerColors]);
 
     const yAxisTicks = Array.from({ length: 21 }, (_, i) => i * 5); // 0, 5, ..., 100
+
+    // Función para crear la URL del degradado con opacidad
+    const getFillUrl = (key: string) => `url(#fill-${key})`;
+    
+    const getRgbaFill = (key: string, opacity: number) => {
+        const color = chartConfig[key]?.color;
+        if (!color) return `rgba(0,0,0,${opacity})`;
+        // Simplificación: No podemos convertir HSL a RGBA fácilmente sin una librería,
+        // así que usaremos el color HSL directamente que recharts parece manejar.
+        return color;
+    };
+
 
     return (
       <ChartContainer config={chartConfig} className="min-h-[250px] w-full h-full" ref={ref}>
@@ -171,13 +184,22 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
             />
             <defs>
               <linearGradient id="fillPlanned" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--muted-foreground))" stopOpacity={0.4} />
-                <stop offset="95%" stopColor="hsl(var(--muted-foreground))" stopOpacity={0.1} />
+                <stop offset="5%" stopColor="var(--color-planned)" stopOpacity={0.4} />
+                <stop offset="95%" stopColor="var(--color-planned)" stopOpacity={0.1} />
               </linearGradient>
               <linearGradient id="fillActual" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
-                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1} />
+                <stop offset="5%" stopColor="var(--color-actual)" stopOpacity={0.4} />
+                <stop offset="95%" stopColor="var(--color-actual)" stopOpacity={0.1} />
               </linearGradient>
+              {providerKeys.map((key) => {
+                  const color = providerColors.get(key) || '#000000';
+                  return (
+                    <linearGradient key={`fill-${key}`} id={`fill-${key}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={color} stopOpacity={0.4} />
+                        <stop offset="95%" stopColor={color} stopOpacity={0.1} />
+                    </linearGradient>
+                  )
+              })}
             </defs>
             <Tooltip
               cursor={{ strokeDasharray: '3 3' }}
@@ -188,7 +210,7 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
               dataKey="planned"
               type="monotone"
               fill="url(#fillPlanned)"
-              stroke="hsl(var(--muted-foreground))"
+              stroke="var(--color-planned)"
               strokeWidth={2}
               activeDot={{ r: 6 }}
               dot={false}
@@ -199,7 +221,7 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
                     dataKey="actual"
                     type="monotone"
                     fill="url(#fillActual)"
-                    stroke="hsl(var(--primary))"
+                    stroke="var(--color-actual)"
                     strokeWidth={2}
                     activeDot={{ r: 6 }}
                     dot={false}
@@ -213,9 +235,8 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
                         key={key}
                         dataKey={key}
                         type="monotone"
-                        fill={color} // Aplicar color directamente
-                        fillOpacity={0.2}
-                        stroke={color} // Aplicar color directamente
+                        fill={getFillUrl(key)}
+                        stroke={color}
                         strokeWidth={2}
                         activeDot={{ r: 6 }}
                         dot={false}
