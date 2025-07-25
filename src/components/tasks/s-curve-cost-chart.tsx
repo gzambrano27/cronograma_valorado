@@ -31,29 +31,35 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
   if (active && payload && payload.length) {
     const data = payload[0].payload as SCurveData;
     
+    // Filtrar proveedores que no tienen valor en este punto para no saturar el tooltip
+    const relevantPayload = payload.filter(p => p.value && p.value > 0);
+
     return (
       <div className="p-4 bg-background/95 backdrop-blur-sm border rounded-lg shadow-xl text-sm min-w-[250px]">
         <p className="font-bold text-base mb-2">{`Fecha: ${label}`}</p>
         <div className="space-y-1.5">
-           {payload.map((p, index) => {
+           {relevantPayload.map((p, index) => {
               const name = p.name as string;
-              const value = p.value as number;
+              let value: string | number = p.value as number;
               const color = p.color || p.stroke;
               let cumulativeValue: number | undefined = undefined;
               
               if (name === 'Planificado') {
                   cumulativeValue = data.cumulativePlannedValue;
+                  value = `${(p.value as number || 0).toFixed(2)}%`;
               } else if (name === 'Real') {
                   cumulativeValue = data.cumulativeActualValue;
+                   value = `${(p.value as number || 0).toFixed(2)}%`;
               } else if (data.cumulativeProviders && name !== 'Planificado' && name !== 'Real') {
                   const providerCumulative = Object.entries(data.cumulativeProviders).find(([providerName]) => providerName === name);
                   if (providerCumulative) {
                       cumulativeValue = providerCumulative[1];
                   }
+                  // En la gráfica de costos, los proveedores ya son un % del total, por lo que no se muestra %
+                  value = formatCurrency(cumulativeValue || 0, 0); 
               }
 
-              // Do not show tooltip item if there's no value for this provider on this day
-              if (!value && name !== 'Planificado' && name !== 'Real') return null;
+              if (name !== "Real" && cumulativeValue === undefined) return null;
 
               return (
                   <div key={index} className="flex justify-between items-center gap-4">
@@ -62,8 +68,8 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
                           {name}:
                       </span>
                       <span className="font-mono font-semibold">
-                        {`${(value || 0).toFixed(2)}%`}
-                        {(cumulativeValue !== undefined) && ` (${formatCurrency(cumulativeValue, 0)})`}
+                        {value}
+                        {(name === 'Planificado' || name === 'Real') && ` (${formatCurrency(cumulativeValue || 0, 0)})`}
                       </span>
                   </div>
               )
@@ -97,6 +103,7 @@ const providerColors = [
 
 export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartProps>(
   ({ data }, ref) => {
+    const chartId = React.useId().replace(/:/g, "");
 
     const providerKeys = React.useMemo(() => {
         if (!data || data.length === 0) return [];
@@ -165,7 +172,7 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
               className="text-xs"
             />
             <defs>
-              <linearGradient id="fillPlannedCost" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id={`fill-planned-${chartId}`} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="var(--color-planned)" stopOpacity={0.4} />
                 <stop offset="95%" stopColor="var(--color-planned)" stopOpacity={0.1} />
               </linearGradient>
@@ -173,7 +180,7 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
                  const color = chartConfig[key]?.color;
                  if (!color) return null;
                  return (
-                    <linearGradient key={`fill-${key}`} id={`fill-${key}`} x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient key={`fill-${key}`} id={`fill-${key}-${chartId}`} x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor={color} stopOpacity={0.3} />
                         <stop offset="95%" stopColor={color} stopOpacity={0.05} />
                     </linearGradient>
@@ -189,14 +196,14 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
             <Area
               dataKey="planned"
               type="monotone"
-              fill="url(#fillPlannedCost)"
+              fill={`url(#fill-planned-${chartId})`}
               stroke="var(--color-planned)"
               strokeWidth={2}
               activeDot={{ r: 6 }}
               dot={false}
               name={chartConfig.planned.label}
             />
-            <Area
+             <Area
               dataKey="actual"
               type="monotone"
               fill="transparent"
@@ -215,13 +222,14 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
                         key={key}
                         dataKey={key}
                         type="monotone"
-                        fill={`url(#fill-${key})`}
+                        fill={`url(#fill-${key}-${chartId})`}
                         stroke={providerConfig.color}
                         strokeWidth={2}
                         activeDot={{ r: 6 }}
                         dot={false}
                         name={providerConfig.label as string}
                         stackId="providers"
+                        yAxisId={0} // Ensure it uses the primary Y-axis
                     />
                 )
             })}

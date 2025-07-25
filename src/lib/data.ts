@@ -297,7 +297,7 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
 
     tasks.forEach(task => {
         if (task.dailyConsumption) {
-            const providerName = task.partnerName;
+            const providerName = task.partnerName || 'Sin Asignar';
             
             task.dailyConsumption.forEach(dc => {
                 const day = startOfDay(new Date(dc.date));
@@ -311,7 +311,7 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
                 dailyData.planned += dc.plannedQuantity * task.cost;
 
                 const consumedCost = dc.consumedQuantity * task.cost;
-                if (consumedCost > 0 && providerName) {
+                if (consumedCost > 0) {
                     allProviders.add(providerName);
                     dailyData.actual[providerName] = (dailyData.actual[providerName] || 0) + consumedCost;
                 }
@@ -337,22 +337,30 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
 
         cumulativePlanned += dailyData.planned;
         
-        let dailyActualTotal = 0;
+        let dailyActualTotalCost = 0;
         for (const provider of allProviders) {
             const providerCost = dailyData.actual[provider] || 0;
             cumulativeProviders[provider] += providerCost;
-            dailyActualTotal += providerCost;
+            dailyActualTotalCost += providerCost;
         }
 
         const plannedPercent = totalProjectCost > 0 ? (cumulativePlanned / totalProjectCost) * 100 : 0;
         
-        const providerPercentages: { [providerName: string]: number } = {};
-        for(const provider of allProviders) {
-            providerPercentages[provider] = totalProjectCost > 0 ? (cumulativeProviders[provider] / totalProjectCost) * 100 : 0;
-        }
-        
         const totalActualCost = Object.values(cumulativeProviders).reduce((sum, current) => sum + current, 0);
         const actualPercent = totalProjectCost > 0 ? (totalActualCost / totalProjectCost) * 100 : 0;
+
+        const providerPercentages: { [providerName: string]: number } = {};
+        if (totalActualCost > 0) {
+            for(const provider of allProviders) {
+                // Formula corregida: % del proveedor es sobre el total real acumulado, no sobre 100.
+                providerPercentages[provider] = (cumulativeProviders[provider] / totalActualCost) * 100;
+            }
+        } else {
+             for(const provider of allProviders) {
+                providerPercentages[provider] = 0;
+            }
+        }
+        
 
         finalCurve.push({
             date: format(day, "d MMM", { locale: es }),
