@@ -316,7 +316,6 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
 
                 const consumedCost = dc.consumedQuantity * task.cost;
                 if (consumedCost > 0) {
-                    // El costo del proveedor "Sin Asignar" se cuenta en el total pero no se desglosa.
                     if (providerName !== 'Sin Asignar') {
                         dailyData.actual[providerName] = (dailyData.actual[providerName] || 0) + consumedCost;
                     }
@@ -334,7 +333,6 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
     const finalCurve: SCurveData[] = [];
     
     let cumulativePlanned = 0;
-    let cumulativeActual = 0;
     const cumulativeProviders: { [providerName: string]: number } = {};
     Array.from(allProviders).forEach(p => cumulativeProviders[p] = 0);
 
@@ -343,31 +341,33 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
         const dailyData = valuesByDate.get(dayTimestamp) || { planned: 0, actual: {} };
 
         cumulativePlanned += dailyData.planned;
-
+        
         let dailyActualTotal = 0;
         for (const provider of allProviders) {
             const providerCost = dailyData.actual[provider] || 0;
             cumulativeProviders[provider] += providerCost;
             dailyActualTotal += providerCost;
         }
-        cumulativeActual += dailyActualTotal;
 
         const plannedPercent = (cumulativePlanned / totalProjectCost) * 100;
-        const actualPercent = (cumulativeActual / totalProjectCost) * 100;
         
         const providerPercentages: { [providerName: string]: number } = {};
         for(const provider in cumulativeProviders) {
             providerPercentages[provider] = (cumulativeProviders[provider] / totalProjectCost) * 100;
         }
+        
+        const totalActualCost = Object.values(cumulativeProviders).reduce((sum, current) => sum + current, 0);
+        const actualPercent = (totalActualCost / totalProjectCost) * 100;
 
         finalCurve.push({
             date: format(day, "d MMM", { locale: es }),
             planned: plannedPercent,
             actual: actualPercent,
             cumulativePlannedValue: cumulativePlanned,
-            cumulativeActualValue: cumulativeActual,
+            cumulativeActualValue: totalActualCost,
             deviation: actualPercent - plannedPercent,
             providers: providerPercentages,
+            cumulativeProviders: {...cumulativeProviders},
         });
     }
     

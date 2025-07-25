@@ -11,6 +11,7 @@ import {
   XAxis,
   YAxis,
   Legend,
+  Line,
 } from "recharts"
 import { ArrowUp, ArrowDown } from "lucide-react"
 
@@ -46,7 +47,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     const tooltipItems = payload.map((p, index) => {
         const name = p.name;
         const value = p.value;
-        const color = p.color;
+        const color = p.color || p.stroke;
 
         let cumulativeValue = 0;
         if(name === 'Planificado') cumulativeValue = data.cumulativePlannedValue;
@@ -54,11 +55,9 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
         // For provider-specific tooltips, find the correct cumulative value
         if (isCostView && data.providers && name !== 'Planificado' && name !== 'Real') {
-            const providerCumulative = Object.entries(data.providers).find(([providerName]) => providerName === name);
+            const providerCumulative = Object.entries(data.cumulativeProviders || {}).find(([providerName]) => providerName === name);
             if (providerCumulative) {
-                // The value in tooltip is percentage, we need absolute value from cumulativeProviders
-                // This is a bit tricky as the payload doesn't carry the absolute value directly
-                // We'll show the percentage for now.
+                cumulativeValue = providerCumulative[1];
             }
         }
 
@@ -169,12 +168,6 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
                 <stop offset="5%" stopColor="var(--color-actual)" stopOpacity={0.4} />
                 <stop offset="95%" stopColor="var(--color-actual)" stopOpacity={0.1} />
               </linearGradient>
-               {providerKeys.map(key => (
-                    <linearGradient key={key} id={`fill${key.replace(/\s+/g, '')}`} x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={`var(--color-${key})`} stopOpacity={0.4} />
-                        <stop offset="95%" stopColor={`var(--color-${key})`} stopOpacity={0.1} />
-                    </linearGradient>
-               ))}
             </defs>
             <Tooltip
               cursor={{ strokeDasharray: '3 3' }}
@@ -204,11 +197,10 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
                 />
             )}
             {showCostBreakdown && providerKeys.map((key) => (
-                <Area
+                <Line
                     key={key}
                     dataKey={`providers.${key}`}
                     type="monotone"
-                    fill={`url(#fill${key.replace(/\s+/g, '')})`}
                     stroke={`var(--color-${key})`}
                     strokeWidth={2}
                     activeDot={{ r: 6 }}
