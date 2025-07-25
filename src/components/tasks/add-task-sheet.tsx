@@ -102,10 +102,14 @@ export function AddTaskSheet({ projectId, onSuccess }: { projectId: number, onSu
                     <Label htmlFor="name">Nombre de la Tarea</Label>
                     <Input id="name" name="name" placeholder="Ej: Vaciado de hormigón" required />
                 </div>
+                <div className="space-y-2">
+                    <Label htmlFor="quantity">Cantidad</Label>
+                    <Input id="quantity" name="quantity" type="number" placeholder="100" required />
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <Label htmlFor="quantity">Cantidad</Label>
-                        <Input id="quantity" name="quantity" type="number" placeholder="100" required />
+                        <Label htmlFor="cost">Costo</Label>
+                        <Input id="cost" name="cost" type="number" placeholder="400" required />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="precio">Precio (PVP)</Label>

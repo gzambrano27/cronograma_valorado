@@ -44,7 +44,8 @@ export async function updateSettings(formData: FormData) {
 const TaskSchema = z.object({
     name: z.string().min(3, { message: 'El nombre debe tener al menos 3 caracteres.' }),
     quantity: z.coerce.number().min(0, { message: 'La cantidad no puede ser negativa.' }),
-    precio: z.coerce.number().min(0, { message: 'El precio no puede ser negativa.' }),
+    cost: z.coerce.number().min(0, { message: 'El costo no puede ser negativo.' }),
+    precio: z.coerce.number().min(0, { message: 'El precio no puede ser negativo.' }),
     startDate: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: 'Fecha de inicio inválida.' }),
     endDate: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: 'Fecha de fin inválida.' }),
 });
@@ -92,6 +93,7 @@ export async function createTask(projectId: number, formData: FormData): Promise
   const validatedFields = TaskSchema.safeParse({
     name: formData.get('name'),
     quantity: formData.get('quantity'),
+    cost: formData.get('cost'),
     precio: formData.get('precio'),
     startDate: formData.get('startDate'),
     endDate: formData.get('endDate'),
@@ -101,7 +103,7 @@ export async function createTask(projectId: number, formData: FormData): Promise
     return { success: false, message: 'Datos de la tarea inválidos.' };
   }
 
-  const { name, quantity, precio, startDate, endDate } = validatedFields.data;
+  const { name, quantity, cost, precio, startDate, endDate } = validatedFields.data;
 
   const start = new Date(startDate);
   const end = new Date(endDate);
@@ -116,7 +118,7 @@ export async function createTask(projectId: number, formData: FormData): Promise
     await query(`
       INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "cost", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
       VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', 0, $8)
-    `, [projectId, name, quantity, precio, precio, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption)]);
+    `, [projectId, name, quantity, precio, cost, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption)]);
   
     // Revalida las rutas para que Next.js actualice la caché y muestre los nuevos datos.
     revalidatePath(`/dashboard/projects-overview/${projectId}`);
@@ -164,10 +166,10 @@ export async function updateTaskConsumption(taskId: number, date: string, consum
     const task = {
         ...taskData,
         quantity: parseFloat(taskData.quantity),
-        precio: parseFloat(taskData.precio)
+        precio: parseFloat(taskData.value)
     }
 
-    const dailyConsumption = (task.dailyconsumption || []).map(dc => ({
+    const dailyConsumption = (taskData.dailyconsumption || []).map(dc => ({
       ...dc,
       date: new Date(dc.date)
     })) as DailyConsumption[];
@@ -318,8 +320,8 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
         if (precioFieldId && Array.isArray(task.ExtendedAttribute)) {
              const priceAttr = task.ExtendedAttribute.find((attr: any) => attr.FieldID === precioFieldId);
             if (priceAttr && priceAttr.Value != null) {
-                const parsedPrice = parseFloat(priceAttr.Value);
-                if (!isNaN(parsedPrice)) totalTaskPrice = parsedPrice / 100;
+                const parsedPrice = parseFloat(priceAttr.Value) / 100;
+                if (!isNaN(parsedPrice)) totalTaskPrice = parsedPrice;
             }
         }
 
