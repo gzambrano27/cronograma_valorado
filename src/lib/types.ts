@@ -67,6 +67,7 @@ export type RawProject = {
   client?: any;
   totalValue: string;
   consumedValue: string;
+  totalCost: string;
   taskCount: string;
   completedTasks: string;
   progress: string;
@@ -81,6 +82,7 @@ export type Project = {
   client?: string;
   totalValue: number;
   consumedValue: number;
+  totalCost: number;
   taskCount: number;
   completedTasks: number;
   progress: number;

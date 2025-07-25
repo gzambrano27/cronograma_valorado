@@ -2,7 +2,7 @@
 
 'use client'
 import { notFound, useParams } from "next/navigation";
-import { getProjects, getTasksByProjectId, generateSCurveData } from "@/lib/data";
+import { getProjects, getTasksByProjectId, generateSCurveData, generateCostSCurveData } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TaskTable } from "@/components/tasks/task-table";
 import { XmlImport } from "@/components/tasks/xml-import";
@@ -10,6 +10,7 @@ import { DollarSign, CheckCircle, ListTodo } from "lucide-react";
 import { AddTaskSheet } from "@/components/tasks/add-task-sheet";
 import { Progress } from "@/components/ui/progress";
 import { SCurveCard } from "@/components/tasks/s-curve-card";
+import { SCurveCostCard } from "@/components/tasks/s-curve-cost-card";
 import { formatCurrency } from "@/lib/utils";
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Project, Task, SCurveData } from '@/lib/types';
@@ -22,6 +23,7 @@ export default function ProjectPage() {
   const [project, setProject] = useState<Project | null>(null);
   const [projectTasks, setProjectTasks] = useState<Task[]>([]);
   const [sCurve, setSCurve] = useState<SCurveData[]>([]);
+  const [sCurveCost, setSCurveCost] = useState<SCurveData[]>([]);
   const { session } = useSession();
   const isManager = session.user?.isManager ?? false;
 
@@ -47,6 +49,8 @@ export default function ProjectPage() {
         if (isManager) {
             const sCurveData = await generateSCurveData(fetchedTasks, fetchedProject.totalValue);
             setSCurve(sCurveData);
+            const sCurveCostData = await generateCostSCurveData(fetchedTasks, fetchedProject.totalCost);
+            setSCurveCost(sCurveCostData);
         }
 
     } catch(error) {
@@ -120,47 +124,12 @@ export default function ProjectPage() {
           </CardContent>
         </Card>
       </div>
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {isManager && <SCurveCard data={sCurve} />}
-          <Card className={isManager ? "lg:col-span-1" : "lg:col-span-3"}>
-              <CardHeader>
-                  <CardTitle className="font-headline">Resumen de Tareas</CardTitle>
-                  <CardDescription>Vista rápida del estado de las tareas.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {project.taskCount > 0 ? (
-                  <>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center text-sm">
-                        <span className="font-medium text-muted-foreground">Completadas</span>
-                        <span className="font-semibold">{project.completedTasks} / {project.taskCount}</span>
-                      </div>
-                      <Progress value={progressPercentage} aria-label={`${progressPercentage.toFixed(0)}% completado`} />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center text-sm">
-                        <span className="font-medium text-muted-foreground">En Progreso</span>
-                        <span className="font-semibold">{tasksInProgress}</span>
-                      </div>
-                      <Progress value={(tasksInProgress / project.taskCount) * 100} aria-label={`${tasksInProgress} tareas en progreso`} />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center text-sm">
-                        <span className="font-medium text-muted-foreground">Pendientes</span>
-                        <span className="font-semibold">{tasksPending}</span>
-                      </div>
-                      <Progress value={(tasksPending / project.taskCount) * 100} className="[&>div]:bg-muted-foreground/60" aria-label={`${tasksPending} tareas pendientes`} />
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-center text-muted-foreground py-10">
-                    Aún no hay tareas en este proyecto.
-                  </div>
-                )}
-              </CardContent>
-          </Card>
+          {isManager && <SCurveCostCard data={sCurveCost} />}
       </div>
+
 
       <Card>
         <CardHeader>
