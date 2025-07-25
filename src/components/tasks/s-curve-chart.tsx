@@ -13,7 +13,6 @@ import {
   TooltipProps,
 } from "recharts"
 import { ArrowUp, ArrowDown } from "lucide-react"
-import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent"
 
 import {
   ChartContainer,
@@ -21,6 +20,12 @@ import {
 } from "@/components/ui/chart"
 import type { SCurveData } from "@/lib/types"
 import { formatCurrency } from "@/lib/utils"
+import { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent"
+
+interface SCurveChartProps {
+  data: SCurveData[]
+  showCostBreakdown?: boolean
+}
 
 
 const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
@@ -43,8 +48,8 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
                  cumulativeValue = providerCumulative[1];
              }
         }
-
-        // Do not show items with 0 value unless it's the planned curve
+        
+        // No mostrar items con valor 0 a menos que sea la curva planificada.
         if (name !== 'Planificado' && (!value || value === 0)) return null;
 
         return (
@@ -58,7 +63,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
                 </span>
             </div>
         )
-    }).filter(Boolean); // Filter out null items
+    }).filter(Boolean); // Filtrar items nulos
 
     return (
       <div className="p-4 bg-background/95 backdrop-blur-sm border rounded-lg shadow-xl text-sm min-w-[250px]">
@@ -98,6 +103,18 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
         });
         return Array.from(providers);
     }, [data, showCostBreakdown]);
+    
+    // Generar y memorizar colores para cada proveedor
+    const providerColors = React.useMemo(() => {
+        const colors = new Map<string, string>();
+        providerKeys.forEach((name) => {
+            const hue = Math.floor(Math.random() * 360);
+            const saturation = Math.floor(Math.random() * 30) + 70; // 70-100%
+            const lightness = Math.floor(Math.random() * 20) + 50; // 50-70%
+            colors.set(name, `hsl(${hue}, ${saturation}%, ${lightness}%)`);
+        });
+        return colors;
+    }, [providerKeys]);
 
     const chartConfig = React.useMemo(() => {
         const config: ChartConfig = {
@@ -111,19 +128,14 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
             },
         };
 
-        if (showCostBreakdown) {
-             providerKeys.forEach((name) => {
-                const hue = Math.floor(Math.random() * 360);
-                const saturation = Math.floor(Math.random() * 30) + 70; // 70-100%
-                const lightness = Math.floor(Math.random() * 20) + 50; // 50-70%
-                 config[name] = {
-                     label: name,
-                     color: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
-                 }
-             });
-        }
+        providerKeys.forEach((name) => {
+            config[name] = {
+                label: name,
+                color: providerColors.get(name)!,
+            }
+        });
         return config;
-    }, [providerKeys, showCostBreakdown]);
+    }, [providerKeys, providerColors]);
 
     const yAxisTicks = Array.from({ length: 21 }, (_, i) => i * 5); // 0, 5, ..., 100
 
@@ -159,19 +171,13 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
             />
             <defs>
               <linearGradient id="fillPlanned" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--color-planned)" stopOpacity={0.4} />
-                <stop offset="95%" stopColor="var(--color-planned)" stopOpacity={0.1} />
+                <stop offset="5%" stopColor="hsl(var(--muted-foreground))" stopOpacity={0.4} />
+                <stop offset="95%" stopColor="hsl(var(--muted-foreground))" stopOpacity={0.1} />
               </linearGradient>
               <linearGradient id="fillActual" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--color-actual)" stopOpacity={0.4} />
-                <stop offset="95%" stopColor="var(--color-actual)" stopOpacity={0.1} />
+                <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
+                <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1} />
               </linearGradient>
-              {providerKeys.map((key) => (
-                  <linearGradient key={`fill-${key}`} id={`fill-${key}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={`var(--color-${key})`} stopOpacity={0.3} />
-                    <stop offset="95%" stopColor={`var(--color-${key})`} stopOpacity={0.05} />
-                  </linearGradient>
-              ))}
             </defs>
             <Tooltip
               cursor={{ strokeDasharray: '3 3' }}
@@ -182,7 +188,7 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
               dataKey="planned"
               type="monotone"
               fill="url(#fillPlanned)"
-              stroke="var(--color-planned)"
+              stroke="hsl(var(--muted-foreground))"
               strokeWidth={2}
               activeDot={{ r: 6 }}
               dot={false}
@@ -193,26 +199,30 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
                     dataKey="actual"
                     type="monotone"
                     fill="url(#fillActual)"
-                    stroke="var(--color-actual)"
+                    stroke="hsl(var(--primary))"
                     strokeWidth={2}
                     activeDot={{ r: 6 }}
                     dot={false}
                     name={chartConfig.actual.label}
                 />
             )}
-            {showCostBreakdown && providerKeys.map((key) => (
-                <Area
-                    key={key}
-                    dataKey={key}
-                    type="monotone"
-                    fill={`url(#fill-${key})`}
-                    stroke={`var(--color-${key})`}
-                    strokeWidth={2}
-                    activeDot={{ r: 6 }}
-                    dot={false}
-                    name={chartConfig[key]?.label || key}
-                />
-            ))}
+            {showCostBreakdown && providerKeys.map((key) => {
+                const color = providerColors.get(key) || '#000000';
+                return (
+                    <Area
+                        key={key}
+                        dataKey={key}
+                        type="monotone"
+                        fill={color} // Aplicar color directamente
+                        fillOpacity={0.2}
+                        stroke={color} // Aplicar color directamente
+                        strokeWidth={2}
+                        activeDot={{ r: 6 }}
+                        dot={false}
+                        name={chartConfig[key]?.label || key}
+                    />
+                )
+            })}
           </AreaChart>
         </ResponsiveContainer>
       </ChartContainer>
