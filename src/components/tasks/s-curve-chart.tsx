@@ -39,11 +39,13 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
         const value = p.value as number;
         const color = p.color || p.stroke;
 
-        let cumulativeValue = 0;
-        if(name === 'Planificado') cumulativeValue = data.cumulativePlannedValue;
-        else if(name === 'Real') cumulativeValue = data.cumulativeActualValue;
-
-        if (isCostView && data.cumulativeProviders && name !== 'Planificado' && name !== 'Real') {
+        let cumulativeValue: number | undefined = undefined;
+        
+        if (name === 'Planificado') {
+            cumulativeValue = data.cumulativePlannedValue;
+        } else if (name === 'Real') {
+            cumulativeValue = data.cumulativeActualValue;
+        } else if (isCostView && data.cumulativeProviders && name !== 'Planificado' && name !== 'Real') {
              const providerCumulative = Object.entries(data.cumulativeProviders).find(([providerName]) => providerName === name);
              if (providerCumulative) {
                  cumulativeValue = providerCumulative[1];
@@ -59,7 +61,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
                     {name}:
                 </span>
                 <span className="font-mono font-semibold">{`${(value || 0).toFixed(2)}%`}
-                 {(isCostView && cumulativeValue > 0) && ` (${formatCurrency(cumulativeValue, 0)})`}
+                 {(cumulativeValue !== undefined) && ` (${formatCurrency(cumulativeValue, 0)})`}
                 </span>
             </div>
         )
@@ -260,3 +262,4 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
   }
 );
 SCurveChart.displayName = 'SCurveChart';
+
