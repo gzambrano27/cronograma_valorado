@@ -110,6 +110,7 @@ export function DailyConsumptionTracker({ task, onSuccess }: DailyConsumptionTra
                 <TableHead>Cant. Planificada</TableHead>
                 <TableHead>Cant. Registrada</TableHead>
                 <TableHead>Diferencia</TableHead>
+                {isManager && <TableHead>Costo Consumido</TableHead>}
                 {isManager && <TableHead>Valor Consumido</TableHead>}
                 <TableHead className="w-[100px] text-right">Acción</TableHead>
             </TableRow>
@@ -118,6 +119,7 @@ export function DailyConsumptionTracker({ task, onSuccess }: DailyConsumptionTra
             {consumptions.map((consumptionDay) => {
                 const displayDate = adjustDateForDisplay(consumptionDay.date);
                 const dateString = format(displayDate, "yyyy-MM-dd");
+                const consumedCost = consumptionDay.consumedQuantity * task.cost;
                 const consumedValue = consumptionDay.consumedQuantity * task.precio;
                 const difference = consumptionDay.consumedQuantity - consumptionDay.plannedQuantity;
                 
@@ -138,6 +140,11 @@ export function DailyConsumptionTracker({ task, onSuccess }: DailyConsumptionTra
                       />
                     </TableCell>
                     <TableCell className="font-mono">{difference.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
+                    {isManager && (
+                        <TableCell className="font-mono">
+                          {formatCurrency(consumedCost)}
+                        </TableCell>
+                    )}
                     {isManager && (
                         <TableCell className="font-mono">
                           {formatCurrency(consumedValue)}
