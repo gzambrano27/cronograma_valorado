@@ -8,9 +8,7 @@ import { TaskTable } from "@/components/tasks/task-table";
 import { XmlImport } from "@/components/tasks/xml-import";
 import { DollarSign, CheckCircle, ListTodo } from "lucide-react";
 import { AddTaskSheet } from "@/components/tasks/add-task-sheet";
-import { Progress } from "@/components/ui/progress";
 import { SCurveCard } from "@/components/tasks/s-curve-card";
-import { SCurveCostCard } from "@/components/tasks/s-curve-cost-card";
 import { formatCurrency } from "@/lib/utils";
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Project, Task, SCurveData } from '@/lib/types';
@@ -125,9 +123,8 @@ export default function ProjectPage() {
         </Card>
       </div>
       
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {isManager && <SCurveCard data={sCurve} />}
-          {isManager && <SCurveCostCard data={sCurveCost} />}
+      <div className="grid grid-cols-1 gap-6">
+          {isManager && <SCurveCard valueData={sCurve} costData={sCurveCost} />}
       </div>
 
 

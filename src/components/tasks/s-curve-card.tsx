@@ -19,25 +19,45 @@ import { SCurveChart } from '@/components/tasks/s-curve-chart';
 import type { SCurveData } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Maximize } from 'lucide-react';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+import { Switch } from '../ui/switch';
+import { Label } from '../ui/label';
 
 interface SCurveCardProps {
-  data: SCurveData[];
+  valueData: SCurveData[];
+  costData: SCurveData[];
 }
 
-export function SCurveCard({ data }: SCurveCardProps) {
+export function SCurveCard({ valueData, costData }: SCurveCardProps) {
   const chartRef = useRef<HTMLDivElement>(null);
+  const [showCostCurve, setShowCostCurve] = useState(false);
+
+  const activeData = showCostCurve ? costData : valueData;
+  const cardTitle = showCostCurve ? 'Curva "S" de Costo' : 'Curva "S" de Avance';
+  const cardDescription = showCostCurve 
+    ? "Comparación del costo planificado vs. el costo real."
+    : "Comparación del avance valorado planificado vs. el avance real.";
 
   return (
     <Card className="lg:col-span-2">
       <CardHeader className="flex flex-row items-start justify-between">
         <div>
-          <CardTitle className="font-headline">Curva "S" de Avance</CardTitle>
+          <CardTitle className="font-headline">{cardTitle}</CardTitle>
           <CardDescription>
-            Comparación del avance valorado planificado vs. el avance real.
+            {cardDescription}
           </CardDescription>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="curve-switch" className="text-sm font-medium">Avance</Label>
+              <Switch
+                id="curve-switch"
+                checked={showCostCurve}
+                onCheckedChange={setShowCostCurve}
+                aria-label="Cambiar entre curva de avance y curva de costo"
+              />
+              <Label htmlFor="curve-switch" className="text-sm font-medium">Costo</Label>
+            </div>
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -47,17 +67,17 @@ export function SCurveCard({ data }: SCurveCardProps) {
               </DialogTrigger>
               <DialogContent className="w-[95vw] max-w-[95vw] h-[90vh] flex flex-col">
                 <DialogHeader>
-                  <DialogTitle className="font-headline">Curva "S" de Avance (Vista Ampliada)</DialogTitle>
+                  <DialogTitle className="font-headline">{`${cardTitle} (Vista Ampliada)`}</DialogTitle>
                 </DialogHeader>
                 <div className="flex-grow min-h-0">
-                  <SCurveChart data={data} />
+                  <SCurveChart data={activeData} />
                 </div>
               </DialogContent>
             </Dialog>
         </div>
       </CardHeader>
       <CardContent className="pl-2 h-[300px]" ref={chartRef}>
-        <SCurveChart data={data} />
+        <SCurveChart data={activeData} />
       </CardContent>
     </Card>
   );
