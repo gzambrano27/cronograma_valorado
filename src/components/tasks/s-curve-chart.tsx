@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -85,15 +86,16 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
   return null;
 };
 
+// Paleta de colores cohesiva y profesional
 const providerColors = [
-  "hsl(262.1 83.3% 57.8%)",
-  "hsl(221.2 83.2% 53.3%)",
-  "hsl(172.2 68.5% 42.4%)",
-  "hsl(314.3 86.8% 54.3%)",
-  "hsl(24.6 95% 53.1%)",
-  "hsl(142.1 76.2% 36.3%)",
-  "hsl(210, 40%, 50%)",
-  "hsl(350, 65%, 55%)"
+  "hsl(210, 40%, 50%)", // Blue
+  "hsl(160, 50%, 45%)", // Teal
+  "hsl(262, 45%, 55%)", // Indigo
+  "hsl(310, 40%, 50%)", // Purple
+  "hsl(180, 40%, 40%)", // Cyan
+  "hsl(230, 50%, 60%)", // Royal Blue
+  "hsl(280, 45%, 58%)", // Violet
+  "hsl(190, 55%, 50%)", // Deep Cyan
 ];
 
 
