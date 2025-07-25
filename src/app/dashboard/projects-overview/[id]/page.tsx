@@ -1,5 +1,4 @@
 
-
 'use client'
 import { notFound, useParams } from "next/navigation";
 import { getProjects, getTasksByProjectId, generateSCurveData, generateCostSCurveData } from "@/lib/data";
