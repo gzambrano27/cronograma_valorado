@@ -297,11 +297,7 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
 
     tasks.forEach(task => {
         if (task.dailyConsumption) {
-            const providerName = task.partnerName || 'Sin Asignar';
-            // Solo añadir proveedores reales, no "Sin Asignar"
-            if (providerName !== 'Sin Asignar') {
-                allProviders.add(providerName);
-            }
+            const providerName = task.partnerName;
             
             task.dailyConsumption.forEach(dc => {
                 const day = startOfDay(new Date(dc.date));
@@ -315,10 +311,9 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
                 dailyData.planned += dc.plannedQuantity * task.cost;
 
                 const consumedCost = dc.consumedQuantity * task.cost;
-                if (consumedCost > 0) {
-                    if (providerName !== 'Sin Asignar') {
-                        dailyData.actual[providerName] = (dailyData.actual[providerName] || 0) + consumedCost;
-                    }
+                if (consumedCost > 0 && providerName) {
+                    allProviders.add(providerName);
+                    dailyData.actual[providerName] = (dailyData.actual[providerName] || 0) + consumedCost;
                 }
 
                 if (!minDate || day < minDate) minDate = day;
@@ -349,15 +344,15 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
             dailyActualTotal += providerCost;
         }
 
-        const plannedPercent = (cumulativePlanned / totalProjectCost) * 100;
+        const plannedPercent = totalProjectCost > 0 ? (cumulativePlanned / totalProjectCost) * 100 : 0;
         
         const providerPercentages: { [providerName: string]: number } = {};
-        for(const provider in cumulativeProviders) {
-            providerPercentages[provider] = (cumulativeProviders[provider] / totalProjectCost) * 100;
+        for(const provider of allProviders) {
+            providerPercentages[provider] = totalProjectCost > 0 ? (cumulativeProviders[provider] / totalProjectCost) * 100 : 0;
         }
         
         const totalActualCost = Object.values(cumulativeProviders).reduce((sum, current) => sum + current, 0);
-        const actualPercent = (totalActualCost / totalProjectCost) * 100;
+        const actualPercent = totalProjectCost > 0 ? (totalActualCost / totalProjectCost) * 100 : 0;
 
         finalCurve.push({
             date: format(day, "d MMM", { locale: es }),
@@ -366,26 +361,25 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
             cumulativePlannedValue: cumulativePlanned,
             cumulativeActualValue: totalActualCost,
             deviation: actualPercent - plannedPercent,
-            providers: providerPercentages,
             cumulativeProviders: {...cumulativeProviders},
+            ...providerPercentages,
         });
     }
     
     // Redondea los valores para una mejor presentación.
     return finalCurve.map(point => {
-        const roundedProviders: { [key: string]: number } = {};
-        if (point.providers) {
-            for(const provider in point.providers) {
-                roundedProviders[provider] = Math.round(point.providers[provider] * 100) / 100;
-            }
-        }
-        return {
-            ...point,
-            planned: Math.round(point.planned * 100) / 100,
-            actual: Math.round(point.actual * 100) / 100,
-            deviation: Math.round(point.deviation * 100) / 100,
-            providers: roundedProviders
+        const roundedPoint: SCurveData = {
+          ...point,
+          planned: Math.round(point.planned * 100) / 100,
+          actual: Math.round(point.actual * 100) / 100,
+          deviation: Math.round(point.deviation * 100) / 100,
         };
+        allProviders.forEach(provider => {
+            if (roundedPoint[provider]) {
+                roundedPoint[provider] = Math.round(roundedPoint[provider] * 100) / 100;
+            }
+        });
+        return roundedPoint;
     });
 }
 

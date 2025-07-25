@@ -42,7 +42,7 @@ const getColor = (index: number) => providerColors[index % providerColors.length
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload as SCurveData;
-    const isCostView = 'providers' in data;
+    const isCostView = 'cumulativeProviders' in data;
 
     const tooltipItems = payload.map((p, index) => {
         const name = p.name;
@@ -52,15 +52,13 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         let cumulativeValue = 0;
         if(name === 'Planificado') cumulativeValue = data.cumulativePlannedValue;
         else if(name === 'Real') cumulativeValue = data.cumulativeActualValue;
-
-        // For provider-specific tooltips, find the correct cumulative value
-        if (isCostView && data.providers && name !== 'Planificado' && name !== 'Real') {
-            const providerCumulative = Object.entries(data.cumulativeProviders || {}).find(([providerName]) => providerName === name);
-            if (providerCumulative) {
-                cumulativeValue = providerCumulative[1];
-            }
+        
+        if (isCostView && data.cumulativeProviders && name !== 'Planificado' && name !== 'Real') {
+             const providerCumulative = Object.entries(data.cumulativeProviders).find(([providerName]) => providerName === name);
+             if (providerCumulative) {
+                 cumulativeValue = providerCumulative[1];
+             }
         }
-
 
         return (
             <div key={index} className="flex justify-between items-center gap-4">
@@ -68,8 +66,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
                     <div className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: color }} />
                     {name}:
                 </span>
-                <span className="font-mono font-semibold">{`${value.toFixed(2)}%`}
-                 {isCostView && ` (${formatCurrency(cumulativeValue, 0)})`}
+                <span className="font-mono font-semibold">{`${(typeof value === 'number' ? value : 0).toFixed(2)}%`}
+                 {(isCostView && cumulativeValue > 0) && ` (${formatCurrency(cumulativeValue, 0)})`}
                 </span>
             </div>
         )
@@ -99,6 +97,13 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
   ({ data, showCostBreakdown = false }, ref) => {
     
+    const providerKeys = React.useMemo(() => {
+        if (!showCostBreakdown || !data || data.length === 0) return [];
+        // Extract keys from the first data point, excluding the standard keys
+        const standardKeys = ['date', 'planned', 'actual', 'cumulativePlannedValue', 'cumulativeActualValue', 'deviation', 'cumulativeProviders'];
+        return Object.keys(data[0]).filter(key => !standardKeys.includes(key));
+    }, [data, showCostBreakdown]);
+
     const chartConfig = React.useMemo(() => {
         const config: ChartConfig = {
             planned: {
@@ -111,9 +116,8 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
             },
         };
 
-        if (showCostBreakdown && data.length > 0 && data[0].providers) {
-             const providerNames = Object.keys(data[0].providers);
-             providerNames.forEach((name, index) => {
+        if (showCostBreakdown) {
+             providerKeys.forEach((name, index) => {
                  config[name] = {
                      label: name,
                      color: getColor(index),
@@ -121,11 +125,7 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
              });
         }
         return config;
-    }, [data, showCostBreakdown]);
-    
-    const providerKeys = showCostBreakdown && data.length > 0 && data[0].providers 
-        ? Object.keys(data[0].providers)
-        : [];
+    }, [providerKeys, showCostBreakdown]);
 
     const yAxisTicks = Array.from({ length: 21 }, (_, i) => i * 5); // 0, 5, ..., 100
 
@@ -199,7 +199,7 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
             {showCostBreakdown && providerKeys.map((key) => (
                 <Line
                     key={key}
-                    dataKey={`providers.${key}`}
+                    dataKey={key}
                     type="monotone"
                     stroke={`var(--color-${key})`}
                     strokeWidth={2}
@@ -215,4 +215,3 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
   }
 );
 SCurveChart.displayName = 'SCurveChart';
-

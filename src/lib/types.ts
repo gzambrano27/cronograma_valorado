@@ -133,8 +133,8 @@ export type SCurveData = {
   cumulativePlannedValue: number; // Valor planificado acumulado.
   cumulativeActualValue: number; // Valor real acumulado.
   deviation: number; // Desviación entre planificado y real.
-  providers?: { [providerName: string]: number }; // Desglose del valor real por proveedor.
   cumulativeProviders?: { [providerName: string]: number }; // Desglose acumulado del costo por proveedor
+  [key: string]: any; // Permite propiedades dinámicas para los proveedores
 };
 
 // Configuración de la aplicación.
