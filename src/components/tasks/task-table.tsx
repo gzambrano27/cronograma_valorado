@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -423,9 +422,10 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
         />
         <Select
             value={(table.getColumn("status")?.getFilterValue() as string) ?? "all"}
-            onValueChange={(value) =>
-                table.getColumn("status")?.setFilterValue(value === "all" ? undefined : value)
-            }
+            onValueChange={(value) => {
+                const filterValue = value === "all" ? undefined : [value];
+                table.getColumn("status")?.setFilterValue(filterValue);
+            }}
         >
             <SelectTrigger className="w-full sm:w-[220px]">
                 <SelectValue placeholder="Filtrar por estado" />
