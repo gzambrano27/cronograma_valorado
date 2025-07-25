@@ -87,13 +87,12 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
     
     const providerKeys = React.useMemo(() => {
         if (!showCostBreakdown || !data || data.length === 0) return [];
-        // Claves estándar que no representan a un proveedor.
-        const standardKeys = ['date', 'planned', 'actual', 'cumulativePlannedValue', 'cumulativeActualValue', 'deviation', 'cumulativeProviders'];
+        const standardKeys = new Set(['date', 'planned', 'actual', 'cumulativePlannedValue', 'cumulativeActualValue', 'deviation', 'cumulativeProviders']);
         
         const providers = new Set<string>();
         data.forEach(d => {
             Object.keys(d).forEach(key => {
-                if (!standardKeys.includes(key)) {
+                if (!standardKeys.has(key)) {
                     providers.add(key);
                 }
             })
@@ -114,10 +113,9 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
         };
 
         if (showCostBreakdown) {
-             // Genera un color aleatorio para cada proveedor y lo almacena.
              providerKeys.forEach((name) => {
                 const hue = Math.floor(Math.random() * 360);
-                const saturation = Math.floor(Math.random() * 20) + 70; // 70-90%
+                const saturation = Math.floor(Math.random() * 30) + 70; // 70-100%
                 const lightness = Math.floor(Math.random() * 20) + 50; // 50-70%
                  config[name] = {
                      label: name,
@@ -223,3 +221,5 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
   }
 );
 SCurveChart.displayName = 'SCurveChart';
+
+    
