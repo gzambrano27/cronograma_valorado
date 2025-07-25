@@ -24,7 +24,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#FFFFFF" />
          <title>Centro de Aplicaciones</title>
          <meta name="description" content="Una aplicación para valorar y gestionar el cronograma de proyectos." />
-         <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='18' height='18' x='3' y='3' rx='2'/><path d='M7 7h3v3H7z'/><path d='M14 7h3v3h-3z'/><path d='M7 14h3v3H7z'/><path d='M14 14h3v3h-3z'/></svg>" />
+         <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='currentColor'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Crect%20width='18'%20height='18'%20x='3'%20y='3'%20rx='2'/%3E%3Cpath%20d='M7%207h3v3H7z'/%3E%3Cpath%20d='M14%207h3v3h-3z'/%3E%3Cpath%20d='M7%2014h3v3H7z'/%3E%3Cpath%20d='M14%2014h3v3h-3z'/%3E%3C/svg%3E" />
       </head>
       <body className="font-body antialiased">
         {/* El children representa el contenido de la página actual */}
