@@ -34,8 +34,8 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
     const isCostView = 'cumulativeProviders' in data;
 
     const tooltipItems = payload.map((p, index) => {
-        const name = p.name;
-        const value = p.value;
+        const name = p.name as string;
+        const value = p.value as number;
         const color = p.color || p.stroke;
 
         let cumulativeValue = 0;
@@ -55,7 +55,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
                     <div className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: color }} />
                     {name}:
                 </span>
-                <span className="font-mono font-semibold">{`${(typeof value === 'number' ? value : 0).toFixed(2)}%`}
+                <span className="font-mono font-semibold">{`${(value || 0).toFixed(2)}%`}
                  {(isCostView && cumulativeValue > 0) && ` (${formatCurrency(cumulativeValue, 0)})`}
                 </span>
             </div>
