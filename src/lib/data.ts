@@ -285,7 +285,7 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
 
 // Genera los datos para el gráfico de Curva "S" de costos.
 export async function generateCostSCurveData(tasks: Task[], totalProjectCost: number): Promise<SCurveData[]> {
-    if (tasks.length === 0 || totalProjectCost <= 0) {
+    if (tasks.length === 0) {
         return [];
     }
 
@@ -338,52 +338,28 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
         cumulativePlanned += dailyData.planned;
         
         let dailyActualTotalCost = 0;
+        const providerValuesForChart: { [providerName: string]: number } = {};
+
         for (const provider of allProviders) {
             const providerCost = dailyData.actual[provider] || 0;
             cumulativeProviders[provider] += providerCost;
+            providerValuesForChart[provider] = cumulativeProviders[provider];
             dailyActualTotalCost += providerCost;
         }
-
-        const plannedPercent = totalProjectCost > 0 ? (cumulativePlanned / totalProjectCost) * 100 : 0;
         
         const totalActualCost = Object.values(cumulativeProviders).reduce((sum, current) => sum + current, 0);
         
-        const providerPercentagesForChart: { [providerName: string]: number } = {};
-        const providerPercentagesForTooltip: { [providerName: string]: number } = {};
-
-        for(const provider of allProviders) {
-            // Para la gráfica, el % es sobre el costo TOTAL del proyecto para que las áreas se apilen correctamente
-            providerPercentagesForChart[provider] = totalProjectCost > 0 ? (cumulativeProviders[provider] / totalProjectCost) * 100 : 0;
-            
-            // Para el tooltip, el % es sobre el costo REAL acumulado para mostrar la distribución
-            providerPercentagesForTooltip[provider] = totalActualCost > 0 ? (cumulativeProviders[provider] / totalActualCost) * 100 : 0;
-        }
-        
         finalCurve.push({
             date: format(day, "d MMM", { locale: es }),
-            planned: plannedPercent,
+            planned: cumulativePlanned, // Valor monetario
             cumulativePlannedValue: cumulativePlanned,
             cumulativeActualValue: totalActualCost,
-            deviation: ((totalActualCost / totalProjectCost) * 100) - plannedPercent,
-            cumulativeProviders: {...cumulativeProviders},
-            providerDistribution: providerPercentagesForTooltip, // Datos para el tooltip
-            ...providerPercentagesForChart, // Datos para las áreas de la gráfica
+            deviation: 0, // La desviación en % no aplica directamente aquí.
+            ...providerValuesForChart,
         });
     }
     
-    return finalCurve.map(point => {
-        const roundedPoint: SCurveData = {
-          ...point,
-          planned: Math.round(point.planned * 100) / 100,
-          deviation: Math.round(point.deviation * 100) / 100,
-        };
-        allProviders.forEach(provider => {
-            if (roundedPoint[provider]) {
-                roundedPoint[provider] = Math.round(roundedPoint[provider] * 100) / 100;
-            }
-        });
-        return roundedPoint;
-    });
+    return finalCurve;
 }
 
 
