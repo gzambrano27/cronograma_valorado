@@ -215,3 +215,4 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
   }
 );
 SCurveChart.displayName = 'SCurveChart';
+
