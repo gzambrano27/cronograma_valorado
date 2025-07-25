@@ -340,17 +340,19 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
             date: format(day, "d MMM", { locale: es }),
             planned: (cumulativePlannedValue / totalProjectCost) * 100,
             cumulativePlannedValue,
-            actual: 0, // Placeholder, not used in this chart view
-            cumulativeActualValue: 0, // Placeholder
-            deviation: 0, // Placeholder
+            actual: 0, 
+            cumulativeActualValue: 0,
+            deviation: 0,
         };
         
-        // Add provider percentages based on total project cost for stacking
+        let cumulativeActualCost = 0;
+        Object.values(cumulativeProviderValues).forEach(val => cumulativeActualCost += val);
+
         for (const provider of allProviders) {
              const providerValue = cumulativeProviderValues[provider];
-             // The value for the Area component (the percentage of total project cost)
-             dataPoint[provider] = (providerValue / totalProjectCost) * 100;
-             // The monetary value for the tooltip
+             const providerPercentOfTotal = (providerValue / totalProjectCost) * 100;
+             // Use null if the value is zero to prevent rendering issues in stacked charts
+             dataPoint[provider] = providerPercentOfTotal > 0 ? providerPercentOfTotal : null;
              dataPoint[`${provider}_value`] = providerValue;
         }
 
