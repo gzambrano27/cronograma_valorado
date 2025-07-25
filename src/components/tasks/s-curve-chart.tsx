@@ -52,6 +52,17 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         if(name === 'Planificado') cumulativeValue = data.cumulativePlannedValue;
         else if(name === 'Real') cumulativeValue = data.cumulativeActualValue;
 
+        // For provider-specific tooltips, find the correct cumulative value
+        if (isCostView && data.providers && name !== 'Planificado' && name !== 'Real') {
+            const providerCumulative = Object.entries(data.providers).find(([providerName]) => providerName === name);
+            if (providerCumulative) {
+                // The value in tooltip is percentage, we need absolute value from cumulativeProviders
+                // This is a bit tricky as the payload doesn't carry the absolute value directly
+                // We'll show the percentage for now.
+            }
+        }
+
+
         return (
             <div key={index} className="flex justify-between items-center gap-4">
                 <span className="flex items-center">
@@ -203,7 +214,6 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
                     activeDot={{ r: 6 }}
                     dot={false}
                     name={chartConfig[key]?.label || key}
-                    stackId="providers"
                 />
             ))}
           </AreaChart>

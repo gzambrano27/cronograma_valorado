@@ -298,7 +298,10 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
     tasks.forEach(task => {
         if (task.dailyConsumption) {
             const providerName = task.partnerName || 'Sin Asignar';
-            allProviders.add(providerName);
+            // Solo añadir proveedores reales, no "Sin Asignar"
+            if (providerName !== 'Sin Asignar') {
+                allProviders.add(providerName);
+            }
             
             task.dailyConsumption.forEach(dc => {
                 const day = startOfDay(new Date(dc.date));
@@ -313,7 +316,10 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
 
                 const consumedCost = dc.consumedQuantity * task.cost;
                 if (consumedCost > 0) {
-                    dailyData.actual[providerName] = (dailyData.actual[providerName] || 0) + consumedCost;
+                    // El costo del proveedor "Sin Asignar" se cuenta en el total pero no se desglosa.
+                    if (providerName !== 'Sin Asignar') {
+                        dailyData.actual[providerName] = (dailyData.actual[providerName] || 0) + consumedCost;
+                    }
                 }
 
                 if (!minDate || day < minDate) minDate = day;
