@@ -27,7 +27,6 @@ interface SCurveChartProps {
   showCostBreakdown?: boolean
 }
 
-
 const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload as SCurveData;
@@ -86,6 +85,16 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
   return null;
 };
 
+const providerColors = [
+    "hsl(221.2 83.2% 53.3%)", // blue-500
+    "hsl(142.1 76.2% 36.3%)", // green-600
+    "hsl(24.6 95% 53.1%)",   // orange-500
+    "hsl(262.1 83.3% 57.8%)", // violet-500
+    "hsl(314.3 86.8% 54.3%)", // pink-500
+    "hsl(172.2 68.5% 42.4%)", // teal-500
+    "hsl(47.9 95.8% 53.1%)",  // yellow-500
+];
+
 export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
   ({ data, showCostBreakdown = false }, ref) => {
 
@@ -117,16 +126,12 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
         };
 
         if (showCostBreakdown) {
-            const HUE_STEP = 360 / Math.max(providerKeys.length, 1);
-            providerKeys.forEach((name, index) => {
-               const hue = Math.round(index * HUE_STEP);
-               const saturation = 70;
-               const lightness = 50;
+             providerKeys.forEach((name, index) => {
                 config[name] = {
                     label: name,
-                    color: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
+                    color: providerColors[index % providerColors.length],
                 }
-            });
+             });
         }
         return config;
     }, [providerKeys, showCostBreakdown]);
@@ -173,14 +178,14 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
                 <stop offset="95%" stopColor="var(--color-actual)" stopOpacity={0.1} />
               </linearGradient>
               {providerKeys.map((key) => {
-                 const providerColor = chartConfig[key]?.color;
-                 if (!providerColor) return null;
-                 return (
+                const providerColor = chartConfig[key]?.color;
+                if (!providerColor) return null;
+                return (
                   <linearGradient key={`fill-${key}`} id={`fill-${key}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={providerColor} stopOpacity={0.3} />
-                    <stop offset="95%" stopColor={providerColor} stopOpacity={0.05} />
+                    <stop offset="5%" stopColor={providerColor} stopOpacity={0.4} />
+                    <stop offset="95%" stopColor={providerColor} stopOpacity={0.1} />
                   </linearGradient>
-                 )
+                )
               })}
             </defs>
             <Tooltip
@@ -211,21 +216,21 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
                 />
             )}
             {showCostBreakdown && providerKeys.map((key) => {
-               const providerConfig = chartConfig[key];
-               if (!providerConfig) return null;
-               return (
-                <Area
-                    key={key}
-                    dataKey={key}
-                    type="monotone"
-                    fill={`url(#fill-${key})`}
-                    stroke={providerConfig.color}
-                    strokeWidth={2}
-                    activeDot={{ r: 6 }}
-                    dot={false}
-                    name={providerConfig.label}
-                />
-               )
+                const providerConfig = chartConfig[key];
+                if (!providerConfig) return null;
+                return (
+                    <Area
+                        key={key}
+                        dataKey={key}
+                        type="monotone"
+                        fill={`url(#fill-${key})`}
+                        stroke={providerConfig.color}
+                        strokeWidth={2}
+                        activeDot={{ r: 6 }}
+                        dot={false}
+                        name={providerConfig.label}
+                    />
+                )
             })}
           </AreaChart>
         </ResponsiveContainer>
