@@ -293,7 +293,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   const precioAttrDef = extendedAttrDefs.find((attr: any) => attr.Alias?.toLowerCase() === 'precio');
   const precioFieldId = precioAttrDef?.FieldID;
 
-  const newTasks: Omit<Task, 'id' | 'consumedQuantity' | 'validations'>[] = [];
+  const newTasks: Omit<Task, 'id' | 'consumedQuantity' | 'validations' | 'status'>[] = [];
   const tasks = projectData.Tasks.Task;
 
   for (const task of tasks) {
@@ -307,7 +307,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
 
         const costRaw = task.FixedCost ?? task.Cost;
         if (costRaw === undefined || costRaw === null) continue;
-        const totalTaskCost = parseFloat(costRaw) / 100;
+        const totalTaskCost = parseFloat(costRaw);
         
         let quantity = 0;
         if (cantidadFieldId && Array.isArray(task.ExtendedAttribute)) {
@@ -341,7 +341,6 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
             cost,
             startDate,
             endDate,
-            status: 'pendiente',
             dailyConsumption,
         });
     } catch (e) {
@@ -363,4 +362,24 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   revalidatePath(`/dashboard/projects-overview/${projectId}`);
   revalidatePath(`/dashboard`);
   return { success: true, message: `${newTasks.length} tareas importadas.` };
+}
+
+export async function updateTaskPartner(taskId: number, partnerId: number | null): Promise<{ success: boolean; message?: string }> {
+  try {
+    await query(
+      'UPDATE "externo_tasks" SET partner_id = $1 WHERE id = $2',
+      [partnerId, taskId]
+    );
+
+    const result = await query<{ projectid: number }>(`SELECT projectid FROM "externo_tasks" WHERE id = $1`, [taskId]);
+    if (result.length > 0) {
+      const projectId = result[0].projectid;
+      revalidatePath(`/dashboard/projects-overview/${projectId}`);
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating task partner:', error);
+    return { success: false, message: 'No se pudo actualizar el proveedor.' };
+  }
 }

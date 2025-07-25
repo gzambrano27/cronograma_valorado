@@ -43,7 +43,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import type { Task } from "@/lib/types"
+import type { Partner, Task } from "@/lib/types"
 import { DailyConsumptionTracker } from "./daily-consumption-tracker"
 import { TaskActions } from "./task-actions"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -54,6 +54,8 @@ import { Switch } from "../ui/switch"
 import { Label } from "../ui/label"
 import { cn, formatCurrency } from "@/lib/utils"
 import { useSession } from "@/hooks/use-session"
+import { getPartners } from "@/lib/data"
+import { PartnerCell } from "./partner-cell"
 
 const statusTranslations: Record<Task['status'], string> = {
     'pendiente': 'Pendiente',
@@ -68,7 +70,7 @@ const adjustDateForTimezone = (date: Date | string): Date => {
 };
 
 
-const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[] => {
+const getColumns = (isManager: boolean, allPartners: Partner[], onSuccess: () => void): ColumnDef<Task>[] => {
   
   const columns: ColumnDef<Task>[] = [
     {
@@ -141,7 +143,7 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
     {
       accessorKey: "partnerName",
       header: "Proveedor",
-      cell: ({ row }) => <div className="capitalize">{row.getValue("partnerName") || '-'}</div>,
+      cell: ({ row }) => <PartnerCell task={row.original} allPartners={allPartners} onSuccess={onSuccess} />,
     },
     {
       accessorKey: "status",
@@ -296,6 +298,7 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
   const [showAll, setShowAll] = React.useState(false);
   const { session } = useSession();
   const isManager = session.user?.isManager ?? false;
+  const [allPartners, setAllPartners] = React.useState<Partner[]>([]);
   
   const isMobile = useIsMobile();
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
@@ -306,6 +309,14 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
     subtotalPVPActual: false,
   });
   
+  React.useEffect(() => {
+    async function loadPartners() {
+      const fetchedPartners = await getPartners();
+      setAllPartners(fetchedPartners);
+    }
+    loadPartners();
+  }, []);
+
   React.useEffect(() => {
     const mobileVisibility: VisibilityState = {
         quantity: false,
@@ -344,7 +355,7 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
   const [expanded, setExpanded] = React.useState({})
 
-  const columns = React.useMemo(() => getColumns(isManager, onSuccess), [isManager, onSuccess]);
+  const columns = React.useMemo(() => getColumns(isManager, allPartners, onSuccess), [isManager, allPartners, onSuccess]);
 
   const table = useReactTable({
     data,
