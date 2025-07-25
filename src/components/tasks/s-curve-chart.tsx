@@ -11,7 +11,6 @@ import {
   XAxis,
   YAxis,
   Legend,
-  Line,
 } from "recharts"
 import { ArrowUp, ArrowDown } from "lucide-react"
 
@@ -99,7 +98,6 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
     
     const providerKeys = React.useMemo(() => {
         if (!showCostBreakdown || !data || data.length === 0) return [];
-        // Extract keys from the first data point, excluding the standard keys
         const standardKeys = ['date', 'planned', 'actual', 'cumulativePlannedValue', 'cumulativeActualValue', 'deviation', 'cumulativeProviders'];
         return Object.keys(data[0]).filter(key => !standardKeys.includes(key));
     }, [data, showCostBreakdown]);
@@ -168,6 +166,12 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
                 <stop offset="5%" stopColor="var(--color-actual)" stopOpacity={0.4} />
                 <stop offset="95%" stopColor="var(--color-actual)" stopOpacity={0.1} />
               </linearGradient>
+              {providerKeys.map((key) => (
+                  <linearGradient key={`fill-${key}`} id={`fill-${key}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={`var(--color-${key})`} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={`var(--color-${key})`} stopOpacity={0.05} />
+                  </linearGradient>
+              ))}
             </defs>
             <Tooltip
               cursor={{ strokeDasharray: '3 3' }}
@@ -197,10 +201,11 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
                 />
             )}
             {showCostBreakdown && providerKeys.map((key) => (
-                <Line
+                <Area
                     key={key}
                     dataKey={key}
                     type="monotone"
+                    fill={`url(#fill-${key})`}
                     stroke={`var(--color-${key})`}
                     strokeWidth={2}
                     activeDot={{ r: 6 }}
