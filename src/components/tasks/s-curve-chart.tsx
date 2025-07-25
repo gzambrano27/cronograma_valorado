@@ -33,7 +33,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
     const data = payload[0].payload as SCurveData;
     const isCostView = 'cumulativeProviders' in data;
 
-    const tooltipItems = payload.map((p, index) => {
+    const tooltipItems = payload.map((p, index: number) => {
         const name = p.name as string;
         const value = p.value as number;
         const color = p.color || p.stroke;
