@@ -1,4 +1,5 @@
 
+
 'use server';
 import type { Project, Task, SCurveData, AppConfig, TaskValidation, RawTask, RawTaskValidation, RawProject, Partner } from './types';
 import fs from 'fs/promises';
@@ -288,7 +289,6 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
         return [];
     }
 
-    // Mapa para almacenar valores diarios: planned total y actual desglosado por proveedor.
     const valuesByDate = new Map<number, { planned: number; actual: { [providerName: string]: number } }>();
     const allProviders = new Set<string>();
 
@@ -349,19 +349,17 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
         const totalActualCost = Object.values(cumulativeProviders).reduce((sum, current) => sum + current, 0);
         const actualPercent = totalProjectCost > 0 ? (totalActualCost / totalProjectCost) * 100 : 0;
 
-        const providerPercentages: { [providerName: string]: number } = {};
-        if (totalActualCost > 0) {
-            for(const provider of allProviders) {
-                // Formula corregida: % del proveedor es sobre el total real acumulado, no sobre 100.
-                providerPercentages[provider] = (cumulativeProviders[provider] / totalActualCost) * 100;
-            }
-        } else {
-             for(const provider of allProviders) {
-                providerPercentages[provider] = 0;
-            }
+        const providerPercentagesForChart: { [providerName: string]: number } = {};
+        const providerPercentagesForTooltip: { [providerName: string]: number } = {};
+
+        for(const provider of allProviders) {
+            // Para la gráfica, el % es sobre el costo TOTAL del proyecto para que las áreas se apilen correctamente
+            providerPercentagesForChart[provider] = totalProjectCost > 0 ? (cumulativeProviders[provider] / totalProjectCost) * 100 : 0;
+            
+            // Para el tooltip, el % es sobre el costo REAL acumulado para mostrar la distribución
+            providerPercentagesForTooltip[provider] = totalActualCost > 0 ? (cumulativeProviders[provider] / totalActualCost) * 100 : 0;
         }
         
-
         finalCurve.push({
             date: format(day, "d MMM", { locale: es }),
             planned: plannedPercent,
@@ -370,11 +368,11 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
             cumulativeActualValue: totalActualCost,
             deviation: actualPercent - plannedPercent,
             cumulativeProviders: {...cumulativeProviders},
-            ...providerPercentages,
+            providerDistribution: providerPercentagesForTooltip, // Datos para el tooltip
+            ...providerPercentagesForChart, // Datos para las áreas de la gráfica
         });
     }
     
-    // Redondea los valores para una mejor presentación.
     return finalCurve.map(point => {
         const roundedPoint: SCurveData = {
           ...point,

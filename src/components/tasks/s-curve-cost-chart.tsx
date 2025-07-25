@@ -32,50 +32,59 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
     const data = payload[0].payload as SCurveData;
     
     // Filtrar proveedores que no tienen valor en este punto para no saturar el tooltip
-    const relevantPayload = payload.filter(p => p.value && p.value > 0);
+    const relevantPayload = payload.filter(p => p.dataKey && p.dataKey !== 'planned' && p.dataKey !== 'actual' && p.value && p.value > 0);
 
     return (
-      <div className="p-4 bg-background/95 backdrop-blur-sm border rounded-lg shadow-xl text-sm min-w-[250px]">
+      <div className="p-4 bg-background/95 backdrop-blur-sm border rounded-lg shadow-xl text-sm min-w-[300px]">
         <p className="font-bold text-base mb-2">{`Fecha: ${label}`}</p>
         <div className="space-y-1.5">
-           {relevantPayload.map((p, index) => {
-              const name = p.name as string;
-              let value: string | number = p.value as number;
-              const color = p.color || p.stroke;
-              let cumulativeValue: number | undefined = undefined;
-              
-              if (name === 'Planificado') {
-                  cumulativeValue = data.cumulativePlannedValue;
-                  value = `${(p.value as number || 0).toFixed(2)}%`;
-              } else if (name === 'Real') {
-                  cumulativeValue = data.cumulativeActualValue;
-                   value = `${(p.value as number || 0).toFixed(2)}%`;
-              } else if (data.cumulativeProviders && name !== 'Planificado' && name !== 'Real') {
-                  const providerCumulative = Object.entries(data.cumulativeProviders).find(([providerName]) => providerName === name);
-                  if (providerCumulative) {
-                      cumulativeValue = providerCumulative[1];
-                  }
-                  // En la gráfica de costos, los proveedores ya son un % del total, por lo que no se muestra %
-                  value = formatCurrency(cumulativeValue || 0, 0); 
-              }
+          {/* Línea para el Planificado */}
+          <div className="flex justify-between items-center gap-4">
+              <span className="flex items-center">
+                  <div className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: 'hsl(var(--muted-foreground))' }} />
+                  Planificado:
+              </span>
+              <span className="font-mono font-semibold">
+                {`${(data.planned || 0).toFixed(2)}%`} ({formatCurrency(data.cumulativePlannedValue || 0, 0)})
+              </span>
+          </div>
 
-              if (name !== "Real" && cumulativeValue === undefined) return null;
+          {/* Línea para el Real Total */}
+           <div className="flex justify-between items-center gap-4">
+              <span className="flex items-center">
+                  <div className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: 'hsl(var(--primary))' }} />
+                  Real (Total):
+              </span>
+              <span className="font-mono font-semibold">
+                {`${(data.actual || 0).toFixed(2)}%`} ({formatCurrency(data.cumulativeActualValue || 0, 0)})
+              </span>
+          </div>
+          
+          {relevantPayload.length > 0 && <div className="border-t my-2" />}
+
+          {/* Líneas para los proveedores */}
+           {relevantPayload.map((p) => {
+              const name = p.name as string;
+              const color = p.color || p.stroke;
+              const providerDistribution = data.providerDistribution || {};
+              const providerPercentage = providerDistribution[name] || 0;
+              const providerCumulative = (data.cumulativeProviders || {})[name] || 0;
 
               return (
-                  <div key={index} className="flex justify-between items-center gap-4">
+                  <div key={name} className="flex justify-between items-center gap-4">
                       <span className="flex items-center">
                           <div className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: color }} />
                           {name}:
                       </span>
                       <span className="font-mono font-semibold">
-                        {value}
-                        {(name === 'Planificado' || name === 'Real') && ` (${formatCurrency(cumulativeValue || 0, 0)})`}
+                        {`${(providerPercentage).toFixed(2)}%`} ({formatCurrency(providerCumulative, 0)})
                       </span>
                   </div>
               )
-           }).filter(Boolean)}
+           })}
+
            <div className="flex justify-between items-center gap-4 pt-2 mt-2 border-t">
-                <span className="font-semibold">Desviación:</span>
+                <span className="font-semibold">Desviación (Costo):</span>
                 <span className={`font-mono font-bold flex items-center ${data.deviation < 0 ? 'text-destructive' : 'text-green-500'}`}>
                   {data.deviation > 0 && <ArrowUp className="h-4 w-4 mr-1" />}
                   {data.deviation < 0 && <ArrowDown className="h-4 w-4 mr-1" />}
@@ -107,7 +116,7 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
 
     const providerKeys = React.useMemo(() => {
         if (!data || data.length === 0) return [];
-        const standardKeys = new Set(['date', 'planned', 'actual', 'cumulativePlannedValue', 'cumulativeActualValue', 'deviation', 'cumulativeProviders']);
+        const standardKeys = new Set(['date', 'planned', 'actual', 'cumulativePlannedValue', 'cumulativeActualValue', 'deviation', 'cumulativeProviders', 'providerDistribution']);
         const providers = new Set<string>();
         data.forEach(d => {
             Object.keys(d).forEach(key => {
@@ -126,7 +135,7 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
                 color: "hsl(var(--muted-foreground))",
             },
             actual: {
-                label: "Real",
+                label: "Real (Total)",
                 color: "hsl(var(--primary))",
             },
         };
@@ -173,16 +182,16 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
             />
             <defs>
               <linearGradient id={`fill-planned-${chartId}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--color-planned)" stopOpacity={0.4} />
-                <stop offset="95%" stopColor="var(--color-planned)" stopOpacity={0.1} />
+                <stop offset="5%" stopColor={chartConfig.planned.color} stopOpacity={0.4} />
+                <stop offset="95%" stopColor={chartConfig.planned.color} stopOpacity={0.1} />
               </linearGradient>
               {providerKeys.map((key) => {
                  const color = chartConfig[key]?.color;
                  if (!color) return null;
                  return (
                     <linearGradient key={`fill-${key}`} id={`fill-${key}-${chartId}`} x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={color} stopOpacity={0.3} />
-                        <stop offset="95%" stopColor={color} stopOpacity={0.05} />
+                        <stop offset="5%" stopColor={color} stopOpacity={0.4} />
+                        <stop offset="95%" stopColor={color} stopOpacity={0.1} />
                     </linearGradient>
                  )
               })}
@@ -197,17 +206,18 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
               dataKey="planned"
               type="monotone"
               fill={`url(#fill-planned-${chartId})`}
-              stroke="var(--color-planned)"
+              stroke={chartConfig.planned.color}
               strokeWidth={2}
               activeDot={{ r: 6 }}
               dot={false}
               name={chartConfig.planned.label}
+              stackId="a"
             />
              <Area
               dataKey="actual"
               type="monotone"
               fill="transparent"
-              stroke="var(--color-actual)"
+              stroke={chartConfig.actual.color}
               strokeWidth={2}
               strokeDasharray="5 5"
               activeDot={{ r: 6 }}
@@ -229,7 +239,7 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
                         dot={false}
                         name={providerConfig.label as string}
                         stackId="providers"
-                        yAxisId={0} // Ensure it uses the primary Y-axis
+                        yAxisId={0}
                     />
                 )
             })}
@@ -240,3 +250,4 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
   }
 );
 SCurveCostChart.displayName = 'SCurveCostChart';
+
