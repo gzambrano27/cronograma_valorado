@@ -48,8 +48,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
              }
         }
         
-        // No mostrar items con valor 0, excepto 'Planificado'
-        if (name !== 'Planificado' && (!value || value === 0)) return null;
+        if (isCostView && !value && name !== 'Planificado') return null;
 
         return (
             <div key={index} className="flex justify-between items-center gap-4">
@@ -85,14 +84,14 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
   return null;
 };
 
+
 const providerColors = [
     "hsl(221.2 83.2% 53.3%)", // blue-500
-    "hsl(142.1 76.2% 36.3%)", // green-600
-    "hsl(24.6 95% 53.1%)",   // orange-500
+    "hsl(172.2 68.5% 42.4%)", // teal-500
     "hsl(262.1 83.3% 57.8%)", // violet-500
     "hsl(314.3 86.8% 54.3%)", // pink-500
-    "hsl(172.2 68.5% 42.4%)", // teal-500
-    "hsl(47.9 95.8% 53.1%)",  // yellow-500
+    "hsl(24.6 95% 53.1%)",   // orange-500
+    "hsl(142.1 76.2% 36.3%)", // green-600
 ];
 
 export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
@@ -127,10 +126,10 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
 
         if (showCostBreakdown) {
              providerKeys.forEach((name, index) => {
-                config[name] = {
-                    label: name,
-                    color: providerColors[index % providerColors.length],
-                }
+                 config[name] = {
+                     label: name,
+                     color: providerColors[index % providerColors.length],
+                 }
              });
         }
         return config;
@@ -177,16 +176,6 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
                 <stop offset="5%" stopColor="var(--color-actual)" stopOpacity={0.4} />
                 <stop offset="95%" stopColor="var(--color-actual)" stopOpacity={0.1} />
               </linearGradient>
-              {providerKeys.map((key) => {
-                const providerColor = chartConfig[key]?.color;
-                if (!providerColor) return null;
-                return (
-                  <linearGradient key={`fill-${key}`} id={`fill-${key}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={providerColor} stopOpacity={0.4} />
-                    <stop offset="95%" stopColor={providerColor} stopOpacity={0.1} />
-                  </linearGradient>
-                )
-              })}
             </defs>
             <Tooltip
               cursor={{ strokeDasharray: '3 3' }}
@@ -223,8 +212,9 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
                         key={key}
                         dataKey={key}
                         type="monotone"
-                        fill={`url(#fill-${key})`}
                         stroke={providerConfig.color}
+                        fill={providerConfig.color}
+                        fillOpacity={0.3}
                         strokeWidth={2}
                         activeDot={{ r: 6 }}
                         dot={false}
