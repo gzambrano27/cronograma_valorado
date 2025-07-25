@@ -44,7 +44,7 @@ export async function updateSettings(formData: FormData) {
 const TaskSchema = z.object({
     name: z.string().min(3, { message: 'El nombre debe tener al menos 3 caracteres.' }),
     quantity: z.coerce.number().min(0, { message: 'La cantidad no puede ser negativa.' }),
-    precio: z.coerce.number().min(0, { message: 'El precio no puede ser negativo.' }),
+    precio: z.coerce.number().min(0, { message: 'El precio no puede ser negativa.' }),
     startDate: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: 'Fecha de inicio inválida.' }),
     endDate: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: 'Fecha de fin inválida.' }),
 });
@@ -163,7 +163,8 @@ export async function updateTaskConsumption(taskId: number, date: string, consum
 
     const task = {
         ...taskData,
-        quantity: parseFloat(taskData.quantity)
+        quantity: parseFloat(taskData.quantity),
+        precio: parseFloat(taskData.precio)
     }
 
     const dailyConsumption = (task.dailyconsumption || []).map(dc => ({
@@ -288,7 +289,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   const precioAttrDef = extendedAttrDefs.find((attr: any) => attr.Alias?.toLowerCase() === 'precio');
   const precioFieldId = precioAttrDef?.FieldID;
 
-  const newTasks: Omit<Task, 'id' | 'consumedQuantity'>[] = [];
+  const newTasks: Omit<Task, 'id' | 'consumedQuantity' | 'validations'>[] = [];
   const tasks = projectData.Tasks.Task;
 
   for (const task of tasks) {
@@ -318,7 +319,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
              const priceAttr = task.ExtendedAttribute.find((attr: any) => attr.FieldID === precioFieldId);
             if (priceAttr && priceAttr.Value != null) {
                 const parsedPrice = parseFloat(priceAttr.Value);
-                if (!isNaN(parsedPrice)) totalTaskPrice = parsedPrice;
+                if (!isNaN(parsedPrice)) totalTaskPrice = parsedPrice / 100;
             }
         }
 
@@ -359,3 +360,5 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   revalidatePath(`/dashboard`);
   return { success: true, message: `${newTasks.length} tareas importadas.` };
 }
+
+    

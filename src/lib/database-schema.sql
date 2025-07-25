@@ -1,4 +1,4 @@
--- Este archivo define el esquema completo y actualizado de las tablas personalizadas 
+-- Este archivo define el esquema completo y actualizado de las tablas personalizadas
 -- que la aplicación utiliza en la base de datos de Odoo.
 
 -- Tabla para almacenar las tareas de los proyectos.
@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS "externo_tasks" (
     "name" VARCHAR(255) NOT NULL,
     "quantity" NUMERIC(14, 2) DEFAULT 0,
     "consumedquantity" NUMERIC(14, 2) DEFAULT 0,
+    "cost" NUMERIC(14, 2) DEFAULT 0,
     "value" NUMERIC(14, 2) DEFAULT 0,
     "startdate" TIMESTAMP WITH TIME ZONE,
     "enddate" TIMESTAMP WITH TIME ZONE,
@@ -15,7 +16,7 @@ CREATE TABLE IF NOT EXISTS "externo_tasks" (
     "dailyconsumption" JSONB,
     "displayorder" INTEGER,
     CONSTRAINT fk_project
-      FOREIGN KEY("projectid") 
+      FOREIGN KEY("projectid")
 	  REFERENCES "project_project"("id")
 	  ON DELETE CASCADE
 );
@@ -42,7 +43,7 @@ CREATE TABLE IF NOT EXISTS "externo_task_validations" (
     "imageurl" TEXT NOT NULL,
     "location" VARCHAR(255) NOT NULL,
     CONSTRAINT fk_task
-      FOREIGN KEY("taskid") 
+      FOREIGN KEY("taskid")
 	  REFERENCES "externo_tasks"("id")
 	  ON DELETE CASCADE,
     CONSTRAINT fk_user
