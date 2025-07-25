@@ -13,6 +13,7 @@ import {
   TooltipProps,
 } from "recharts"
 import { ArrowUp, ArrowDown } from "lucide-react"
+import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent"
 
 import {
   ChartContainer,
@@ -20,12 +21,6 @@ import {
 } from "@/components/ui/chart"
 import type { SCurveData } from "@/lib/types"
 import { formatCurrency } from "@/lib/utils"
-import { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent"
-
-interface SCurveChartProps {
-  data: SCurveData[]
-  showCostBreakdown?: boolean
-}
 
 
 const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
@@ -33,7 +28,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
     const data = payload[0].payload as SCurveData;
     const isCostView = 'cumulativeProviders' in data;
 
-    const tooltipItems = payload.map((p, index: number) => {
+    const tooltipItems = payload.map((p, index) => {
         const name = p.name as string;
         const value = p.value as number;
         const color = p.color || p.stroke;
@@ -49,6 +44,9 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
              }
         }
 
+        // Do not show items with 0 value unless it's the planned curve
+        if (name !== 'Planificado' && (!value || value === 0)) return null;
+
         return (
             <div key={index} className="flex justify-between items-center gap-4">
                 <span className="flex items-center">
@@ -60,7 +58,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
                 </span>
             </div>
         )
-    });
+    }).filter(Boolean); // Filter out null items
 
     return (
       <div className="p-4 bg-background/95 backdrop-blur-sm border rounded-lg shadow-xl text-sm min-w-[250px]">
