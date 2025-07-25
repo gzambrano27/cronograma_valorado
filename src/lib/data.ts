@@ -340,10 +340,9 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
             date: format(day, "d MMM", { locale: es }),
             planned: (cumulativePlannedValue / totalProjectCost) * 100,
             cumulativePlannedValue,
-            // These are no longer used for the cost curve view but are kept for type consistency
-            actual: 0,
-            cumulativeActualValue: 0,
-            deviation: 0,
+            actual: 0, // Placeholder, not used in this chart view
+            cumulativeActualValue: 0, // Placeholder
+            deviation: 0, // Placeholder
         };
         
         // Add provider percentages based on total project cost for stacking

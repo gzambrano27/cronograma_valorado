@@ -151,19 +151,30 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
               className="text-xs"
             />
             <defs>
-              <linearGradient id={`fill-planned-${chartId}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={chartConfig.planned.color} stopOpacity={0.4} />
-                <stop offset="95%" stopColor={chartConfig.planned.color} stopOpacity={0.1} />
-              </linearGradient>
-              {providerKeys.map((key) => {
-                 const color = (chartConfig[key] as {color: string})?.color;
-                 if (!color) return null;
-                 return (
-                    <linearGradient key={`fill-${key}`} id={`fill-${key}-${chartId}`} x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={color} stopOpacity={0.4} />
-                        <stop offset="95%" stopColor={color} stopOpacity={0.1} />
-                    </linearGradient>
-                 )
+              {Object.entries(chartConfig).map(([key, config]) => {
+                const color = (config as { color: string }).color;
+                if (!color) return null;
+                return (
+                  <linearGradient
+                    key={`fill-${key}`}
+                    id={`fill-${key}-${chartId}`}
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop
+                      offset="5%"
+                      stopColor={color}
+                      stopOpacity={0.4}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor={color}
+                      stopOpacity={0.1}
+                    />
+                  </linearGradient>
+                );
               })}
             </defs>
             <Tooltip
@@ -207,4 +218,3 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
   }
 );
 SCurveCostChart.displayName = 'SCurveCostChart';
-
