@@ -175,13 +175,12 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
             <Area
               dataKey="planned"
               type="monotone"
-              fill={`url(#fill-planned-${chartId})`}
+              fill="transparent"
               stroke={chartConfig.planned.color}
               strokeWidth={2}
               activeDot={{ r: 6 }}
               dot={false}
               name={chartConfig.planned.label}
-              stackId="a"
             />
             {providerKeys.map((key) => {
                 const providerConfig = chartConfig[key] as {label: string, color: string};
