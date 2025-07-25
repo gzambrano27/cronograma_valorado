@@ -207,3 +207,4 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
   }
 );
 SCurveCostChart.displayName = 'SCurveCostChart';
+

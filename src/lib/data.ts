@@ -285,7 +285,7 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
 
 // Genera los datos para el gráfico de Curva "S" de costos.
 export async function generateCostSCurveData(tasks: Task[], totalProjectCost: number): Promise<SCurveData[]> {
-    if (tasks.length === 0) {
+    if (tasks.length === 0 || totalProjectCost <= 0) {
         return [];
     }
 
@@ -296,9 +296,9 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
     let maxDate: Date | null = null;
 
     tasks.forEach(task => {
+        const providerName = task.partnerName || 'Sin Asignar';
+        allProviders.add(providerName);
         if (task.dailyConsumption) {
-            const providerName = task.partnerName || 'Sin Asignar';
-            
             task.dailyConsumption.forEach(dc => {
                 const day = startOfDay(new Date(dc.date));
                 const dayTimestamp = day.getTime();
@@ -309,12 +309,7 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
 
                 const dailyData = valuesByDate.get(dayTimestamp)!;
                 dailyData.planned += dc.plannedQuantity * task.cost;
-
-                const consumedCost = dc.consumedQuantity * task.cost;
-                if (consumedCost > 0) {
-                    allProviders.add(providerName);
-                    dailyData.providers[providerName] = (dailyData.providers[providerName] || 0) + consumedCost;
-                }
+                dailyData.providers[providerName] = (dailyData.providers[providerName] || 0) + (dc.consumedQuantity * task.cost);
 
                 if (!minDate || day < minDate) minDate = day;
                 if (!maxDate || day > maxDate) maxDate = day;
@@ -341,22 +336,22 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
             cumulativeProviderValues[provider] += dailyData.providers[provider] || 0;
         }
         
-        const cumulativeActualValue = Object.values(cumulativeProviderValues).reduce((sum, v) => sum + v, 0);
-
         const dataPoint: SCurveData = {
             date: format(day, "d MMM", { locale: es }),
-            planned: totalProjectCost > 0 ? (cumulativePlannedValue / totalProjectCost) * 100 : 0,
-            actual: totalProjectCost > 0 ? (cumulativeActualValue / totalProjectCost) * 100 : 0,
+            planned: (cumulativePlannedValue / totalProjectCost) * 100,
             cumulativePlannedValue,
-            cumulativeActualValue,
-            deviation: 0, // No se usa en la gráfica de costos
+            // These are no longer used for the cost curve view but are kept for type consistency
+            actual: 0,
+            cumulativeActualValue: 0,
+            deviation: 0,
         };
         
-        // Add provider percentages based on total project cost
+        // Add provider percentages based on total project cost for stacking
         for (const provider of allProviders) {
              const providerValue = cumulativeProviderValues[provider];
-             dataPoint[provider] = totalProjectCost > 0 ? (providerValue / totalProjectCost) * 100 : 0;
-             // Store monetary value for the tooltip
+             // The value for the Area component (the percentage of total project cost)
+             dataPoint[provider] = (providerValue / totalProjectCost) * 100;
+             // The monetary value for the tooltip
              dataPoint[`${provider}_value`] = providerValue;
         }
 
