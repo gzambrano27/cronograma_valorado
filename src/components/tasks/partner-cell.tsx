@@ -24,8 +24,10 @@ export function PartnerCell({ task, allPartners, onSuccess }: PartnerCellProps) 
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
 
-  const handlePartnerChange = (partnerId: string) => {
-    const newPartnerId = partnerId ? Number(partnerId) : null;
+  const handlePartnerChange = (partnerIdString: string) => {
+    // Si se selecciona "Sin Asignar", el valor será 'null', que se convertirá en el valor null de JS.
+    const newPartnerId = partnerIdString === 'null' ? null : Number(partnerIdString);
+    
     startTransition(async () => {
       const result = await updateTaskPartner(task.id, newPartnerId);
       if (result.success) {
@@ -48,7 +50,7 @@ export function PartnerCell({ task, allPartners, onSuccess }: PartnerCellProps) 
     <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
       {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
       <Select
-        defaultValue={task.partnerId?.toString()}
+        defaultValue={task.partnerId?.toString() || 'null'}
         onValueChange={handlePartnerChange}
         disabled={isPending}
       >
@@ -56,7 +58,8 @@ export function PartnerCell({ task, allPartners, onSuccess }: PartnerCellProps) 
             <SelectValue placeholder="Asignar proveedor" />
         </SelectTrigger>
         <SelectContent>
-            <SelectItem value="">Sin Asignar</SelectItem>
+            {/* Se cambia el valor de "" a "null" para evitar el error. */}
+            <SelectItem value="null">Sin Asignar</SelectItem>
             {allPartners.map((partner) => (
                 <SelectItem key={partner.id} value={String(partner.id)}>
                     {partner.name}
