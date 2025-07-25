@@ -27,6 +27,7 @@ function processTask(rawTask: RawTask): Task {
     quantity: toFloat(rawTask.quantity),
     consumedQuantity: toFloat(rawTask.consumedquantity),
     value: toFloat(rawTask.value),
+    cost: toFloat(rawTask.cost),
     startDate: new Date(rawTask.startdate),
     endDate: new Date(rawTask.enddate),
     status: rawTask.status,

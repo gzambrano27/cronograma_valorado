@@ -114,9 +114,9 @@ export async function createTask(projectId: number, formData: FormData): Promise
     const dailyConsumption = createDailyConsumption(start, end, quantity);
   
     await query(`
-      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
-      VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7)
-    `, [projectId, name, quantity, value, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption)]);
+      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "cost", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
+      VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', 0, $8)
+    `, [projectId, name, quantity, value, value, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption)]);
   
     // Revalida las rutas para que Next.js actualice la caché y muestre los nuevos datos.
     revalidatePath(`/dashboard/projects-overview/${projectId}`);
@@ -285,6 +285,8 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   const extendedAttrDefs = projectData.ExtendedAttributes?.ExtendedAttribute || [];
   const cantidadAttrDef = extendedAttrDefs.find((attr: any) => attr.Alias?.toLowerCase() === 'cantidades');
   const cantidadFieldId = cantidadAttrDef?.FieldID;
+  const precioAttrDef = extendedAttrDefs.find((attr: any) => attr.Alias?.toLowerCase() === 'precio');
+  const precioFieldId = precioAttrDef?.FieldID;
 
   const newTasks: Omit<Task, 'id' | 'consumedQuantity'>[] = [];
   const tasks = projectData.Tasks.Task;
@@ -300,12 +302,8 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
 
         const costRaw = task.FixedCost ?? task.Cost;
         if (costRaw === undefined || costRaw === null) continue;
-
-        const parsedCost = parseFloat(costRaw);
-        if (isNaN(parsedCost)) continue;
-
-        const totalTaskValue = parsedCost / 100;
-
+        const totalTaskCost = parseFloat(costRaw) / 100;
+        
         let quantity = 0;
         if (cantidadFieldId && Array.isArray(task.ExtendedAttribute)) {
             const quantityAttr = task.ExtendedAttribute.find((attr: any) => attr.FieldID === cantidadFieldId);
@@ -314,12 +312,20 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
                 if (!isNaN(parsedQuantity)) quantity = parsedQuantity;
             }
         }
-
-        if (totalTaskValue === 0 || quantity === 0) {
-            continue;
+        
+        let totalTaskPrice = 0;
+        if (precioFieldId && Array.isArray(task.ExtendedAttribute)) {
+             const priceAttr = task.ExtendedAttribute.find((attr: any) => attr.FieldID === precioFieldId);
+            if (priceAttr && priceAttr.Value != null) {
+                const parsedPrice = parseFloat(priceAttr.Value);
+                if (!isNaN(parsedPrice)) totalTaskPrice = parsedPrice;
+            }
         }
 
-        const value = quantity > 0 ? totalTaskValue / quantity : 0;
+        if (quantity === 0) continue;
+
+        const cost = quantity > 0 ? totalTaskCost / quantity : 0;
+        const value = quantity > 0 ? totalTaskPrice / quantity : 0;
         const dailyConsumption = createDailyConsumption(startDate, endDate, quantity);
 
         newTasks.push({
@@ -327,6 +333,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
             name: task.Name,
             quantity,
             value,
+            cost,
             startDate,
             endDate,
             status: 'pendiente',
@@ -338,14 +345,14 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   }
 
   if (newTasks.length === 0) {
-    throw new Error('No se encontraron tareas válidas para importar (verifique que tengan costo y cantidad).');
+    throw new Error('No se encontraron tareas válidas para importar (verifique que tengan costo, precio y cantidad).');
   }
 
   for (const task of newTasks) {
     await query(`
-      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
-      VALUES ($1, $2, $3, $4, $5, $6, 'pendiente', 0, $7)
-    `, [task.projectId, task.name, task.quantity, task.value, task.startDate.toISOString(), task.endDate.toISOString(), JSON.stringify(task.dailyConsumption)]);
+      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "cost", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
+      VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', 0, $8)
+    `, [task.projectId, task.name, task.quantity, task.value, task.cost, task.startDate.toISOString(), task.endDate.toISOString(), JSON.stringify(task.dailyConsumption)]);
   }
 
   revalidatePath(`/dashboard/projects-overview/${projectId}`);

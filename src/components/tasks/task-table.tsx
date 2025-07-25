@@ -188,6 +188,30 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
   if (isManager) {
       columns.push(...[
         {
+          accessorKey: "cost",
+          header: () => <div className="text-right">Costo</div>,
+          cell: ({ row }) => {
+            const amount = parseFloat(row.getValue("cost"))
+            return <div className="text-right font-mono">{formatCurrency(amount)}</div>
+          },
+        },
+        {
+          id: "subtotalCostValued",
+          header: () => <div className="text-right">Subtotal Costo Valorado</div>,
+          cell: ({ row }) => {
+              const subtotal = row.original.quantity * row.original.cost;
+              return <div className="text-right font-mono">{formatCurrency(subtotal)}</div>;
+          }
+        },
+        {
+          id: "subtotalCostActual",
+          header: () => <div className="text-right">Subtotal Costo Real</div>,
+          cell: ({ row }) => {
+              const subtotal = row.original.consumedQuantity * row.original.cost;
+              return <div className="text-right font-mono">{formatCurrency(subtotal)}</div>;
+          }
+        },
+        {
           accessorKey: "value",
           header: () => <div className="text-right">PVP</div>,
           cell: ({ row }) => {
@@ -196,16 +220,16 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
           },
         },
         {
-          id: "subtotalValued",
-          header: () => <div className="text-right">Subtotal Valorado</div>,
+          id: "subtotalPVPValued",
+          header: () => <div className="text-right">Subtotal PVP Valorado</div>,
           cell: ({ row }) => {
               const subtotal = row.original.quantity * row.original.value;
               return <div className="text-right font-mono">{formatCurrency(subtotal)}</div>;
           }
         },
         {
-          id: "subtotalActual",
-          header: () => <div className="text-right">Subtotal Avance Real</div>,
+          id: "subtotalPVPActual",
+          header: () => <div className="text-right">Subtotal PVP Real</div>,
           cell: ({ row }) => {
               const subtotal = row.original.consumedQuantity * row.original.value;
               return <div className="text-right font-mono">{formatCurrency(subtotal)}</div>;
@@ -247,9 +271,12 @@ const columnTranslations: Record<string, string> = {
     quantity: "Cant. Planificada",
     consumedQuantity: "Cant. Consumida",
     difference: "Diferencia de Consumo",
+    cost: "Costo",
+    subtotalCostValued: "Subtotal Costo Valorado",
+    subtotalCostActual: "Subtotal Costo Real",
     value: "PVP",
-    subtotalValued: "Subtotal Valorado",
-    subtotalActual: "Subtotal Avance Real",
+    subtotalPVPValued: "Subtotal PVP Valorado",
+    subtotalPVPActual: "Subtotal PVP Real",
     startDate: "Fecha Inicio",
     endDate: "Fecha Fin",
     expander: "Expandir",
@@ -267,8 +294,11 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
   const isMobile = useIsMobile();
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
     value: false,
-    subtotalValued: false,
-    subtotalActual: false,
+    cost: false,
+    subtotalCostValued: false,
+    subtotalCostActual: false,
+    subtotalPVPValued: false,
+    subtotalPVPActual: false,
   });
   
   React.useEffect(() => {
@@ -281,15 +311,21 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
     };
     if (isManager) {
         mobileVisibility.value = false;
-        mobileVisibility.subtotalValued = false;
-        mobileVisibility.subtotalActual = false;
+        mobileVisibility.cost = false;
+        mobileVisibility.subtotalCostValued = false;
+        mobileVisibility.subtotalCostActual = false;
+        mobileVisibility.subtotalPVPValued = false;
+        mobileVisibility.subtotalPVPActual = false;
     }
 
     const desktopVisibility: VisibilityState = {};
     if (isManager) {
         desktopVisibility.value = false;
-        desktopVisibility.subtotalValued = false;
-        desktopVisibility.subtotalActual = false;
+        desktopVisibility.cost = false;
+        desktopVisibility.subtotalCostValued = false;
+        desktopVisibility.subtotalCostActual = false;
+        desktopVisibility.subtotalPVPValued = false;
+        desktopVisibility.subtotalPVPActual = false;
     }
 
     if (isMobile) {

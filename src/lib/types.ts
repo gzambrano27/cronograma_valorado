@@ -94,6 +94,7 @@ export type RawTask = {
   quantity: string;
   consumedquantity: string;
   value: string;
+  cost: string;
   startdate: string;
   enddate: string;
   validations?: RawTaskValidation[];
@@ -109,6 +110,7 @@ export type Task = {
   quantity: number;
   consumedQuantity: number;
   value: number; // Precio de Venta al Público (PVP) o Precio Unitario.
+  cost: number; // Costo unitario
   startDate: Date;
   endDate: Date;
   validations?: TaskValidation[];
