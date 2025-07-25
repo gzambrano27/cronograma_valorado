@@ -197,6 +197,7 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
               content={<CustomTooltip />}
             />
             <Legend wrapperStyle={{paddingTop: '1rem', fontSize: '12px'}}/>
+            
             <Area
               dataKey="planned"
               type="monotone"
@@ -235,6 +236,7 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
                             activeDot={{ r: 6 }}
                             dot={false}
                             name={providerConfig.label as string}
+                            stackId="providers"
                         />
                     )
                 })}
