@@ -289,7 +289,7 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
         return [];
     }
 
-    const valuesByDate = new Map<number, { planned: number; actual: { [providerName: string]: number } }>();
+    const valuesByDate = new Map<number, { planned: number; providers: { [providerName: string]: number } }>();
     const allProviders = new Set<string>();
 
     let minDate: Date | null = null;
@@ -304,7 +304,7 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
                 const dayTimestamp = day.getTime();
 
                 if (!valuesByDate.has(dayTimestamp)) {
-                    valuesByDate.set(dayTimestamp, { planned: 0, actual: {} });
+                    valuesByDate.set(dayTimestamp, { planned: 0, providers: {} });
                 }
 
                 const dailyData = valuesByDate.get(dayTimestamp)!;
@@ -313,7 +313,7 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
                 const consumedCost = dc.consumedQuantity * task.cost;
                 if (consumedCost > 0) {
                     allProviders.add(providerName);
-                    dailyData.actual[providerName] = (dailyData.actual[providerName] || 0) + consumedCost;
+                    dailyData.providers[providerName] = (dailyData.providers[providerName] || 0) + consumedCost;
                 }
 
                 if (!minDate || day < minDate) minDate = day;
@@ -321,42 +321,46 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
             });
         }
     });
-
+    
     if (!minDate || !maxDate) return [];
 
     const dateRange = eachDayOfInterval({ start: minDate, end: maxDate });
     const finalCurve: SCurveData[] = [];
     
-    let cumulativePlanned = 0;
-    const cumulativeProviders: { [providerName: string]: number } = {};
-    Array.from(allProviders).forEach(p => cumulativeProviders[p] = 0);
+    let cumulativePlannedValue = 0;
+    const cumulativeProviderValues: { [providerName: string]: number } = {};
+    Array.from(allProviders).forEach(p => cumulativeProviderValues[p] = 0);
 
     for (const day of dateRange) {
         const dayTimestamp = day.getTime();
-        const dailyData = valuesByDate.get(dayTimestamp) || { planned: 0, actual: {} };
+        const dailyData = valuesByDate.get(dayTimestamp) || { planned: 0, providers: {} };
 
-        cumulativePlanned += dailyData.planned;
+        cumulativePlannedValue += dailyData.planned;
         
-        let dailyActualTotalCost = 0;
-        const providerValuesForChart: { [providerName: string]: number } = {};
-
         for (const provider of allProviders) {
-            const providerCost = dailyData.actual[provider] || 0;
-            cumulativeProviders[provider] += providerCost;
-            providerValuesForChart[provider] = cumulativeProviders[provider];
-            dailyActualTotalCost += providerCost;
+            cumulativeProviderValues[provider] += dailyData.providers[provider] || 0;
         }
         
-        const totalActualCost = Object.values(cumulativeProviders).reduce((sum, current) => sum + current, 0);
-        
-        finalCurve.push({
+        const cumulativeActualValue = Object.values(cumulativeProviderValues).reduce((sum, v) => sum + v, 0);
+
+        const dataPoint: SCurveData = {
             date: format(day, "d MMM", { locale: es }),
-            planned: cumulativePlanned, // Valor monetario
-            cumulativePlannedValue: cumulativePlanned,
-            cumulativeActualValue: totalActualCost,
-            deviation: 0, // La desviación en % no aplica directamente aquí.
-            ...providerValuesForChart,
-        });
+            planned: totalProjectCost > 0 ? (cumulativePlannedValue / totalProjectCost) * 100 : 0,
+            actual: totalProjectCost > 0 ? (cumulativeActualValue / totalProjectCost) * 100 : 0,
+            cumulativePlannedValue,
+            cumulativeActualValue,
+            deviation: 0, // No se usa en la gráfica de costos
+        };
+        
+        // Add provider percentages based on total project cost
+        for (const provider of allProviders) {
+             const providerValue = cumulativeProviderValues[provider];
+             dataPoint[provider] = totalProjectCost > 0 ? (providerValue / totalProjectCost) * 100 : 0;
+             // Store monetary value for the tooltip
+             dataPoint[`${provider}_value`] = providerValue;
+        }
+
+        finalCurve.push(dataPoint);
     }
     
     return finalCurve;
