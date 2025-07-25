@@ -171,12 +171,12 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
                 <stop offset="95%" stopColor="var(--color-actual)" stopOpacity={0.1} />
               </linearGradient>
               {providerKeys.map((key) => {
-                  const providerColor = chartConfig[key]?.color;
-                  if (!providerColor) return null;
+                  const providerConfig = chartConfig[key];
+                  if (!providerConfig) return null;
                   return (
-                    <linearGradient key={`fill-${key}`} id={`fill-${key}`} x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={providerColor} stopOpacity={0.3} />
-                      <stop offset="95%" stopColor={providerColor} stopOpacity={0.05} />
+                    <linearGradient key={`fill-grad-${key}`} id={`fill-${key}`} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={providerConfig.color} stopOpacity={0.3} />
+                      <stop offset="95%" stopColor={providerConfig.color} stopOpacity={0.05} />
                     </linearGradient>
                   )
               })}
