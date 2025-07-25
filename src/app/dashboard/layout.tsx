@@ -44,7 +44,7 @@ export default async function DashboardLayout({
               {/* AuthLayoutClient es un componente de cliente que gestiona la sesión y protege las rutas */}
               <AuthLayoutClient>
                   {children}
-              </Auth-layout-client>
+              </AuthLayoutClient>
             </DashboardProvider>
         </ThemeProvider>
     </SessionProvider>
