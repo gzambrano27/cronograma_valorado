@@ -117,15 +117,16 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
         };
 
         if (showCostBreakdown) {
-             providerKeys.forEach((name) => {
-                const hue = Math.floor(Math.random() * 360);
-                const saturation = Math.floor(Math.random() * 30) + 70; // 70-100%
-                const lightness = Math.floor(Math.random() * 20) + 25; // 25-45% (dark colors)
-                 config[name] = {
-                     label: name,
-                     color: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
-                 }
-             });
+            const HUE_STEP = 360 / Math.max(providerKeys.length, 1);
+            providerKeys.forEach((name, index) => {
+               const hue = Math.round(index * HUE_STEP);
+               const saturation = 70;
+               const lightness = 50;
+                config[name] = {
+                    label: name,
+                    color: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
+                }
+            });
         }
         return config;
     }, [providerKeys, showCostBreakdown]);
@@ -171,6 +172,16 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
                 <stop offset="5%" stopColor="var(--color-actual)" stopOpacity={0.4} />
                 <stop offset="95%" stopColor="var(--color-actual)" stopOpacity={0.1} />
               </linearGradient>
+              {providerKeys.map((key) => {
+                 const providerColor = chartConfig[key]?.color;
+                 if (!providerColor) return null;
+                 return (
+                  <linearGradient key={`fill-${key}`} id={`fill-${key}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={providerColor} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={providerColor} stopOpacity={0.05} />
+                  </linearGradient>
+                 )
+              })}
             </defs>
             <Tooltip
               cursor={{ strokeDasharray: '3 3' }}
@@ -200,22 +211,21 @@ export const SCurveChart = React.forwardRef<HTMLDivElement, SCurveChartProps>(
                 />
             )}
             {showCostBreakdown && providerKeys.map((key) => {
-                const providerConfig = chartConfig[key];
-                if (!providerConfig) return null;
-                return (
-                    <Area
-                        key={key}
-                        dataKey={key}
-                        type="monotone"
-                        fill={providerConfig.color}
-                        stroke={providerConfig.color}
-                        fillOpacity={0.3}
-                        strokeWidth={2}
-                        activeDot={{ r: 6 }}
-                        dot={false}
-                        name={providerConfig.label || key}
-                    />
-                )
+               const providerConfig = chartConfig[key];
+               if (!providerConfig) return null;
+               return (
+                <Area
+                    key={key}
+                    dataKey={key}
+                    type="monotone"
+                    fill={`url(#fill-${key})`}
+                    stroke={providerConfig.color}
+                    strokeWidth={2}
+                    activeDot={{ r: 6 }}
+                    dot={false}
+                    name={providerConfig.label}
+                />
+               )
             })}
           </AreaChart>
         </ResponsiveContainer>
