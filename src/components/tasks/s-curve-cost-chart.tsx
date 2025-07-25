@@ -32,7 +32,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
     const data = payload[0].payload as SCurveData;
     
     // Filtrar proveedores que no tienen valor en este punto para no saturar el tooltip
-    const relevantPayload = payload.filter(p => p.dataKey && p.dataKey !== 'planned' && p.dataKey !== 'actual' && p.value && p.value > 0);
+    const relevantPayload = payload.filter(p => p.dataKey && p.dataKey !== 'planned' && p.value && p.value > 0);
 
     return (
       <div className="p-4 bg-background/95 backdrop-blur-sm border rounded-lg shadow-xl text-sm min-w-[300px]">
@@ -46,17 +46,6 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
               </span>
               <span className="font-mono font-semibold">
                 {`${(data.planned || 0).toFixed(2)}%`} ({formatCurrency(data.cumulativePlannedValue || 0, 0)})
-              </span>
-          </div>
-
-          {/* Línea para el Real Total */}
-           <div className="flex justify-between items-center gap-4">
-              <span className="flex items-center">
-                  <div className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: 'hsl(var(--primary))' }} />
-                  Real (Total):
-              </span>
-              <span className="font-mono font-semibold">
-                {`${(data.actual || 0).toFixed(2)}%`} ({formatCurrency(data.cumulativeActualValue || 0, 0)})
               </span>
           </div>
           
@@ -134,10 +123,6 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
                 label: "Planificado",
                 color: "hsl(var(--muted-foreground))",
             },
-            actual: {
-                label: "Real (Total)",
-                color: "hsl(var(--primary))",
-            },
         };
         providerKeys.forEach((name, index) => {
              config[name] = {
@@ -213,17 +198,6 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
               name={chartConfig.planned.label}
               stackId="a"
             />
-             <Area
-              dataKey="actual"
-              type="monotone"
-              fill="transparent"
-              stroke={chartConfig.actual.color}
-              strokeWidth={2}
-              strokeDasharray="5 5"
-              activeDot={{ r: 6 }}
-              dot={false}
-              name={chartConfig.actual.label}
-            />
             {providerKeys.map((key) => {
                 const providerConfig = chartConfig[key];
                 if (!providerConfig) return null;
@@ -250,4 +224,5 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
   }
 );
 SCurveCostChart.displayName = 'SCurveCostChart';
+
 

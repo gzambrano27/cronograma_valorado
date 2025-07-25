@@ -347,8 +347,7 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
         const plannedPercent = totalProjectCost > 0 ? (cumulativePlanned / totalProjectCost) * 100 : 0;
         
         const totalActualCost = Object.values(cumulativeProviders).reduce((sum, current) => sum + current, 0);
-        const actualPercent = totalProjectCost > 0 ? (totalActualCost / totalProjectCost) * 100 : 0;
-
+        
         const providerPercentagesForChart: { [providerName: string]: number } = {};
         const providerPercentagesForTooltip: { [providerName: string]: number } = {};
 
@@ -363,10 +362,9 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
         finalCurve.push({
             date: format(day, "d MMM", { locale: es }),
             planned: plannedPercent,
-            actual: actualPercent,
             cumulativePlannedValue: cumulativePlanned,
             cumulativeActualValue: totalActualCost,
-            deviation: actualPercent - plannedPercent,
+            deviation: ((totalActualCost / totalProjectCost) * 100) - plannedPercent,
             cumulativeProviders: {...cumulativeProviders},
             providerDistribution: providerPercentagesForTooltip, // Datos para el tooltip
             ...providerPercentagesForChart, // Datos para las áreas de la gráfica
@@ -377,7 +375,6 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
         const roundedPoint: SCurveData = {
           ...point,
           planned: Math.round(point.planned * 100) / 100,
-          actual: Math.round(point.actual * 100) / 100,
           deviation: Math.round(point.deviation * 100) / 100,
         };
         allProviders.forEach(provider => {
