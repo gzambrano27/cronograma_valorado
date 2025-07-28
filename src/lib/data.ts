@@ -349,27 +349,25 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
 
         cumulativePlannedValue += dailyData.planned;
         
+        let cumulativeActualCost = 0;
         for (const provider of allProviders) {
             cumulativeProviderValues[provider] += dailyData.providers[provider] || 0;
+            cumulativeActualCost += cumulativeProviderValues[provider];
         }
         
         const dataPoint: SCurveData = {
             date: format(day, "d MMM", { locale: es }),
             planned: (cumulativePlannedValue / totalProjectCost) * 100,
             cumulativePlannedValue,
-            actual: 0,
-            cumulativeActualValue: 0,
+            actual: (cumulativeActualCost / totalProjectCost) * 100,
+            cumulativeActualValue: cumulativeActualCost,
             deviation: 0,
         };
         
-        let cumulativeActualCost = 0;
-        Object.values(cumulativeProviderValues).forEach(val => cumulativeActualCost += val);
 
         for (const provider of allProviders) {
              const providerValue = cumulativeProviderValues[provider];
-             // The main value for the Area component is the % of total project cost
              dataPoint[provider] = (providerValue / totalProjectCost) * 100;
-             // We store the raw monetary value for the tooltip
              dataPoint[`${provider}_value`] = providerValue;
         }
 
@@ -392,4 +390,5 @@ export async function getPartners(): Promise<Partner[]> {
         name: getTranslatedName(p.name)
     }));
 }
+
 

@@ -34,7 +34,9 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
 
     const sortedPayload = [...relevantPayload].sort((a, b) => {
         if (a.dataKey === 'planned') return -1;
+        if (a.dataKey === 'actual') return -1;
         if (b.dataKey === 'planned') return 1;
+        if (b.dataKey === 'actual') return 1;
         return (a.name || '').localeCompare(b.name || '');
     });
 
@@ -43,13 +45,14 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
         <p className="font-bold text-base mb-2">{`Fecha: ${label}`}</p>
         <div className="space-y-1.5">
            {sortedPayload.map((p) => {
-              const isPlanned = p.dataKey === 'planned';
-              const value = p.value as number;
               const name = p.name as string;
+              const value = p.value as number;
               let cumulativeValue: number;
 
-              if (isPlanned) {
+              if (p.dataKey === 'planned') {
                   cumulativeValue = dataPoint.cumulativePlannedValue;
+              } else if (p.dataKey === 'actual') {
+                  cumulativeValue = dataPoint.cumulativeActualValue;
               } else {
                   cumulativeValue = dataPoint[`${name}_value`] || 0;
               }
@@ -91,7 +94,7 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
 
     const providerKeys = React.useMemo(() => {
         if (!data || data.length === 0) return [];
-        const standardKeys = new Set(['date', 'planned', 'cumulativePlannedValue', 'actual', 'cumulativeActualValue', 'deviation', 'providerDistribution']);
+        const standardKeys = new Set(['date', 'planned', 'cumulativePlannedValue', 'actual', 'cumulativeActualValue', 'deviation']);
         const providers = new Set<string>();
         data.forEach(d => {
             Object.keys(d).forEach(key => {
@@ -109,6 +112,10 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
                 label: "Planificado",
                 color: "hsl(var(--muted-foreground))",
             },
+            actual: {
+                label: "Real",
+                color: "hsl(var(--primary))",
+            },
         };
         providerKeys.forEach((name, index) => {
              config[name] = {
@@ -120,8 +127,6 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
     }, [providerKeys]);
 
     const yAxisTicks = Array.from({ length: 11 }, (_, i) => i * 10); 
-
-    const plannedGradientId = `${chartId}-planned`;
 
     return (
       <ChartContainer config={chartConfig} className="min-h-[250px] w-full h-full" ref={ref}>
@@ -154,15 +159,19 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
               className="text-xs"
             />
             <defs>
-              <linearGradient id={plannedGradientId} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={chartConfig.planned.color} stopOpacity={0.4} />
-                <stop offset="95%" stopColor={chartConfig.planned.color} stopOpacity={0.1} />
-              </linearGradient>
+                <linearGradient id={`fill-planned-${chartId}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={chartConfig.planned.color} stopOpacity={0.4} />
+                    <stop offset="95%" stopColor={chartConfig.planned.color} stopOpacity={0.1} />
+                </linearGradient>
+                <linearGradient id={`fill-actual-${chartId}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={chartConfig.actual.color} stopOpacity={0.4} />
+                    <stop offset="95%" stopColor={chartConfig.actual.color} stopOpacity={0.1} />
+                </linearGradient>
 
               {providerKeys.map((key) => {
                  const providerConfig = chartConfig[key] as {label: string, color: string} | undefined;
                  if (!providerConfig) return null;
-                 const gradientId = `${chartId}-${key.replace(/\s+/g, '-')}`;
+                 const gradientId = `fill-${key.replace(/[^a-zA-Z0-9]/g, '-')}-${chartId}`;
                  return (
                     <linearGradient
                         key={`gradient-${key}`}
@@ -187,7 +196,7 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
             <Area
               dataKey="planned"
               type="monotone"
-              fill={`url(#${plannedGradientId})`}
+              fill={`url(#fill-planned-${chartId})`}
               stroke={chartConfig.planned.color}
               strokeWidth={2}
               activeDot={{ r: 6 }}
@@ -195,10 +204,21 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
               name={chartConfig.planned.label}
               connectNulls
             />
+            <Area
+              dataKey="actual"
+              type="monotone"
+              fill={`url(#fill-actual-${chartId})`}
+              stroke={chartConfig.actual.color}
+              strokeWidth={2}
+              activeDot={{ r: 6 }}
+              dot={false}
+              name={chartConfig.actual.label}
+              connectNulls
+            />
             {providerKeys.map((key) => {
                 const providerConfig = chartConfig[key] as {label: string, color: string} | undefined;
                 if (!providerConfig) return null;
-                const gradientId = `${chartId}-${key.replace(/\s+/g, '-')}`;
+                const gradientId = `fill-${key.replace(/[^a-zA-Z0-9]/g, '-')}-${chartId}`;
                 return (
                     <Area
                         key={key}
