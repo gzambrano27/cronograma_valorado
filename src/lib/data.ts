@@ -262,7 +262,7 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
     }
 
     // Añade un punto de inicio en cero si es necesario.
-    if (minDate > new Date()) {
+    if (finalCurve.length > 0 && minDate) {
        const dayBefore = new Date(minDate.getTime() - 86400000);
         finalCurve.unshift({
           date: format(dayBefore, "d MMM", { locale: es }),
@@ -325,6 +325,23 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
     let cumulativePlannedValue = 0;
     const cumulativeProviderValues: { [providerName: string]: number } = {};
     Array.from(allProviders).forEach(p => cumulativeProviderValues[p] = 0);
+    
+    // Add a starting point at zero for all series
+    const dayBefore = new Date(minDate.getTime() - 86400000);
+    const startPoint: SCurveData = {
+        date: format(dayBefore, "d MMM", { locale: es }),
+        planned: 0,
+        cumulativePlannedValue: 0,
+        actual: 0,
+        cumulativeActualValue: 0,
+        deviation: 0,
+    };
+    for (const provider of allProviders) {
+        startPoint[provider] = 0;
+        startPoint[`${provider}_value`] = 0;
+    }
+    finalCurve.push(startPoint);
+
 
     for (const day of dateRange) {
         const dayTimestamp = day.getTime();
@@ -340,7 +357,7 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
             date: format(day, "d MMM", { locale: es }),
             planned: (cumulativePlannedValue / totalProjectCost) * 100,
             cumulativePlannedValue,
-            actual: 0, 
+            actual: 0,
             cumulativeActualValue: 0,
             deviation: 0,
         };
@@ -350,9 +367,9 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
 
         for (const provider of allProviders) {
              const providerValue = cumulativeProviderValues[provider];
-             const providerPercentOfTotal = (providerValue / totalProjectCost) * 100;
-             // Use null if the value is zero to prevent rendering issues in stacked charts
-             dataPoint[provider] = providerPercentOfTotal > 0 ? providerPercentOfTotal : null;
+             // The main value for the Area component is the % of total project cost
+             dataPoint[provider] = (providerValue / totalProjectCost) * 100;
+             // We store the raw monetary value for the tooltip
              dataPoint[`${provider}_value`] = providerValue;
         }
 
@@ -375,3 +392,4 @@ export async function getPartners(): Promise<Partner[]> {
         name: getTranslatedName(p.name)
     }));
 }
+
