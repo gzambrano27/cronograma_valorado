@@ -33,10 +33,19 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
     const relevantPayload = payload.filter(p => p.value !== null && p.value !== undefined && p.value > 0);
 
     const sortedPayload = [...relevantPayload].sort((a, b) => {
-        if (a.dataKey === 'planned') return -1;
-        if (a.dataKey === 'actual') return -1;
-        if (b.dataKey === 'planned') return 1;
-        if (b.dataKey === 'actual') return 1;
+        const getOrder = (key: any) => {
+            if (key === 'planned') return 1;
+            if (key === 'actual') return 2;
+            return 3;
+        }
+
+        const orderA = getOrder(a.dataKey);
+        const orderB = getOrder(b.dataKey);
+
+        if (orderA !== orderB) {
+            return orderA - orderB;
+        }
+        
         return (a.name || '').localeCompare(b.name || '');
     });
 
@@ -159,14 +168,14 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
               className="text-xs"
             />
             <defs>
-                <linearGradient id={`fill-planned-${chartId}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={chartConfig.planned.color} stopOpacity={0.4} />
-                    <stop offset="95%" stopColor={chartConfig.planned.color} stopOpacity={0.1} />
-                </linearGradient>
-                <linearGradient id={`fill-actual-${chartId}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={chartConfig.actual.color} stopOpacity={0.4} />
-                    <stop offset="95%" stopColor={chartConfig.actual.color} stopOpacity={0.1} />
-                </linearGradient>
+              <linearGradient id={`fill-planned-${chartId}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={chartConfig.planned.color} stopOpacity={0.4} />
+                  <stop offset="95%" stopColor={chartConfig.planned.color} stopOpacity={0.1} />
+              </linearGradient>
+              <linearGradient id={`fill-actual-${chartId}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={chartConfig.actual.color} stopOpacity={0.4} />
+                  <stop offset="95%" stopColor={chartConfig.actual.color} stopOpacity={0.1} />
+              </linearGradient>
 
               {providerKeys.map((key) => {
                  const providerConfig = chartConfig[key] as {label: string, color: string} | undefined;
