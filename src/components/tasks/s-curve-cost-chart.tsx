@@ -30,14 +30,11 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
   if (active && payload && payload.length) {
     const dataPoint = payload[0].payload as SCurveData;
     
-    // Filtra los proveedores con valor 0 para no mostrarlos en el tooltip
-    const relevantPayload = payload.filter(p => p.value && p.value > 0);
+    const relevantPayload = payload.filter(p => p.value !== null && p.value !== undefined && p.value > 0);
 
     const sortedPayload = [...relevantPayload].sort((a, b) => {
-        // "Planificado" siempre primero
         if (a.dataKey === 'planned') return -1;
         if (b.dataKey === 'planned') return 1;
-        // Luego ordenar por nombre de proveedor
         return (a.name || '').localeCompare(b.name || '');
     });
 
@@ -46,8 +43,6 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
         <p className="font-bold text-base mb-2">{`Fecha: ${label}`}</p>
         <div className="space-y-1.5">
            {sortedPayload.map((p) => {
-              if (p.value === null || p.value === undefined) return null;
-              
               const isPlanned = p.dataKey === 'planned';
               const value = p.value as number;
               const name = p.name as string;
@@ -56,7 +51,6 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
               if (isPlanned) {
                   cumulativeValue = dataPoint.cumulativePlannedValue;
               } else {
-                  // El valor acumulado para proveedores ya viene en la propiedad correcta
                   cumulativeValue = dataPoint[`${name}_value`] || 0;
               }
 
@@ -80,7 +74,6 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
   return null;
 };
 
-// Paleta de colores consistentes para los proveedores
 const providerColors = [
   "hsl(210, 40%, 50%)", 
   "hsl(160, 50%, 45%)", 
@@ -128,6 +121,8 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
 
     const yAxisTicks = Array.from({ length: 11 }, (_, i) => i * 10); 
 
+    const plannedGradientId = `${chartId}-planned`;
+
     return (
       <ChartContainer config={chartConfig} className="min-h-[250px] w-full h-full" ref={ref}>
         <ResponsiveContainer width="100%" height="100%">
@@ -159,6 +154,11 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
               className="text-xs"
             />
             <defs>
+              <linearGradient id={plannedGradientId} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={chartConfig.planned.color} stopOpacity={0.4} />
+                <stop offset="95%" stopColor={chartConfig.planned.color} stopOpacity={0.1} />
+              </linearGradient>
+
               {providerKeys.map((key) => {
                  const providerConfig = chartConfig[key] as {label: string, color: string} | undefined;
                  if (!providerConfig) return null;
@@ -187,12 +187,13 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
             <Area
               dataKey="planned"
               type="monotone"
-              fill={"transparent"}
+              fill={`url(#${plannedGradientId})`}
               stroke={chartConfig.planned.color}
               strokeWidth={2}
               activeDot={{ r: 6 }}
               dot={false}
               name={chartConfig.planned.label}
+              connectNulls
             />
             {providerKeys.map((key) => {
                 const providerConfig = chartConfig[key] as {label: string, color: string} | undefined;
