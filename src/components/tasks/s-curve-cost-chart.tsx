@@ -30,37 +30,40 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
   if (active && payload && payload.length) {
     const dataPoint = payload[0].payload as SCurveData;
     
-    const plannedPayload = payload.find(p => p.dataKey === 'planned');
-    const providerPayloads = payload.filter(p => p.dataKey !== 'planned');
-    
+    // Sort payload to have 'Planned' first, then by provider name
+    const sortedPayload = [...payload].sort((a, b) => {
+        if (a.dataKey === 'planned') return -1;
+        if (b.dataKey === 'planned') return 1;
+        return (a.name || '').localeCompare(b.name || '');
+    });
+
     return (
       <div className="p-4 bg-background/95 backdrop-blur-sm border rounded-lg shadow-xl text-sm min-w-[300px]">
         <p className="font-bold text-base mb-2">{`Fecha: ${label}`}</p>
         <div className="space-y-1.5">
-           {plannedPayload && (
-             <div className="flex justify-between items-center gap-4">
-                <span className="flex items-center">
-                    <div className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: plannedPayload.color || plannedPayload.stroke }} />
-                    {plannedPayload.name}:
-                </span>
-                <span className="font-mono font-semibold">
-                  {`${(plannedPayload.value as number || 0).toFixed(2)}%`}
-                  {` (${formatCurrency(dataPoint.cumulativePlannedValue, 0)})`}
-                </span>
-            </div>
-           )}
-           {providerPayloads.map((p) => {
-              if (!p.name || p.value === 0) return null;
-              const providerValue = dataPoint[`${p.name}_value`];
+           {sortedPayload.map((p) => {
+              if (p.value === null || p.value === undefined) return null;
+              
+              const isPlanned = p.dataKey === 'planned';
+              const value = p.value as number;
+              const name = p.name as string;
+              let cumulativeValue: number;
+
+              if (isPlanned) {
+                  cumulativeValue = dataPoint.cumulativePlannedValue;
+              } else {
+                  cumulativeValue = dataPoint[`${name}_value`] || 0;
+              }
+
               return (
                  <div key={p.dataKey} className="flex justify-between items-center gap-4">
                       <span className="flex items-center">
                           <div className="w-2.5 h-2.5 rounded-full mr-2" style={{ backgroundColor: p.color || p.stroke }} />
-                          {p.name}:
+                          {name}:
                       </span>
                       <span className="font-mono font-semibold">
-                        {`${(p.value as number || 0).toFixed(2)}%`}
-                        {` (${formatCurrency(providerValue, 0)})`}
+                        {`${value.toFixed(2)}%`}
+                        {` (${formatCurrency(cumulativeValue, 0)})`}
                       </span>
                   </div>
               )
@@ -90,7 +93,7 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
 
     const providerKeys = React.useMemo(() => {
         if (!data || data.length === 0) return [];
-        const standardKeys = new Set(['date', 'planned', 'actual', 'cumulativePlannedValue', 'cumulativeActualValue', 'deviation']);
+        const standardKeys = new Set(['date', 'planned', 'actual', 'cumulativePlannedValue', 'cumulativeActualValue', 'deviation', 'providerDistribution']);
         const providers = new Set<string>();
         data.forEach(d => {
             Object.keys(d).forEach(key => {
@@ -118,7 +121,7 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
         return config;
     }, [providerKeys]);
 
-    const yAxisTicks = Array.from({ length: 21 }, (_, i) => i * 5); // 0, 5, ..., 100
+    const yAxisTicks = Array.from({ length: 11 }, (_, i) => i * 10); // 0, 10, ..., 100
 
     return (
       <ChartContainer config={chartConfig} className="min-h-[250px] w-full h-full" ref={ref}>
@@ -146,7 +149,7 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
               axisLine={false}
               tickMargin={8}
               tickFormatter={(value) => `${value}%`}
-              domain={[0, 100]}
+              domain={[0, 'auto']}
               ticks={yAxisTicks}
               className="text-xs"
             />
@@ -207,7 +210,6 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
                         activeDot={{ r: 6 }}
                         dot={false}
                         name={providerConfig.label}
-                        stackId="providers"
                     />
                 )
             })}
