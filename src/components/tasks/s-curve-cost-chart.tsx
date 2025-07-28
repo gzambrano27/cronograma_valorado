@@ -30,9 +30,14 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
   if (active && payload && payload.length) {
     const dataPoint = payload[0].payload as SCurveData;
     
-    const sortedPayload = [...payload].sort((a, b) => {
+    // Filtra los proveedores con valor 0 para no mostrarlos en el tooltip
+    const relevantPayload = payload.filter(p => p.value && p.value > 0);
+
+    const sortedPayload = [...relevantPayload].sort((a, b) => {
+        // "Planificado" siempre primero
         if (a.dataKey === 'planned') return -1;
         if (b.dataKey === 'planned') return 1;
+        // Luego ordenar por nombre de proveedor
         return (a.name || '').localeCompare(b.name || '');
     });
 
@@ -51,6 +56,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
               if (isPlanned) {
                   cumulativeValue = dataPoint.cumulativePlannedValue;
               } else {
+                  // El valor acumulado para proveedores ya viene en la propiedad correcta
                   cumulativeValue = dataPoint[`${name}_value`] || 0;
               }
 
@@ -74,6 +80,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
   return null;
 };
 
+// Paleta de colores consistentes para los proveedores
 const providerColors = [
   "hsl(210, 40%, 50%)", 
   "hsl(160, 50%, 45%)", 
@@ -153,12 +160,13 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
             />
             <defs>
               {providerKeys.map((key) => {
-                 const providerConfig = chartConfig[key] as {label: string, color: string};
+                 const providerConfig = chartConfig[key] as {label: string, color: string} | undefined;
                  if (!providerConfig) return null;
+                 const gradientId = `${chartId}-${key.replace(/\s+/g, '-')}`;
                  return (
                     <linearGradient
-                        key={`fill-${key}`}
-                        id={`fill-${key}`}
+                        key={`gradient-${key}`}
+                        id={gradientId}
                         x1="0"
                         y1="0"
                         x2="0"
@@ -187,14 +195,15 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
               name={chartConfig.planned.label}
             />
             {providerKeys.map((key) => {
-                const providerConfig = chartConfig[key] as {label: string, color: string};
+                const providerConfig = chartConfig[key] as {label: string, color: string} | undefined;
                 if (!providerConfig) return null;
+                const gradientId = `${chartId}-${key.replace(/\s+/g, '-')}`;
                 return (
                     <Area
                         key={key}
                         dataKey={key}
                         type="monotone"
-                        fill={`url(#fill-${key})`}
+                        fill={`url(#${gradientId})`}
                         stroke={providerConfig.color}
                         strokeWidth={2}
                         activeDot={{ r: 6 }}
