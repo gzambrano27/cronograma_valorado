@@ -30,7 +30,6 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
   if (active && payload && payload.length) {
     const dataPoint = payload[0].payload as SCurveData;
     
-    // Sort payload to have 'Planned' first, then by provider name
     const sortedPayload = [...payload].sort((a, b) => {
         if (a.dataKey === 'planned') return -1;
         if (b.dataKey === 'planned') return 1;
@@ -75,25 +74,24 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
   return null;
 };
 
-// Paleta de colores cohesiva y profesional
 const providerColors = [
-  "hsl(210, 40%, 50%)", // Blue
-  "hsl(160, 50%, 45%)", // Teal
-  "hsl(262, 45%, 55%)", // Indigo
-  "hsl(310, 40%, 50%)", // Purple
-  "hsl(180, 40%, 40%)", // Cyan
-  "hsl(230, 50%, 60%)", // Royal Blue
-  "hsl(280, 45%, 58%)", // Violet
-  "hsl(190, 55%, 50%)", // Deep Cyan
+  "hsl(210, 40%, 50%)", 
+  "hsl(160, 50%, 45%)", 
+  "hsl(262, 45%, 55%)", 
+  "hsl(310, 40%, 50%)", 
+  "hsl(180, 40%, 40%)", 
+  "hsl(230, 50%, 60%)", 
+  "hsl(280, 45%, 58%)", 
+  "hsl(190, 55%, 50%)", 
 ];
 
 export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartProps>(
   ({ data }, ref) => {
-    const chartId = React.useId().replace(/:/g, "");
+    const chartId = React.useId();
 
     const providerKeys = React.useMemo(() => {
         if (!data || data.length === 0) return [];
-        const standardKeys = new Set(['date', 'planned', 'actual', 'cumulativePlannedValue', 'cumulativeActualValue', 'deviation', 'providerDistribution']);
+        const standardKeys = new Set(['date', 'planned', 'cumulativePlannedValue', 'actual', 'cumulativeActualValue', 'deviation', 'providerDistribution']);
         const providers = new Set<string>();
         data.forEach(d => {
             Object.keys(d).forEach(key => {
@@ -121,7 +119,7 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
         return config;
     }, [providerKeys]);
 
-    const yAxisTicks = Array.from({ length: 11 }, (_, i) => i * 10); // 0, 10, ..., 100
+    const yAxisTicks = Array.from({ length: 11 }, (_, i) => i * 10); 
 
     return (
       <ChartContainer config={chartConfig} className="min-h-[250px] w-full h-full" ref={ref}>
@@ -154,30 +152,22 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
               className="text-xs"
             />
             <defs>
-              {Object.entries(chartConfig).map(([key, config]) => {
-                const color = (config as { color: string }).color;
-                if (!color) return null;
-                return (
-                  <linearGradient
-                    key={`fill-${key}`}
-                    id={`fill-${key}-${chartId}`}
-                    x1="0"
-                    y1="0"
-                    x2="0"
-                    y2="1"
-                  >
-                    <stop
-                      offset="5%"
-                      stopColor={color}
-                      stopOpacity={0.4}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor={color}
-                      stopOpacity={0.1}
-                    />
-                  </linearGradient>
-                );
+              {providerKeys.map((key) => {
+                 const providerConfig = chartConfig[key] as {label: string, color: string};
+                 if (!providerConfig) return null;
+                 return (
+                    <linearGradient
+                        key={`fill-${key}`}
+                        id={`fill-${key}`}
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                    >
+                        <stop offset="5%" stopColor={providerConfig.color} stopOpacity={0.4} />
+                        <stop offset="95%" stopColor={providerConfig.color} stopOpacity={0.1} />
+                    </linearGradient>
+                 )
               })}
             </defs>
             <Tooltip
@@ -189,7 +179,7 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
             <Area
               dataKey="planned"
               type="monotone"
-              fill="transparent"
+              fill={"transparent"}
               stroke={chartConfig.planned.color}
               strokeWidth={2}
               activeDot={{ r: 6 }}
@@ -204,12 +194,13 @@ export const SCurveCostChart = React.forwardRef<HTMLDivElement, SCurveCostChartP
                         key={key}
                         dataKey={key}
                         type="monotone"
-                        fill={`url(#fill-${key}-${chartId})`}
+                        fill={`url(#fill-${key})`}
                         stroke={providerConfig.color}
                         strokeWidth={2}
                         activeDot={{ r: 6 }}
                         dot={false}
                         name={providerConfig.label}
+                        connectNulls
                     />
                 )
             })}
