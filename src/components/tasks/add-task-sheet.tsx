@@ -123,6 +123,7 @@ export function AddTaskSheet({ projectId, onSuccess }: { projectId: number, onSu
                             <SelectValue placeholder="Seleccione un proveedor" />
                         </SelectTrigger>
                         <SelectContent>
+                           <SelectItem value="null">Sin Asignar</SelectItem>
                            {partners.map(partner => (
                                <SelectItem key={partner.id} value={String(partner.id)}>
                                    {partner.name}

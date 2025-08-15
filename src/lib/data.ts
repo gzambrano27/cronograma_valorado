@@ -326,7 +326,6 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
     const cumulativeProviderValues: { [providerName: string]: number } = {};
     Array.from(allProviders).forEach(p => cumulativeProviderValues[p] = 0);
     
-    // Add a starting point at zero for all series
     const dayBefore = new Date(minDate.getTime() - 86400000);
     const startPoint: SCurveData = {
         date: format(dayBefore, "d MMM", { locale: es }),
@@ -338,7 +337,6 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
     };
     for (const provider of allProviders) {
         startPoint[provider] = 0;
-        startPoint[`${provider}_value`] = 0;
     }
     finalCurve.push(startPoint);
 
@@ -367,7 +365,7 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
 
         for (const provider of allProviders) {
              const providerValue = cumulativeProviderValues[provider];
-             dataPoint[provider] = (providerValue / totalProjectCost) * 100;
+             dataPoint[provider] = providerValue > 0 ? (providerValue / totalProjectCost) * 100 : null;
              dataPoint[`${provider}_value`] = providerValue;
         }
 
@@ -390,5 +388,6 @@ export async function getPartners(): Promise<Partner[]> {
         name: getTranslatedName(p.name)
     }));
 }
+
 
 

@@ -48,7 +48,7 @@ const TaskSchema = z.object({
     precio: z.coerce.number().min(0, { message: 'El precio no puede ser negativo.' }),
     startDate: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: 'Fecha de inicio inválida.' }),
     endDate: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: 'Fecha de fin inválida.' }),
-    partnerId: z.coerce.number().optional(),
+    partnerId: z.coerce.number().optional().nullable(),
 });
 
 // Crea el desglose de consumo diario para una tarea.
@@ -91,6 +91,7 @@ function createDailyConsumption(startDate: Date, endDate: Date, totalQuantity: n
 
 // Acción para crear una nueva tarea en la base de datos.
 export async function createTask(projectId: number, formData: FormData): Promise<{ success: boolean, message: string | null }> {
+  const rawPartnerId = formData.get('partnerId');
   const validatedFields = TaskSchema.safeParse({
     name: formData.get('name'),
     quantity: formData.get('quantity'),
@@ -98,7 +99,7 @@ export async function createTask(projectId: number, formData: FormData): Promise
     precio: formData.get('precio'),
     startDate: formData.get('startDate'),
     endDate: formData.get('endDate'),
-    partnerId: formData.get('partnerId'),
+    partnerId: rawPartnerId === 'null' ? null : rawPartnerId,
   });
 
   if (!validatedFields.success) {
