@@ -2,6 +2,7 @@
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import React from 'react';
+import { ThemeProvider } from '@/components/layout/theme-provider';
 
 // Layout raíz de la aplicación.
 // Este es el layout más básico que envuelve a todas las páginas.
@@ -27,10 +28,15 @@ export default function RootLayout({
          <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='currentColor'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Crect%20width='18'%20height='18'%20x='3'%20y='3'%20rx='2'/%3E%3Cpath%20d='M7%207h3v3H7z'/%3E%3Cpath%20d='M14%207h3v3h-3z'/%3E%3Cpath%20d='M7%2014h3v3H7z'/%3E%3Cpath%20d='M14%2014h3v3h-3z'/%3E%3C/svg%3E" />
       </head>
       <body className="font-body antialiased">
-        {/* El children representa el contenido de la página actual */}
-        {children}
-        {/* El Toaster es el componente que muestra las notificaciones (toasts) */}
-        <Toaster />
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem={false}
+            disableTransitionOnChange
+        >
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
