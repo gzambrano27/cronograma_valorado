@@ -289,7 +289,7 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
         return [];
     }
 
-    const valuesByDate = new Map<number, { planned: number; providers: { [providerName: string]: number } }>();
+    const valuesByDate = new Map<number, { planned: number; actual: number; providers: { [providerName: string]: number } }>();
     const allProviders = new Set<string>();
 
     let minDate: Date | null = null;
@@ -304,12 +304,13 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
                 const dayTimestamp = day.getTime();
 
                 if (!valuesByDate.has(dayTimestamp)) {
-                    valuesByDate.set(dayTimestamp, { planned: 0, providers: {} });
+                    valuesByDate.set(dayTimestamp, { planned: 0, actual: 0, providers: {} });
                 }
 
                 const dailyData = valuesByDate.get(dayTimestamp)!;
                 dailyData.planned += dc.plannedQuantity * task.cost;
                 dailyData.providers[providerName] = (dailyData.providers[providerName] || 0) + (dc.consumedQuantity * task.cost);
+                dailyData.actual += dc.consumedQuantity * task.cost;
 
                 if (!minDate || day < minDate) minDate = day;
                 if (!maxDate || day > maxDate) maxDate = day;
@@ -320,12 +321,15 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
     if (!minDate || !maxDate) return [];
 
     const dateRange = eachDayOfInterval({ start: minDate, end: maxDate });
-    const finalCurve: SCurveData[] = [];
     
     let cumulativePlannedValue = 0;
+    let cumulativeActualValue = 0;
     const cumulativeProviderValues: { [providerName: string]: number } = {};
     Array.from(allProviders).forEach(p => cumulativeProviderValues[p] = 0);
     
+    const finalCurve: SCurveData[] = [];
+
+    // Add a starting point at zero
     const dayBefore = new Date(minDate.getTime() - 86400000);
     const startPoint: SCurveData = {
         date: format(dayBefore, "d MMM", { locale: es }),
@@ -337,35 +341,32 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
     };
     for (const provider of allProviders) {
         startPoint[provider] = 0;
+        startPoint[`${provider}_value`] = 0;
     }
     finalCurve.push(startPoint);
 
 
     for (const day of dateRange) {
         const dayTimestamp = day.getTime();
-        const dailyData = valuesByDate.get(dayTimestamp) || { planned: 0, providers: {} };
+        const dailyData = valuesByDate.get(dayTimestamp) || { planned: 0, actual: 0, providers: {} };
 
         cumulativePlannedValue += dailyData.planned;
-        
-        let cumulativeActualCost = 0;
-        for (const provider of allProviders) {
-            cumulativeProviderValues[provider] += dailyData.providers[provider] || 0;
-            cumulativeActualCost += cumulativeProviderValues[provider];
-        }
+        cumulativeActualValue += dailyData.actual;
         
         const dataPoint: SCurveData = {
             date: format(day, "d MMM", { locale: es }),
             planned: (cumulativePlannedValue / totalProjectCost) * 100,
             cumulativePlannedValue,
-            actual: (cumulativeActualCost / totalProjectCost) * 100,
-            cumulativeActualValue: cumulativeActualCost,
-            deviation: 0,
+            actual: (cumulativeActualValue / totalProjectCost) * 100,
+            cumulativeActualValue,
+            deviation: 0, // Deviation logic might need review if 'actual' is the sum.
         };
         
 
         for (const provider of allProviders) {
+             cumulativeProviderValues[provider] += dailyData.providers[provider] || 0;
              const providerValue = cumulativeProviderValues[provider];
-             dataPoint[provider] = providerValue > 0 ? (providerValue / totalProjectCost) * 100 : null;
+             dataPoint[provider] = providerValue > 0 ? (providerValue / totalProjectCost) * 100 : 0;
              dataPoint[`${provider}_value`] = providerValue;
         }
 
@@ -388,6 +389,3 @@ export async function getPartners(): Promise<Partner[]> {
         name: getTranslatedName(p.name)
     }));
 }
-
-
-
