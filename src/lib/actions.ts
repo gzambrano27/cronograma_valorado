@@ -275,10 +275,6 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   
   const precioAttrDef = extendedAttrDefs.find((attr: any) => attr.Alias?.toLowerCase() === 'precio');
   const precioFieldId = precioAttrDef?.FieldID;
-
-  // Corregido: Buscar el costo en el campo "Texto1"
-  const costAttrDef = extendedAttrDefs.find((attr: any) => attr.Alias?.toLowerCase() === 'texto1');
-  const costFieldId = costAttrDef?.FieldID;
   
   const tasks = projectData.Tasks.Task;
 
@@ -302,9 +298,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
         let quantity = 0;
         let precio = 0;
         let cost = 0;
-        let totalTaskCost = 0;
-
-        // Level 5 tasks are the only ones with quantities and costs
+        
         if (level === 5) {
             if (Array.isArray(taskXml.ExtendedAttribute)) {
                 // Obtener Cantidad
@@ -320,17 +314,8 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
                 if (precioFieldId) {
                      const priceAttr = taskXml.ExtendedAttribute.find((attr: any) => attr.FieldID === precioFieldId);
                     if (priceAttr && priceAttr.Value != null) {
-                        const parsedPrice = parseFloat(priceAttr.Value);
+                        const parsedPrice = parseFloat(priceAttr.Value) / 100;
                         if (!isNaN(parsedPrice)) precio = parsedPrice;
-                    }
-                }
-
-                // Obtener Costo Programado (Texto1)
-                if (costFieldId) {
-                    const costAttr = taskXml.ExtendedAttribute.find((attr: any) => attr.FieldID === costFieldId);
-                    if (costAttr && costAttr.Value != null) {
-                        const parsedCost = parseFloat(costAttr.Value);
-                        if (!isNaN(parsedCost)) totalTaskCost = parsedCost;
                     }
                 }
             }
@@ -338,8 +323,11 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
             // Si cantidad es 0, no es una tarea facturable, saltarla.
             if (quantity === 0) continue;
             
-            // Calcular costo unitario
-            cost = totalTaskCost / quantity;
+            // Obtener Costo y calcular costo unitario
+            const totalTaskCost = parseFloat(taskXml.Cost);
+            if (!isNaN(totalTaskCost) && quantity > 0) {
+                 cost = totalTaskCost / quantity;
+            }
         }
 
 
