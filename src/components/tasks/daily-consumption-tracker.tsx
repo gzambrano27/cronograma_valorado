@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { DailyConsumption, Task } from "@/lib/types";
