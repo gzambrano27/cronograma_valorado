@@ -103,8 +103,7 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
       id: 'expander',
       header: () => null,
       cell: ({ row }) => {
-        const canExpand = row.getCanExpand();
-        if (!canExpand) return null;
+        if (!row.getCanExpand()) return null;
 
         return (
           <Button
@@ -394,6 +393,11 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
     onRowSelectionChange: setRowSelection,
     getExpandedRowModel: getExpandedRowModel(),
     onExpandedChange: setExpanded,
+    getCanExpand: (row) => {
+        // Allow expansion for rows that have children (groups)
+        // or are at level 5 (to show daily consumption)
+        return (row.subRows && row.subRows.length > 0) || row.original.level === 5;
+    },
     enableRowSelection: true,
     getSubRows: row => row.children,
     state: {
@@ -527,7 +531,7 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
                     onClick={() => row.toggleSelected(!row.getIsSelected())}
                     className={cn(
                         "cursor-pointer",
-                        row.getCanExpand() ? "font-semibold bg-muted/30 hover:bg-muted/60" : ""
+                        row.getCanExpand() && row.original.level < 5 ? "font-semibold bg-muted/30 hover:bg-muted/60" : ""
                     )}
                   >
                     {row.getVisibleCells().map((cell) => (
@@ -596,5 +600,3 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
     </div>
   )
 }
-
-    
