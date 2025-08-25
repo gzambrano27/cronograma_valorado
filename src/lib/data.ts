@@ -460,4 +460,3 @@ export async function getPartners(searchQuery?: string): Promise<Partner[]> {
         name: getTranslatedName(p.name)
     }));
 }
-
