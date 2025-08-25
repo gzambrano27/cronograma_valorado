@@ -1,3 +1,16 @@
+select * from externo_tasks
+select * from externo_task_daily_consumption
+select * from externo_task_validations
+
+-- Reiniciar IDs de externo_tasks
+ALTER SEQUENCE externo_tasks_id_seq RESTART WITH 1;
+
+-- Reiniciar IDs de externo_task_daily_consumption
+ALTER SEQUENCE externo_task_daily_consumption_id_seq RESTART WITH 1;
+
+-- Reiniciar IDs de externo_task_validations
+ALTER SEQUENCE externo_task_validations_id_seq RESTART WITH 1;
+
 -- Tabla para almacenar las tareas de los proyectos.
 CREATE TABLE IF NOT EXISTS "externo_tasks" (
     "id" SERIAL PRIMARY KEY,
