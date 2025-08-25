@@ -113,7 +113,7 @@ export function DailyConsumptionTracker({ task, onSuccess }: DailyConsumptionTra
                 
                 return (
                 <TableRow key={dateString}>
-                    <TableCell>{format(displayDate, "PPP", { locale: es })}</TableCell>
+                    <TableCell>{format(displayDate, "dd/MM/yyyy", { locale: es })}</TableCell>
                     <TableCell className="font-mono">{consumptionDay.plannedQuantity.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</TableCell>
                     <TableCell>
                       <Input
