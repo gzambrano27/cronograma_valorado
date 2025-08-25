@@ -7,6 +7,7 @@ import {
   ChevronDown,
   ChevronRight,
   Trash2,
+  ListTree
 } from "lucide-react"
 import {
   ColumnDef,
@@ -53,6 +54,7 @@ import { DeleteMultipleTasksDialog } from "./delete-multiple-tasks-dialog"
 import { cn, formatCurrency } from "@/lib/utils"
 import { useSession } from "@/hooks/use-session"
 import { PartnerCell } from "./partner-cell"
+import { DailyConsumptionDialog } from "./daily-consumption-dialog"
 
 const statusTranslations: Record<Task['status'], string> = {
     'pendiente': 'Pendiente',
@@ -67,7 +69,11 @@ const adjustDateForTimezone = (date: Date | string): Date => {
 };
 
 
-const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[] => {
+const getColumns = (
+    isManager: boolean, 
+    onSuccess: () => void,
+    onViewConsumption: (task: Task) => void
+): ColumnDef<Task>[] => {
   
   const columns: ColumnDef<Task>[] = [
     {
@@ -100,7 +106,8 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
       id: 'expander',
       header: () => null,
       cell: ({ row }) => {
-        return row.getCanExpand() ? (
+        const canExpand = row.getCanExpand();
+        return canExpand ? (
           <Button
               variant="ghost"
               size="icon"
@@ -118,7 +125,7 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
               )}
               <span className="sr-only">{row.getIsExpanded() ? 'Contraer' : 'Expandir'}</span>
           </Button>
-        ) : null
+        ) : <div className="w-6 h-6" />; // Placeholder for alignment
       },
       size: 40,
     },
@@ -142,7 +149,6 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
           return (
              <div 
                 className="flex items-center gap-2 capitalize font-medium"
-                style={{ paddingLeft: `${row.depth * 1.5}rem` }}
              >
                 <span className={cn(isGroup && "font-bold")}>{row.getValue("name")}</span>
              </div>
@@ -288,6 +294,25 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
       },
     },
     {
+      id: "consumption",
+      header: () => <div className="text-center pr-4">Desglose</div>,
+      cell: ({ row }) => {
+          if (row.original.level < 5) return null;
+          return (
+            <div className="text-center">
+              <Button variant="outline" size="sm" onClick={(e) => {
+                e.stopPropagation();
+                onViewConsumption(row.original);
+              }}>
+                <ListTree className="mr-2 h-3.5 w-3.5" />
+                Ver
+              </Button>
+            </div>
+          )
+      },
+      size: 100,
+    },
+    {
       id: "actions",
       header: () => <div className="text-right pr-4">Acciones</div>,
       cell: ({ row }) => {
@@ -315,9 +340,10 @@ const columnTranslations: Record<string, string> = {
     subtotalPVPActual: "Subtotal PVP Real",
     startDate: "Fecha Inicio",
     endDate: "Fecha Fin",
-    expander: "Expandir",
+    consumption: "Desglose",
     actions: "Acciones",
-    select: "Seleccionar"
+    select: "Seleccionar",
+    expander: "Expandir"
 };
 
 export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => void }) {
@@ -326,6 +352,14 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
   const { session } = useSession();
   const isManager = session.user?.isManager ?? false;
   
+  const [isConsumptionDialogOpen, setIsConsumptionDialogOpen] = React.useState(false);
+  const [selectedTaskForConsumption, setSelectedTaskForConsumption] = React.useState<Task | null>(null);
+
+  const handleViewConsumption = (task: Task) => {
+    setSelectedTaskForConsumption(task);
+    setIsConsumptionDialogOpen(true);
+  }
+
   const isMobile = useIsMobile();
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
     cost: false,
@@ -373,7 +407,7 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
   const [expanded, setExpanded] = React.useState<ExpandedState>({})
 
-  const columns = React.useMemo(() => getColumns(isManager, onSuccess), [isManager, onSuccess]);
+  const columns = React.useMemo(() => getColumns(isManager, onSuccess, handleViewConsumption), [isManager, onSuccess]);
 
 
   const table = useReactTable({
@@ -390,7 +424,8 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
     onExpandedChange: setExpanded,
     getSubRows: row => row.children,
     getCanExpand: (row) => {
-        return (row.original.children && row.original.children.length > 0) || row.original.level === 5;
+      // Can expand if it's a group (has children)
+      return !!row.original.children && row.original.children.length > 0;
     },
     state: {
       sorting,
@@ -406,6 +441,12 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
 
   return (
     <div className="w-full">
+      <DailyConsumptionDialog
+        task={selectedTaskForConsumption}
+        open={isConsumptionDialogOpen}
+        onOpenChange={setIsConsumptionDialogOpen}
+        onSuccess={onSuccess}
+      />
       {selectedTasks.length > 0 && (
           <>
               <DeleteMultipleTasksDialog
@@ -505,32 +546,28 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <React.Fragment key={row.id}>
-                  <TableRow
-                    data-state={row.getIsSelected() && "selected"}
-                    className={cn(
-                        row.original.level < 5 && "font-semibold bg-muted/30 hover:bg-muted/60"
-                    )}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} style={{
-                        paddingLeft: cell.column.id === 'name' ? `${row.depth * 1.5 + 1}rem` : undefined,
-                      }}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                  {row.getIsExpanded() && row.original.level === 5 && (
-                     <TableRow>
-                        <TableCell colSpan={columns.length}>
-                           <DailyConsumptionTracker task={row.original} onSuccess={onSuccess} />
-                        </TableCell>
-                     </TableRow>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className={cn(
+                      row.original.level < 5 && "font-semibold bg-muted/30 hover:bg-muted/60"
                   )}
-                </React.Fragment>
+                  style={{
+                    paddingLeft: `${row.depth * 1.5}rem`,
+                  }}
+                  onClick={() => row.getCanExpand() && row.toggleExpanded()}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} style={{
+                      paddingLeft: cell.column.id === 'name' ? `${row.depth * 1.5 + 1}rem` : undefined,
+                    }}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
               ))
             ) : (
               <TableRow>
