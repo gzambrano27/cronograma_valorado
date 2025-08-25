@@ -1,4 +1,3 @@
-
 // Este archivo define los tipos de datos principales utilizados en toda la aplicación.
 // Usar TypeScript y definir tipos claros ayuda a prevenir errores y mejora la mantenibilidad.
 
@@ -32,9 +31,13 @@ export type LoginResult = {
 
 // Representa el desglose de consumo diario para una tarea.
 export type DailyConsumption = {
+  id: number;
+  taskId: number;
   date: Date;
   plannedQuantity: number;
   consumedQuantity: number;
+  verifiedQuantity: number;
+  details: string;
 };
 
 // Tipo crudo para las validaciones de tareas, tal como vienen de la BD.
@@ -90,6 +93,17 @@ export type Project = {
   progress: number;
 };
 
+export type RawDailyConsumption = {
+  id: string;
+  taskid: string;
+  date: string;
+  planned_quantity: string;
+  consumed_quantity: string;
+  verified_quantity: string;
+  details: string;
+};
+
+
 // Tipo crudo para las tareas, tal como vienen de la BD.
 export type RawTask = {
   id: string;
@@ -103,7 +117,7 @@ export type RawTask = {
   enddate: string;
   validations?: RawTaskValidation[];
   status: 'pendiente' | 'en-progreso' | 'completado';
-  dailyconsumption?: DailyConsumption[];
+  dailyConsumption?: RawDailyConsumption[];
   partner_id?: string;
   partner_name?: any;
 };
@@ -154,6 +168,6 @@ export type UserGroupInfo = {
 }
 
 export type Partner = {
-    id?: number;
-    name?: string;
+    id: number;
+    name: string;
 }

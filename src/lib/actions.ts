@@ -1,7 +1,7 @@
 
 'use server';
 
-import type { Project, Task, TaskValidation, AppConfig, DailyConsumption, RawTask, LoginResult } from './types';
+import type { Project, Task, TaskValidation, AppConfig, DailyConsumption, RawTask, LoginResult, Partner } from './types';
 import fs from 'fs/promises';
 import path from 'path';
 import { z } from 'zod';
@@ -10,7 +10,7 @@ import { eachDayOfInterval, format } from 'date-fns';
 import { query } from './db';
 import { revalidatePath } from 'next/cache';
 import { getOdooClient } from './odoo-client';
-import { getTranslatedName, checkUserIsManager } from './auth-actions';
+import { getTranslatedName } from './utils';
 
 // NOTA: Este archivo contiene "Server Actions" de Next.js.
 // Estas funciones se ejecutan en el servidor y pueden ser llamadas directamente
@@ -52,10 +52,9 @@ const TaskSchema = z.object({
 });
 
 // Crea el desglose de consumo diario para una tarea.
-function createDailyConsumption(startDate: Date, endDate: Date, totalQuantity: number): DailyConsumption[] {
+function createDailyConsumption(startDate: Date, endDate: Date, totalQuantity: number): Omit<DailyConsumption, 'id' | 'taskId' | 'consumedQuantity' | 'verifiedQuantity' | 'details'>[] {
     if (totalQuantity === 0) return [];
 
-    // Asegura que las fechas estén en UTC para evitar problemas de zona horaria.
     const startUTC = new Date(Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()));
     const endUTC = new Date(Date.UTC(endDate.getFullYear(), endDate.getMonth(), endDate.getDate()));
 
@@ -65,12 +64,10 @@ function createDailyConsumption(startDate: Date, endDate: Date, totalQuantity: n
     if (totalDays <= 0) return [];
 
     const dailyPlannedQuantity = totalQuantity / totalDays;
-
     let distributedQuantity = 0;
 
-    const consumptionBreakdown = dates.map((date, index) => {
+    return dates.map((date, index) => {
         let plannedQtyForDay: number;
-        // Para el último día, asigna el resto para evitar errores de redondeo.
         if (index === totalDays - 1) {
             plannedQtyForDay = totalQuantity - distributedQuantity;
         } else {
@@ -81,11 +78,8 @@ function createDailyConsumption(startDate: Date, endDate: Date, totalQuantity: n
         return {
             date: date,
             plannedQuantity: plannedQtyForDay,
-            consumedQuantity: 0,
         };
     });
-
-    return consumptionBreakdown;
 }
 
 
@@ -98,7 +92,7 @@ export async function createTask(projectId: number, formData: FormData): Promise
     precio: formData.get('precio'),
     startDate: formData.get('startDate'),
     endDate: formData.get('endDate'),
-    partnerId: formData.get('partnerId'),
+    partnerId: formData.get('partnerId') || null,
   });
 
   if (!validatedFields.success) {
@@ -106,7 +100,6 @@ export async function createTask(projectId: number, formData: FormData): Promise
   }
 
   const { name, quantity, cost, precio, startDate, endDate, partnerId } = validatedFields.data;
-
   const start = new Date(startDate);
   const end = new Date(endDate);
 
@@ -115,14 +108,23 @@ export async function createTask(projectId: number, formData: FormData): Promise
   }
   
   try {
-    const dailyConsumption = createDailyConsumption(start, end, quantity);
+    const result = await query<{id: string}>(`
+      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "cost", "startdate", "enddate", "status", "consumedquantity", "partner_id")
+      VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', 0, $8)
+      RETURNING id
+    `, [projectId, name, quantity, precio, cost, start.toISOString(), end.toISOString(), partnerId]);
+    
+    const newTaskId = parseInt(result[0].id, 10);
+    const dailyConsumptionPlan = createDailyConsumption(start, end, quantity);
+
+    if (dailyConsumptionPlan.length > 0) {
+        const values = dailyConsumptionPlan.map(dc => `(${newTaskId}, '${format(dc.date, 'yyyy-MM-dd')}', ${dc.plannedQuantity})`).join(', ');
+        await query(`
+            INSERT INTO "externo_task_daily_consumption" (taskid, date, planned_quantity)
+            VALUES ${values}
+        `);
+    }
   
-    await query(`
-      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "cost", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption", "partner_id")
-      VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', 0, $8, $9)
-    `, [projectId, name, quantity, precio, cost, start.toISOString(), end.toISOString(), JSON.stringify(dailyConsumption), partnerId]);
-  
-    // Revalida las rutas para que Next.js actualice la caché y muestre los nuevos datos.
     revalidatePath(`/dashboard/projects-overview/${projectId}`);
     revalidatePath(`/dashboard`);
     return { success: true, message: 'Tarea creada con éxito.' };
@@ -155,54 +157,56 @@ export async function deleteMultipleTasks(taskIds: number[], projectId: number |
     return { success: true };
 }
 
-// Acción para actualizar el consumo diario de una tarea.
-export async function updateTaskConsumption(taskId: number, date: string, consumedQuantity: number) {
-    const result = await query<RawTask>(`SELECT * FROM "externo_tasks" WHERE id = $1`, [taskId]);
-    const taskData = result[0];
+export async function updateTaskConsumption(
+    taskId: number,
+    date: string,
+    consumedQuantity: number,
+    verifiedQuantity: number,
+    details: string
+) {
+    try {
+        await query(`
+            INSERT INTO "externo_task_daily_consumption" (taskid, date, consumed_quantity, verified_quantity, details)
+            VALUES ($1, $2, $3, $4, $5)
+            ON CONFLICT (taskid, date)
+            DO UPDATE SET
+                consumed_quantity = EXCLUDED.consumed_quantity,
+                verified_quantity = EXCLUDED.verified_quantity,
+                details = EXCLUDED.details;
+        `, [taskId, date, consumedQuantity, verifiedQuantity, details]);
 
+        // Recalcular el total consumido y actualizar el estado de la tarea principal
+        const result = await query<{ total_consumed: string }>(`
+            SELECT SUM(consumed_quantity) as total_consumed
+            FROM "externo_task_daily_consumption"
+            WHERE taskid = $1
+        `, [taskId]);
 
-    if (!taskData) {
-        throw new Error('Tarea no encontrada.');
+        const totalConsumed = parseFloat(result[0].total_consumed) || 0;
+        
+        const taskData = await query<RawTask>(`SELECT * FROM "externo_tasks" WHERE id = $1`, [taskId]);
+
+        if (taskData.length > 0) {
+            const taskQuantity = parseFloat(taskData[0].quantity);
+            const newStatus = totalConsumed >= taskQuantity ? 'completado' : (totalConsumed > 0 ? 'en-progreso' : 'pendiente');
+            
+            await query(`
+                UPDATE "externo_tasks"
+                SET consumedquantity = $1, status = $2
+                WHERE id = $3
+            `, [totalConsumed, newStatus, taskId]);
+
+            revalidatePath(`/dashboard/projects-overview/${taskData[0].projectid}`);
+            revalidatePath(`/dashboard`);
+        }
+
+        return { success: true };
+    } catch (error) {
+        console.error("Error al actualizar consumo:", error);
+        return { success: false, message: 'No se pudo guardar el consumo.' };
     }
-
-    const task = {
-        ...taskData,
-        quantity: parseFloat(taskData.quantity),
-        precio: parseFloat(taskData.value)
-    }
-
-    const dailyConsumption = (taskData.dailyconsumption || []).map(dc => ({
-      ...dc,
-      date: new Date(dc.date)
-    })) as DailyConsumption[];
-
-    const consumptionIndex = dailyConsumption.findIndex(c => {
-        const d = new Date(c.date);
-        const userTimezoneOffset = d.getTimezoneOffset() * 60000;
-        const adjustedDate = new Date(d.getTime() + userTimezoneOffset);
-        return format(adjustedDate, 'yyyy-MM-dd') === date;
-    });
-
-    if (consumptionIndex > -1) {
-        dailyConsumption[consumptionIndex].consumedQuantity = consumedQuantity;
-    }
-
-    const totalConsumed = dailyConsumption.reduce((sum, c) => sum + c.consumedQuantity, 0);
-    const newStatus = totalConsumed >= task.quantity ? 'completado' : (totalConsumed > 0 ? 'en-progreso' : 'pendiente');
-
-    await query(`
-        UPDATE "externo_tasks"
-        SET
-            "dailyconsumption" = $1,
-            "consumedquantity" = $2,
-            "status" = $3
-        WHERE id = $4
-    `, [JSON.stringify(dailyConsumption), totalConsumed, newStatus, taskId]);
-
-    revalidatePath(`/dashboard/projects-overview/${taskData.projectid}`);
-    revalidatePath(`/dashboard`);
-    return { success: true };
 }
+
 
 // Esquema de validación para la validación de tareas.
 const ValidateTaskSchema = z.object({
@@ -294,26 +298,25 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   const cantidadFieldId = cantidadAttrDef?.FieldID;
   const precioAttrDef = extendedAttrDefs.find((attr: any) => attr.Alias?.toLowerCase() === 'precio');
   const precioFieldId = precioAttrDef?.FieldID;
-
-  const newTasks: Omit<Task, 'id' | 'consumedQuantity' | 'validations' | 'status'>[] = [];
+  const newTasks: Omit<Task, 'id' | 'consumedQuantity' | 'validations' | 'status' | 'dailyConsumption'>[] = [];
   const tasks = projectData.Tasks.Task;
 
-  for (const task of tasks) {
+  for (const taskXml of tasks) {
     try {
-        if (task.OutlineLevel !== 5 || !task.Name) continue;
+        if (taskXml.OutlineLevel !== 5 || !taskXml.Name) continue;
 
-        const startDate = new Date(task.Start);
-        const endDate = new Date(task.Finish);
+        const startDate = new Date(taskXml.Start);
+        const endDate = new Date(taskXml.Finish);
 
         if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) continue;
 
-        const costRaw = task.FixedCost ?? task.Cost;
+        const costRaw = taskXml.FixedCost ?? taskXml.Cost;
         if (costRaw === undefined || costRaw === null) continue;
         const totalTaskCost = parseFloat(costRaw);
         
         let quantity = 0;
-        if (cantidadFieldId && Array.isArray(task.ExtendedAttribute)) {
-            const quantityAttr = task.ExtendedAttribute.find((attr: any) => attr.FieldID === cantidadFieldId);
+        if (cantidadFieldId && Array.isArray(taskXml.ExtendedAttribute)) {
+            const quantityAttr = taskXml.ExtendedAttribute.find((attr: any) => attr.FieldID === cantidadFieldId);
             if (quantityAttr && quantityAttr.Value != null) {
                 const parsedQuantity = parseFloat(quantityAttr.Value);
                 if (!isNaN(parsedQuantity)) quantity = parsedQuantity;
@@ -321,8 +324,8 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
         }
         
         let totalTaskPrice = 0;
-        if (precioFieldId && Array.isArray(task.ExtendedAttribute)) {
-             const priceAttr = task.ExtendedAttribute.find((attr: any) => attr.FieldID === precioFieldId);
+        if (precioFieldId && Array.isArray(taskXml.ExtendedAttribute)) {
+             const priceAttr = taskXml.ExtendedAttribute.find((attr: any) => attr.FieldID === precioFieldId);
             if (priceAttr && priceAttr.Value != null) {
                 const parsedPrice = parseFloat(priceAttr.Value) / 100;
                 if (!isNaN(parsedPrice)) totalTaskPrice = parsedPrice;
@@ -330,40 +333,34 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
         }
 
         if (quantity === 0) continue;
-
         const cost = quantity > 0 ? totalTaskCost / quantity : 0;
         const precio = quantity > 0 ? totalTaskPrice / quantity : 0;
-        const dailyConsumption = createDailyConsumption(startDate, endDate, quantity);
 
-        newTasks.push({
-            projectId,
-            name: task.Name,
-            quantity,
-            precio,
-            cost,
-            startDate,
-            endDate,
-            dailyConsumption,
-        });
+        const taskResult = await query<{id: string}>(`
+          INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "cost", "startdate", "enddate", "status", "consumedquantity")
+          VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', 0)
+          RETURNING id
+        `, [projectId, taskXml.Name, quantity, precio, cost, startDate.toISOString(), endDate.toISOString()]);
+
+        const newTaskId = parseInt(taskResult[0].id, 10);
+        const dailyConsumptionPlan = createDailyConsumption(startDate, endDate, quantity);
+        
+        if (dailyConsumptionPlan.length > 0) {
+            const values = dailyConsumptionPlan.map(dc => `(${newTaskId}, '${format(dc.date, 'yyyy-MM-dd')}', ${dc.plannedQuantity})`).join(', ');
+            await query(`
+                INSERT INTO "externo_task_daily_consumption" (taskid, date, planned_quantity)
+                VALUES ${values}
+            `);
+        }
+
     } catch (e) {
-        console.error("Error procesando tarea del XML:", task?.Name, e);
+        console.error("Error procesando tarea del XML:", taskXml?.Name, e);
     }
   }
-
-  if (newTasks.length === 0) {
-    throw new Error('No se encontraron tareas válidas para importar (verifique que tengan costo, precio y cantidad).');
-  }
-
-  for (const task of newTasks) {
-    await query(`
-      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "cost", "startdate", "enddate", "status", "consumedquantity", "dailyconsumption")
-      VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', 0, $8)
-    `, [task.projectId, task.name, task.quantity, task.precio, task.cost, task.startDate.toISOString(), task.endDate.toISOString(), JSON.stringify(task.dailyConsumption)]);
-  }
-
+  
   revalidatePath(`/dashboard/projects-overview/${projectId}`);
   revalidatePath(`/dashboard`);
-  return { success: true, message: `${newTasks.length} tareas importadas.` };
+  return { success: true, message: `${tasks.length} tareas procesadas.` };
 }
 
 export async function updateTaskPartner(taskId: number, partnerId: number | null): Promise<{ success: boolean; message?: string }> {

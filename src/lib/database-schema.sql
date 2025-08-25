@@ -10,7 +10,6 @@ CREATE TABLE IF NOT EXISTS "externo_tasks" (
     "startdate" TIMESTAMP WITH TIME ZONE,
     "enddate" TIMESTAMP WITH TIME ZONE,
     "status" VARCHAR(50) DEFAULT 'pendiente',
-    "dailyconsumption" JSONB,
     "displayorder" INTEGER,
     "partner_id" INTEGER,
     CONSTRAINT fk_project
@@ -18,22 +17,38 @@ CREATE TABLE IF NOT EXISTS "externo_tasks" (
 	  REFERENCES "project_project"("id")
 	  ON DELETE CASCADE,
     CONSTRAINT fk_partner
-      FOREIGN KEY("partner_id")
-      REFERENCES "res_partner"("id")
-      ON DELETE SET NULL
+        FOREIGN KEY("partner_id")
+        REFERENCES "res_partner"("id")
+        ON DELETE SET NULL
 );
+
+-- Tabla para el desglose diario de consumo de las tareas.
+CREATE TABLE IF NOT EXISTS "externo_task_daily_consumption" (
+    "id" SERIAL PRIMARY KEY,
+    "taskid" INTEGER NOT NULL,
+    "date" DATE NOT NULL,
+    "planned_quantity" NUMERIC(14, 2) DEFAULT 0,
+    "consumed_quantity" NUMERIC(14, 2) DEFAULT 0,
+    "verified_quantity" NUMERIC(14, 2) DEFAULT 0,
+    "details" TEXT,
+    CONSTRAINT fk_task_consumption
+      FOREIGN KEY("taskid")
+	  REFERENCES "externo_tasks"("id")
+	  ON DELETE CASCADE,
+    UNIQUE("taskid", "date") -- Asegura que solo haya un registro por tarea y día.
+);
+
 
 -- Comentarios sobre las columnas de "externo_tasks":
 -- "id": Identificador único de la tarea.
 -- "projectid": Clave foránea al proyecto en "project_project".
 -- "name": Nombre de la tarea.
 -- "quantity": Cantidad total planificada.
--- "consumedquantity": Cantidad real consumida.
+-- "consumedquantity": Cantidad real consumida total (agregada).
 -- "value": Valor unitario (PVP).
 -- "startdate": Fecha de inicio planificada.
 -- "enddate": Fecha de fin planificada.
 -- "status": Estado actual ('pendiente', 'en-progreso', 'completado').
--- "dailyconsumption": JSON que almacena el desglose diario del consumo.
 -- "displayorder": Campo para el ordenamiento visual.
 -- "partner_id": Clave foránea al proveedor en "res_partner".
 
@@ -70,3 +85,4 @@ CREATE INDEX IF NOT EXISTS idx_externo_tasks_projectid ON "externo_tasks" ("proj
 CREATE INDEX IF NOT EXISTS idx_externo_task_validations_taskid ON "externo_task_validations" ("taskid");
 CREATE INDEX IF NOT EXISTS idx_externo_task_validations_userid ON "externo_task_validations" ("userid");
 CREATE INDEX IF NOT EXISTS idx_externo_tasks_partner_id ON "externo_tasks" ("partner_id");
+CREATE INDEX IF NOT EXISTS idx_externo_task_daily_consumption_taskid ON "externo_task_daily_consumption" ("taskid");

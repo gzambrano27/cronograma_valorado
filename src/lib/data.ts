@@ -1,6 +1,6 @@
 
 'use server';
-import type { Project, Task, SCurveData, AppConfig, TaskValidation, RawTask, RawTaskValidation, RawProject, Partner } from './types';
+import type { Project, Task, SCurveData, AppConfig, TaskValidation, RawTask, RawTaskValidation, RawProject, Partner, RawDailyConsumption, DailyConsumption } from './types';
 import fs from 'fs/promises';
 import path from 'path';
 import { eachDayOfInterval, format, startOfDay } from 'date-fns';
@@ -31,11 +31,14 @@ function processTask(rawTask: RawTask): Task {
     startDate: new Date(rawTask.startdate),
     endDate: new Date(rawTask.enddate),
     status: rawTask.status,
-    dailyConsumption: (rawTask.dailyconsumption || []).map((dc: any) => ({
-      ...dc,
+    dailyConsumption: (rawTask.dailyConsumption || []).map((dc: RawDailyConsumption) => ({
+      id: parseInt(dc.id, 10),
+      taskId: parseInt(dc.taskid, 10),
       date: new Date(dc.date),
-      plannedQuantity: toFloat(dc.plannedQuantity),
-      consumedQuantity: toFloat(dc.consumedQuantity),
+      plannedQuantity: toFloat(dc.planned_quantity),
+      consumedQuantity: toFloat(dc.consumed_quantity),
+      verifiedQuantity: toFloat(dc.verified_quantity),
+      details: dc.details || '',
     })),
     validations: (rawTask.validations || []).map((v: RawTaskValidation) => ({
       id: parseInt(v.id, 10),
@@ -140,12 +143,16 @@ export async function getTasksByProjectId(id: number): Promise<Task[]> {
       SELECT 
         t.*,
         p.name as partner_name,
-        -- Subconsulta para agregar las validaciones de cada tarea como un array JSON.
         (
           SELECT json_agg(v.*)
           FROM "externo_task_validations" v
           WHERE v.taskid = t.id
-        ) as validations
+        ) as validations,
+        (
+          SELECT json_agg(dc.* ORDER BY dc.date)
+          FROM "externo_task_daily_consumption" dc
+          WHERE dc.taskid = t.id
+        ) as "dailyConsumption"
       FROM "externo_tasks" t
       LEFT JOIN res_partner p ON t.partner_id = p.id
       WHERE t.projectid = $1
@@ -289,7 +296,7 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
         return [];
     }
 
-    const valuesByDate = new Map<number, { planned: number; providers: { [providerName: string]: number } }>();
+    const valuesByDate = new Map<number, { planned: number; actual: number; providers: { [providerName: string]: number } }>();
     const allProviders = new Set<string>();
 
     let minDate: Date | null = null;
@@ -304,12 +311,14 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
                 const dayTimestamp = day.getTime();
 
                 if (!valuesByDate.has(dayTimestamp)) {
-                    valuesByDate.set(dayTimestamp, { planned: 0, providers: {} });
+                    valuesByDate.set(dayTimestamp, { planned: 0, actual: 0, providers: {} });
                 }
 
                 const dailyData = valuesByDate.get(dayTimestamp)!;
                 dailyData.planned += dc.plannedQuantity * task.cost;
-                dailyData.providers[providerName] = (dailyData.providers[providerName] || 0) + (dc.consumedQuantity * task.cost);
+                const consumedCostForDay = dc.consumedQuantity * task.cost;
+                dailyData.actual += consumedCostForDay;
+                dailyData.providers[providerName] = (dailyData.providers[providerName] || 0) + consumedCostForDay;
 
                 if (!minDate || day < minDate) minDate = day;
                 if (!maxDate || day > maxDate) maxDate = day;
@@ -323,6 +332,7 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
     const finalCurve: SCurveData[] = [];
     
     let cumulativePlannedValue = 0;
+    let cumulativeActualValue = 0;
     const cumulativeProviderValues: { [providerName: string]: number } = {};
     Array.from(allProviders).forEach(p => cumulativeProviderValues[p] = 0);
     
@@ -344,24 +354,21 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
 
     for (const day of dateRange) {
         const dayTimestamp = day.getTime();
-        const dailyData = valuesByDate.get(dayTimestamp) || { planned: 0, providers: {} };
+        const dailyData = valuesByDate.get(dayTimestamp) || { planned: 0, actual: 0, providers: {} };
 
         cumulativePlannedValue += dailyData.planned;
+        cumulativeActualValue += dailyData.actual;
         
-        let cumulativeActualCost = 0;
         for (const provider of allProviders) {
             cumulativeProviderValues[provider] += dailyData.providers[provider] || 0;
         }
-        // Recalculate total after updating all providers for the day
-        cumulativeActualCost = Object.values(cumulativeProviderValues).reduce((a, b) => a + b, 0);
-
         
         const dataPoint: SCurveData = {
             date: format(day, "d MMM", { locale: es }),
             planned: (cumulativePlannedValue / totalProjectCost) * 100,
             cumulativePlannedValue,
-            actual: (cumulativeActualCost / totalProjectCost) * 100,
-            cumulativeActualValue: cumulativeActualCost,
+            actual: (cumulativeActualValue / totalProjectCost) * 100,
+            cumulativeActualValue,
             deviation: 0,
         };
         
@@ -375,8 +382,13 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
         finalCurve.push(dataPoint);
     }
     
-    return finalCurve;
+    return finalCurve.map(point => ({
+        ...point,
+        planned: point.planned ? Math.max(0, point.planned) : 0,
+        actual: point.actual ? Math.max(0, point.actual) : 0,
+    }));
 }
+
 
 export async function getPartners(searchQuery?: string): Promise<Partner[]> {
     let sqlQuery = `
@@ -391,7 +403,7 @@ export async function getPartners(searchQuery?: string): Promise<Partner[]> {
         params.push(`%${searchQuery}%`);
     }
 
-    sqlQuery += ` ORDER BY name`;
+    sqlQuery += ` ORDER BY name LIMIT 50`;
 
     const partners = await query<{id: number, name: any}>(sqlQuery, params);
 
