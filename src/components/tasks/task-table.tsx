@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import * as React from "react"
@@ -230,8 +231,8 @@ const getColumns = (
           id: "subtotalCostValued",
           header: () => <div className="text-right">Subtotal Costo Valorado</div>,
           cell: ({ row }) => {
-              if (row.original.level < 5) return null;
-              const subtotal = row.original.quantity * row.original.cost;
+              const task = row.original;
+              const subtotal = task.level < 5 ? task.totalCost : task.quantity * task.cost;
               return <div className="text-right font-mono">{formatCurrency(subtotal)}</div>;
           }
         },
@@ -257,8 +258,8 @@ const getColumns = (
           id: "subtotalPVPValued",
           header: () => <div className="text-right">Subtotal PVP Valorado</div>,
           cell: ({ row }) => {
-              if (row.original.level < 5) return null;
-              const subtotal = row.original.quantity * row.original.precio;
+              const task = row.original;
+              const subtotal = task.level < 5 ? task.totalValue : task.quantity * task.precio;
               return <div className="text-right font-mono">{formatCurrency(subtotal)}</div>;
           }
         },

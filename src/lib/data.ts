@@ -1,4 +1,5 @@
 
+
 'use server';
 import type { Project, Task, SCurveData, TaskValidation, RawTask, RawTaskValidation, RawProject, Partner, RawDailyConsumption, DailyConsumption } from './types';
 import { eachDayOfInterval, format, startOfDay } from 'date-fns';
@@ -31,6 +32,8 @@ function processTask(rawTask: RawTask): Task {
     status: rawTask.status,
     level: rawTask.level ? parseInt(rawTask.level, 10) : 0,
     parentId: rawTask.parentid ? parseInt(rawTask.parentid, 10) : null,
+    totalCost: toFloat(rawTask.totalcost),
+    totalValue: toFloat(rawTask.totalvalue),
     dailyConsumption: (rawTask.dailyconsumption || []).map((dc: RawDailyConsumption) => ({
       id: parseInt(dc.id, 10),
       taskId: parseInt(dc.taskid, 10),
@@ -126,6 +129,37 @@ export async function getTasks(): Promise<Task[]> {
   return tasks_raw.map(processTask);
 }
 
+// Función recursiva para calcular la suma de los valores de las tareas hijas.
+function calculateAggregates(task: Task): { totalCost: number; totalValue: number } {
+  if (task.level === 5) {
+    const totalCost = task.quantity * task.cost;
+    const totalValue = task.quantity * task.precio;
+    // Asigna los valores calculados para que estén disponibles en el objeto
+    task.totalCost = totalCost;
+    task.totalValue = totalValue;
+    return { totalCost, totalValue };
+  }
+
+  if (!task.children || task.children.length === 0) {
+    return { totalCost: 0, totalValue: 0 };
+  }
+
+  let cumulativeCost = 0;
+  let cumulativeValue = 0;
+
+  task.children.forEach(child => {
+    const childAggregates = calculateAggregates(child);
+    cumulativeCost += childAggregates.totalCost;
+    cumulativeValue += childAggregates.totalValue;
+  });
+
+  task.totalCost = cumulativeCost;
+  task.totalValue = cumulativeValue;
+  
+  return { totalCost: cumulativeCost, totalValue: cumulativeValue };
+}
+
+
 // Obtiene las tareas de un proyecto específico por su ID.
 export async function getTasksByProjectId(id: number): Promise<Task[]> {
     const rawTasks = await query<RawTask>(`
@@ -204,6 +238,9 @@ export async function getTasksByProjectId(id: number): Promise<Task[]> {
             rootTasks.push(task);
         }
     });
+
+    // Calcular los agregados para todas las tareas raíz
+    rootTasks.forEach(calculateAggregates);
 
     return rootTasks;
 }

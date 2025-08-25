@@ -1,4 +1,5 @@
 
+
 // Este archivo define los tipos de datos principales utilizados en toda la aplicación.
 // Usar TypeScript y definir tipos claros ayuda a prevenir errores y mejora la mantenibilidad.
 
@@ -118,6 +119,8 @@ export type RawTask = {
   enddate: string;
   level: string;
   parentid: string | null;
+  totalcost?: string;
+  totalvalue?: string;
   validations?: RawTaskValidation[];
   status: 'pendiente' | 'en-progreso' | 'completado';
   dailyconsumption?: RawDailyConsumption[];
@@ -138,6 +141,8 @@ export type Task = {
   endDate: Date;
   level: number;
   parentId: number | null;
+  totalCost?: number;
+  totalValue?: number;
   children?: Task[];
   validations?: TaskValidation[];
   status: 'pendiente' | 'en-progreso' | 'completado';
@@ -172,4 +177,3 @@ export type Partner = {
     id: number;
     name: string;
 }
-
