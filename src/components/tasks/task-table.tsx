@@ -16,11 +16,9 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   getExpandedRowModel,
   useReactTable,
-  Row,
   RowSelectionState,
   ExpandedState,
 } from "@tanstack/react-table"
@@ -52,8 +50,6 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { Checkbox } from "../ui/checkbox"
 import { DeleteMultipleTasksDialog } from "./delete-multiple-tasks-dialog"
-import { Switch } from "../ui/switch"
-import { Label } from "../ui/label"
 import { cn, formatCurrency } from "@/lib/utils"
 import { useSession } from "@/hooks/use-session"
 import { PartnerCell } from "./partner-cell"
@@ -381,13 +377,22 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
 
   const columns = React.useMemo(() => getColumns(isManager, onSuccess), [isManager, onSuccess]);
 
+  // Pagination by top-level group
+  const topLevelGroups = React.useMemo(() => data.filter(task => task.level === 3), [data]);
+  const [currentGroupIndex, setCurrentGroupIndex] = React.useState(0);
+  
+  const displayedData = React.useMemo(() => {
+    if (topLevelGroups.length === 0) return data; // Fallback for flat lists
+    return [topLevelGroups[currentGroupIndex]];
+  }, [data, topLevelGroups, currentGroupIndex]);
+
+
   const table = useReactTable({
-    data,
+    data: displayedData,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -409,6 +414,13 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const selectedTasks = table.getFilteredSelectedRowModel().rows.map(row => row.original);
+
+  const goToNextGroup = () => {
+    setCurrentGroupIndex(prev => Math.min(prev + 1, topLevelGroups.length - 1));
+  };
+  const goToPreviousGroup = () => {
+    setCurrentGroupIndex(prev => Math.max(prev - 1, 0));
+  };
 
   return (
     <div className="w-full">
@@ -514,27 +526,16 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
                 <React.Fragment key={row.id}>
                   <TableRow
                     data-state={row.getIsSelected() && "selected"}
-                    onClick={(e) => {
-                      // Solo permite seleccionar/deseleccionar la fila.
-                      // La expansión se maneja con el botón de la flecha.
-                      row.toggleSelected(!row.getIsSelected())
-                    }}
                     className={cn(
-                        "cursor-pointer",
                         row.getCanExpand() && row.original.level < 5 ? "font-semibold bg-muted/30 hover:bg-muted/60" : ""
                     )}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} onClick={(e) => {
-                          if (cell.column.id === 'expander') {
+                        // Let checkbox handle its own click
+                        if(cell.column.id === 'select' || cell.column.id === 'actions') {
                             e.stopPropagation();
-                            row.toggleExpanded();
-                          } else if (cell.column.id !== 'select') {
-                              // No hacer nada especial, el onClick de la fila se encarga
-                          } else {
-                            // Detener la propagación para el checkbox para evitar que la fila se seleccione/deseleccione dos veces
-                            e.stopPropagation();
-                          }
+                        }
                       }}>
                         {flexRender(
                           cell.column.columnDef.cell,
@@ -564,6 +565,29 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
             )}
           </TableBody>
         </Table>
+      </div>
+       <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="flex-1 text-sm text-muted-foreground">
+            {`Mostrando agrupador ${currentGroupIndex + 1} de ${topLevelGroups.length}`}
+        </div>
+        <div className="space-x-2">
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={goToPreviousGroup}
+                disabled={currentGroupIndex === 0}
+            >
+                Agrupador Anterior
+            </Button>
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={goToNextGroup}
+                disabled={currentGroupIndex >= topLevelGroups.length - 1}
+            >
+                Siguiente Agrupador
+            </Button>
+        </div>
       </div>
     </div>
   )
