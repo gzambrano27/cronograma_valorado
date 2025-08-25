@@ -377,18 +377,9 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
 
   const columns = React.useMemo(() => getColumns(isManager, onSuccess), [isManager, onSuccess]);
 
-  // Pagination by top-level group
-  const topLevelGroups = React.useMemo(() => data.filter(task => task.level === 3), [data]);
-  const [currentGroupIndex, setCurrentGroupIndex] = React.useState(0);
-  
-  const displayedData = React.useMemo(() => {
-    if (topLevelGroups.length === 0) return data; // Fallback for flat lists
-    return [topLevelGroups[currentGroupIndex]];
-  }, [data, topLevelGroups, currentGroupIndex]);
-
 
   const table = useReactTable({
-    data: displayedData,
+    data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -401,7 +392,8 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
     onExpandedChange: setExpanded,
     getSubRows: row => row.children,
     getCanExpand: (row) => {
-        return (row.subRows && row.subRows.length > 0) || row.original.level === 5;
+        // Can expand if it's a group (level < 5) or if it's a level 5 task to show consumption
+        return (row.original.children && row.original.children.length > 0) || row.original.level === 5;
     },
     state: {
       sorting,
@@ -414,13 +406,6 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const selectedTasks = table.getFilteredSelectedRowModel().rows.map(row => row.original);
-
-  const goToNextGroup = () => {
-    setCurrentGroupIndex(prev => Math.min(prev + 1, topLevelGroups.length - 1));
-  };
-  const goToPreviousGroup = () => {
-    setCurrentGroupIndex(prev => Math.max(prev - 1, 0));
-  };
 
   return (
     <div className="w-full">
@@ -527,15 +512,12 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
                   <TableRow
                     data-state={row.getIsSelected() && "selected"}
                     className={cn(
-                        row.getCanExpand() && row.original.level < 5 ? "font-semibold bg-muted/30 hover:bg-muted/60" : ""
+                        row.original.level < 5 && "font-semibold bg-muted/30 hover:bg-muted/60"
                     )}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} onClick={(e) => {
-                        // Let checkbox handle its own click
-                        if(cell.column.id === 'select' || cell.column.id === 'actions') {
-                            e.stopPropagation();
-                        }
+                      <TableCell key={cell.id} style={{
+                        paddingLeft: cell.column.id === 'name' ? `${row.depth * 1.5 + 1}rem` : undefined,
                       }}>
                         {flexRender(
                           cell.column.columnDef.cell,
@@ -546,7 +528,7 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
                   </TableRow>
                   {row.getIsExpanded() && row.original.level === 5 && (
                      <TableRow>
-                        <TableCell colSpan={row.getVisibleCells().length}>
+                        <TableCell colSpan={columns.length}>
                            <DailyConsumptionTracker task={row.original} onSuccess={onSuccess} />
                         </TableCell>
                      </TableRow>
@@ -565,29 +547,6 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
             )}
           </TableBody>
         </Table>
-      </div>
-       <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-            {`Mostrando agrupador ${currentGroupIndex + 1} de ${topLevelGroups.length}`}
-        </div>
-        <div className="space-x-2">
-            <Button
-                variant="outline"
-                size="sm"
-                onClick={goToPreviousGroup}
-                disabled={currentGroupIndex === 0}
-            >
-                Agrupador Anterior
-            </Button>
-            <Button
-                variant="outline"
-                size="sm"
-                onClick={goToNextGroup}
-                disabled={currentGroupIndex >= topLevelGroups.length - 1}
-            >
-                Siguiente Agrupador
-            </Button>
-        </div>
       </div>
     </div>
   )
