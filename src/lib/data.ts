@@ -235,10 +235,8 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
     const taskIds = level5Tasks.map(t => t.id);
     if (taskIds.length === 0) return [];
     
-    // Crear un mapa de tareas para acceder fácilmente a su precio.
     const taskMap = new Map<number, Task>(level5Tasks.map(t => [t.id, t]));
 
-    // Consultar todo el consumo diario para las tareas del proyecto de una sola vez.
     const dailyConsumptions = await query<RawDailyConsumption>(`
         SELECT * FROM externo_task_daily_consumption 
         WHERE taskid IN (${taskIds.map((_, i) => `$${i + 1}`).join(',')})
@@ -252,7 +250,6 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
     let minDate: Date | null = null;
     let maxDate: Date | null = null;
 
-    // Agrupar los valores planificados y reales por fecha.
     for (const dc of dailyConsumptions) {
         const task = taskMap.get(parseInt(dc.taskid));
         if (!task) continue;
@@ -282,7 +279,17 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
     let cumulativePlanned = 0;
     let cumulativeActual = 0;
 
-    // Calcula los valores acumulados para cada día en el rango.
+    // Añade un punto de inicio en cero en el día anterior.
+    const dayBefore = new Date(minDate.getTime() - 86400000);
+    finalCurve.push({
+      date: format(dayBefore, "d MMM", { locale: es }),
+      planned: 0,
+      actual: 0,
+      cumulativePlannedValue: 0,
+      cumulativeActualValue: 0,
+      deviation: 0,
+    });
+
     for (const day of dateRange) {
       const dayTimestamp = day.getTime();
       const dailyValues = valuesByDate.get(dayTimestamp) || { planned: 0, actual: 0 };
@@ -303,20 +310,6 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
       });
     }
 
-    // Añade un punto de inicio en cero si es necesario.
-    if (finalCurve.length > 0 && minDate) {
-       const dayBefore = new Date(minDate.getTime() - 86400000);
-        finalCurve.unshift({
-          date: format(dayBefore, "d MMM", { locale: es }),
-          planned: 0,
-          actual: 0,
-          cumulativePlannedValue: 0,
-          cumulativeActualValue: 0,
-          deviation: 0,
-        });
-    }
-
-    // Redondea los valores para una mejor presentación.
     return finalCurve.map(point => ({
       ...point,
       planned: Math.round(point.planned * 100) / 100,
