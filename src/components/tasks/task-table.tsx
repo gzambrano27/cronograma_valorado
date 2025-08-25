@@ -100,6 +100,34 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
         size: 40,
     },
     {
+      id: 'expander',
+      header: () => null,
+      cell: ({ row }) => {
+        const canExpand = row.getCanExpand();
+        if (!canExpand) return null;
+
+        return (
+          <Button
+              variant="ghost"
+              size="icon"
+              onClick={(e) => {
+                e.stopPropagation();
+                row.toggleExpanded();
+              }}
+              className="w-6 h-6 p-0 data-[state=open]:bg-muted"
+          >
+              {row.getIsExpanded() ? (
+                <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronRight className="h-4 w-4" />
+              )}
+              <span className="sr-only">{row.getIsExpanded() ? 'Contraer' : 'Expandir'}</span>
+          </Button>
+        )
+      },
+      size: 40,
+    },
+    {
       accessorKey: "name",
       header: ({ column }) => {
         return (
@@ -115,31 +143,12 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
       cell: ({ row }) => {
           const task = row.original;
           const isGroup = (task.children ?? []).length > 0;
-          const canExpand = row.getCanExpand();
-
+         
           return (
              <div 
                 className="flex items-center gap-2 capitalize font-medium"
                 style={{ paddingLeft: `${row.depth * 1.5}rem` }}
              >
-                {canExpand && (
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          row.toggleExpanded();
-                        }}
-                        className="w-6 h-6 p-0 data-[state=open]:bg-muted"
-                    >
-                        {row.getIsExpanded() ? (
-                          <ChevronDown className="h-4 w-4" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4" />
-                        )}
-                        <span className="sr-only">{row.getIsExpanded() ? 'Contraer' : 'Expandir'}</span>
-                    </Button>
-                )}
                 <span className={cn(isGroup && "font-bold")}>{row.getValue("name")}</span>
              </div>
           )
@@ -587,3 +596,5 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
     </div>
   )
 }
+
+    
