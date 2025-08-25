@@ -208,17 +208,35 @@ export async function getTasksByProjectId(id: number): Promise<Task[]> {
     return rootTasks;
 }
 
+// Función auxiliar para aplanar el árbol de tareas y devolver solo las de Nivel 5.
+function flattenTasks(tasks: Task[]): Task[] {
+    const flatList: Task[] = [];
+    
+    function traverse(task: Task) {
+        if (task.level === 5) {
+            flatList.push(task);
+        }
+        if (task.children && task.children.length > 0) {
+            task.children.forEach(traverse);
+        }
+    }
+
+    tasks.forEach(traverse);
+    return flatList;
+}
+
 // Genera los datos para el gráfico de Curva "S".
 export async function generateSCurveData(tasks: Task[], totalProjectValue: number): Promise<SCurveData[]> {
-    if (tasks.length === 0 || totalProjectValue <= 0) {
+    const level5Tasks = flattenTasks(tasks);
+    if (level5Tasks.length === 0 || totalProjectValue <= 0) {
       return [];
     }
 
-    const taskIds = tasks.map(t => t.id);
+    const taskIds = level5Tasks.map(t => t.id);
     if (taskIds.length === 0) return [];
     
     // Crear un mapa de tareas para acceder fácilmente a su precio.
-    const taskMap = new Map<number, Task>(tasks.map(t => [t.id, t]));
+    const taskMap = new Map<number, Task>(level5Tasks.map(t => [t.id, t]));
 
     // Consultar todo el consumo diario para las tareas del proyecto de una sola vez.
     const dailyConsumptions = await query<RawDailyConsumption>(`
@@ -309,15 +327,16 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
 
 // Genera los datos para el gráfico de Curva "S" de costos.
 export async function generateCostSCurveData(tasks: Task[], totalProjectCost: number): Promise<SCurveData[]> {
-    if (tasks.length === 0 || totalProjectCost <= 0) {
+    const level5Tasks = flattenTasks(tasks);
+    if (level5Tasks.length === 0 || totalProjectCost <= 0) {
         return [];
     }
     
-    const taskIds = tasks.map(t => t.id);
+    const taskIds = level5Tasks.map(t => t.id);
     if (taskIds.length === 0) return [];
 
-    const taskMap = new Map<number, Task>(tasks.map(t => [t.id, t]));
-    const allProviders = new Set<string>(tasks.map(t => t.partnerName || 'Sin Asignar'));
+    const taskMap = new Map<number, Task>(level5Tasks.map(t => [t.id, t]));
+    const allProviders = new Set<string>(level5Tasks.map(t => t.partnerName || 'Sin Asignar'));
 
     const dailyConsumptions = await query<RawDailyConsumption>(`
         SELECT * FROM externo_task_daily_consumption 
@@ -441,3 +460,4 @@ export async function getPartners(searchQuery?: string): Promise<Partner[]> {
         name: getTranslatedName(p.name)
     }));
 }
+
