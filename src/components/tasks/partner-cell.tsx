@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useTransition, useMemo } from "react";
+import { useState, useTransition, useMemo, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import type { Partner, Task } from "@/lib/types";
 import { updateTaskPartner } from "@/lib/actions";
@@ -21,30 +21,50 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import { getPartners } from "@/lib/data";
+import { useDebounce } from "@/hooks/use-debounce";
 
 interface PartnerCellProps {
   task: Task;
-  allPartners: Partner[];
   onSuccess: () => void;
 }
 
-export function PartnerCell({ task, allPartners, onSuccess }: PartnerCellProps) {
+export function PartnerCell({ task, onSuccess }: PartnerCellProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
-  const [currentValue, setCurrentValue] = useState(task.partnerId?.toString() ?? "null");
+  const [selectedPartner, setSelectedPartner] = useState<Partner | null>({
+      id: task.partnerId,
+      name: task.partnerName,
+  });
 
-  const handlePartnerChange = (partnerIdString: string) => {
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 300);
+  const [isLoading, startLoading] = useTransition();
+
+
+  useEffect(() => {
+    // Si el popover está abierto, iniciamos la carga de datos.
+    // Si hay una búsqueda, la usamos, de lo contrario cargamos la lista inicial.
+    if (open) {
+        startLoading(async () => {
+            const fetchedPartners = await getPartners(debouncedSearch);
+            setPartners(fetchedPartners);
+        });
+    }
+  }, [debouncedSearch, open]);
+
+
+  const handlePartnerChange = (partner: Partner | null) => {
     setOpen(false);
     
-    // Si no hay cambio, no hacer nada.
-    if (partnerIdString === currentValue) return;
+    if (partner?.id === selectedPartner?.id) return;
 
-    setCurrentValue(partnerIdString);
-    const newPartnerId = partnerIdString === "null" ? null : Number(partnerIdString);
+    setSelectedPartner(partner);
 
     startTransition(async () => {
-      const result = await updateTaskPartner(task.id, newPartnerId);
+      const result = await updateTaskPartner(task.id, partner?.id ?? null);
       if (result.success) {
         toast({
           title: "Proveedor Actualizado",
@@ -58,18 +78,15 @@ export function PartnerCell({ task, allPartners, onSuccess }: PartnerCellProps) 
           description: result.message || "No se pudo actualizar el proveedor.",
         });
         // Revertir el valor en caso de error
-        setCurrentValue(task.partnerId?.toString() ?? "null");
+         setSelectedPartner({ id: task.partnerId, name: task.partnerName });
       }
     });
   };
-
+  
   const selectedPartnerName = useMemo(() => {
-    if (currentValue === "null") {
-      return "Sin Asignar";
-    }
-    const partner = allPartners.find(p => p.id.toString() === currentValue);
-    return partner?.name ?? "Asignar proveedor";
-  }, [currentValue, allPartners]);
+    return selectedPartner?.name || "Sin Asignar";
+  }, [selectedPartner]);
+
 
   return (
     <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
@@ -89,32 +106,43 @@ export function PartnerCell({ task, allPartners, onSuccess }: PartnerCellProps) 
         </PopoverTrigger>
         <PopoverContent className="w-[250px] p-0">
           <Command>
-            <CommandInput placeholder="Buscar proveedor..." />
+            <CommandInput
+                placeholder="Buscar proveedor..."
+                value={searchQuery}
+                onValueChange={setSearchQuery}
+            />
             <CommandList>
-                <CommandEmpty>No se encontró el proveedor.</CommandEmpty>
+                {isLoading && (
+                    <div className="p-2 flex justify-center items-center">
+                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground"/>
+                    </div>
+                )}
+                {!isLoading && partners.length === 0 && searchQuery && (
+                    <CommandEmpty>No se encontró el proveedor.</CommandEmpty>
+                )}
                 <CommandGroup>
                     <CommandItem
                         value="null"
-                        onSelect={() => handlePartnerChange("null")}
+                        onSelect={() => handlePartnerChange(null)}
                     >
                         <Check
                             className={cn(
                             "mr-2 h-4 w-4",
-                            currentValue === "null" ? "opacity-100" : "opacity-0"
+                            !selectedPartner?.id ? "opacity-100" : "opacity-0"
                             )}
                         />
                         Sin Asignar
                     </CommandItem>
-                    {allPartners.map((partner) => (
+                    {partners.map((partner) => (
                         <CommandItem
                             key={partner.id}
-                            value={partner.name} // Usamos el nombre para la búsqueda
-                            onSelect={() => handlePartnerChange(partner.id.toString())}
+                            value={partner.name}
+                            onSelect={() => handlePartnerChange(partner)}
                         >
                             <Check
                                 className={cn(
                                 "mr-2 h-4 w-4",
-                                currentValue === partner.id.toString() ? "opacity-100" : "opacity-0"
+                                selectedPartner?.id === partner.id ? "opacity-100" : "opacity-0"
                                 )}
                             />
                             {partner.name}

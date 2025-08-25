@@ -48,7 +48,7 @@ const TaskSchema = z.object({
     precio: z.coerce.number().min(0, { message: 'El precio no puede ser negativo.' }),
     startDate: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: 'Fecha de inicio inválida.' }),
     endDate: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: 'Fecha de fin inválida.' }),
-    partnerId: z.coerce.number().optional().nullable(),
+    partnerId: z.coerce.number().optional(),
 });
 
 // Crea el desglose de consumo diario para una tarea.
@@ -91,7 +91,6 @@ function createDailyConsumption(startDate: Date, endDate: Date, totalQuantity: n
 
 // Acción para crear una nueva tarea en la base de datos.
 export async function createTask(projectId: number, formData: FormData): Promise<{ success: boolean, message: string | null }> {
-  const rawPartnerId = formData.get('partnerId');
   const validatedFields = TaskSchema.safeParse({
     name: formData.get('name'),
     quantity: formData.get('quantity'),
@@ -99,7 +98,7 @@ export async function createTask(projectId: number, formData: FormData): Promise
     precio: formData.get('precio'),
     startDate: formData.get('startDate'),
     endDate: formData.get('endDate'),
-    partnerId: rawPartnerId === 'null' ? null : rawPartnerId,
+    partnerId: formData.get('partnerId'),
   });
 
   if (!validatedFields.success) {
@@ -211,6 +210,7 @@ const ValidateTaskSchema = z.object({
   projectId: z.coerce.number(),
   location: z.string(),
   userId: z.coerce.number().min(1, 'El ID de usuario es requerido.'),
+  notes: z.string().optional(),
 });
 
 // Acción para añadir una validación (imagen y ubicación) a una tarea.
@@ -220,6 +220,7 @@ export async function validateTask(formData: FormData) {
         projectId: formData.get('projectId'),
         location: formData.get('location'),
         userId: formData.get('userId'),
+        notes: formData.get('notes'),
     });
 
     if (!validatedFields.success) {
@@ -227,7 +228,7 @@ export async function validateTask(formData: FormData) {
         throw new Error('Datos de validación inválidos.');
     }
 
-    const { taskId, projectId, location, userId } = validatedFields.data;
+    const { taskId, projectId, location, userId, notes } = validatedFields.data;
     const imageFile = formData.get('image') as File | null;
 
     if (!imageFile || imageFile.size === 0) {
@@ -240,9 +241,9 @@ export async function validateTask(formData: FormData) {
     const imageUrl = `data:${imageFile.type};base64,${buffer.toString('base64')}`;
 
     await query(`
-      INSERT INTO "externo_task_validations" ("taskid", "date", "imageurl", "location", "userid")
-      VALUES ($1, $2, $3, $4, $5)
-    `, [taskId, new Date().toISOString(), imageUrl, location, userId]);
+      INSERT INTO "externo_task_validations" ("taskid", "date", "imageurl", "location", "userid", "notes")
+      VALUES ($1, $2, $3, $4, $5, $6)
+    `, [taskId, new Date().toISOString(), imageUrl, location, userId, notes]);
 
     revalidatePath(`/dashboard/projects-overview/${projectId}`);
     return { success: true };

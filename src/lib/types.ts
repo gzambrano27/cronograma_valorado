@@ -1,5 +1,4 @@
 
-
 // Este archivo define los tipos de datos principales utilizados en toda la aplicación.
 // Usar TypeScript y definir tipos claros ayuda a prevenir errores y mejora la mantenibilidad.
 
@@ -46,6 +45,7 @@ export type RawTaskValidation = {
   imageurl: string;
   location: string;
   userid?: string;
+  notes?: string;
 }
 
 // Tipo procesado para las validaciones de tareas.
@@ -57,6 +57,7 @@ export type TaskValidation = {
   location: string;
   userId?: number;
   username?: string; // Se añade dinámicamente después de la consulta
+  notes?: string;
 };
 
 // Tipo crudo para los proyectos, con métricas agregadas.
@@ -153,6 +154,6 @@ export type UserGroupInfo = {
 }
 
 export type Partner = {
-    id: number;
-    name: string;
+    id?: number;
+    name?: string;
 }

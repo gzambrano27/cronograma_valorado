@@ -1,5 +1,4 @@
 
-
 'use server';
 import type { Project, Task, SCurveData, AppConfig, TaskValidation, RawTask, RawTaskValidation, RawProject, Partner } from './types';
 import fs from 'fs/promises';
@@ -45,6 +44,7 @@ function processTask(rawTask: RawTask): Task {
       imageUrl: v.imageurl,
       location: v.location,
       userId: v.userid ? parseInt(v.userid, 10) : undefined,
+      notes: v.notes,
     })),
     partnerId: rawTask.partner_id ? parseInt(rawTask.partner_id, 10) : undefined,
     partnerName: rawTask.partner_name ? getTranslatedName(rawTask.partner_name) : undefined,
@@ -289,7 +289,7 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
         return [];
     }
 
-    const valuesByDate = new Map<number, { planned: number; actual: number; providers: { [providerName: string]: number } }>();
+    const valuesByDate = new Map<number, { planned: number; providers: { [providerName: string]: number } }>();
     const allProviders = new Set<string>();
 
     let minDate: Date | null = null;
@@ -304,13 +304,12 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
                 const dayTimestamp = day.getTime();
 
                 if (!valuesByDate.has(dayTimestamp)) {
-                    valuesByDate.set(dayTimestamp, { planned: 0, actual: 0, providers: {} });
+                    valuesByDate.set(dayTimestamp, { planned: 0, providers: {} });
                 }
 
                 const dailyData = valuesByDate.get(dayTimestamp)!;
                 dailyData.planned += dc.plannedQuantity * task.cost;
                 dailyData.providers[providerName] = (dailyData.providers[providerName] || 0) + (dc.consumedQuantity * task.cost);
-                dailyData.actual += dc.consumedQuantity * task.cost;
 
                 if (!minDate || day < minDate) minDate = day;
                 if (!maxDate || day > maxDate) maxDate = day;
@@ -321,15 +320,12 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
     if (!minDate || !maxDate) return [];
 
     const dateRange = eachDayOfInterval({ start: minDate, end: maxDate });
+    const finalCurve: SCurveData[] = [];
     
     let cumulativePlannedValue = 0;
-    let cumulativeActualValue = 0;
     const cumulativeProviderValues: { [providerName: string]: number } = {};
     Array.from(allProviders).forEach(p => cumulativeProviderValues[p] = 0);
     
-    const finalCurve: SCurveData[] = [];
-
-    // Add a starting point at zero
     const dayBefore = new Date(minDate.getTime() - 86400000);
     const startPoint: SCurveData = {
         date: format(dayBefore, "d MMM", { locale: es }),
@@ -348,25 +344,31 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
 
     for (const day of dateRange) {
         const dayTimestamp = day.getTime();
-        const dailyData = valuesByDate.get(dayTimestamp) || { planned: 0, actual: 0, providers: {} };
+        const dailyData = valuesByDate.get(dayTimestamp) || { planned: 0, providers: {} };
 
         cumulativePlannedValue += dailyData.planned;
-        cumulativeActualValue += dailyData.actual;
+        
+        let cumulativeActualCost = 0;
+        for (const provider of allProviders) {
+            cumulativeProviderValues[provider] += dailyData.providers[provider] || 0;
+        }
+        // Recalculate total after updating all providers for the day
+        cumulativeActualCost = Object.values(cumulativeProviderValues).reduce((a, b) => a + b, 0);
+
         
         const dataPoint: SCurveData = {
             date: format(day, "d MMM", { locale: es }),
             planned: (cumulativePlannedValue / totalProjectCost) * 100,
             cumulativePlannedValue,
-            actual: (cumulativeActualValue / totalProjectCost) * 100,
-            cumulativeActualValue,
-            deviation: 0, // Deviation logic might need review if 'actual' is the sum.
+            actual: (cumulativeActualCost / totalProjectCost) * 100,
+            cumulativeActualValue: cumulativeActualCost,
+            deviation: 0,
         };
         
-
         for (const provider of allProviders) {
-             cumulativeProviderValues[provider] += dailyData.providers[provider] || 0;
              const providerValue = cumulativeProviderValues[provider];
-             dataPoint[provider] = providerValue > 0 ? (providerValue / totalProjectCost) * 100 : 0;
+             const percentage = (providerValue / totalProjectCost) * 100;
+             dataPoint[provider] = percentage;
              dataPoint[`${provider}_value`] = providerValue;
         }
 
@@ -376,14 +378,23 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
     return finalCurve;
 }
 
-
-export async function getPartners(): Promise<Partner[]> {
-    const partners = await query<{id: number, name: any}>(`
+export async function getPartners(searchQuery?: string): Promise<Partner[]> {
+    let sqlQuery = `
         SELECT id, name
         FROM res_partner
         WHERE is_company = true OR type = 'contact'
-        ORDER BY name
-    `);
+    `;
+    const params: any[] = [];
+
+    if (searchQuery) {
+        sqlQuery += ` AND name ILIKE $1`;
+        params.push(`%${searchQuery}%`);
+    }
+
+    sqlQuery += ` ORDER BY name LIMIT 50`;
+
+    const partners = await query<{id: number, name: any}>(sqlQuery, params);
+
     return partners.map(p => ({
         id: p.id,
         name: getTranslatedName(p.name)

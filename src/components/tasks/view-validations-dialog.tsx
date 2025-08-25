@@ -20,7 +20,7 @@ import type { Task, TaskValidation } from "@/lib/types";
 import Image from "next/image";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { MapPin, Calendar, Trash2, User } from "lucide-react";
+import { MapPin, Calendar, Trash2, User, FileText } from "lucide-react";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { DeleteValidationDialog } from "./delete-validation-dialog";
@@ -119,6 +119,12 @@ export function ViewValidationsDialog({
                                     {validation.location}
                                   </a>
                               </div>
+                               {validation.notes && (
+                                <div className="flex items-start gap-2 text-sm mt-1">
+                                  <FileText className="h-4 w-4 mt-0.5 shrink-0" />
+                                  <p className="line-clamp-2">{validation.notes}</p>
+                                </div>
+                               )}
                             </div>
                           </CardContent>
                         </Card>

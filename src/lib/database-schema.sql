@@ -1,6 +1,3 @@
--- Este archivo define el esquema completo y actualizado de las tablas personalizadas
--- que la aplicación utiliza en la base de datos de Odoo.
-
 -- Tabla para almacenar las tareas de los proyectos.
 CREATE TABLE IF NOT EXISTS "externo_tasks" (
     "id" SERIAL PRIMARY KEY,
@@ -15,10 +12,15 @@ CREATE TABLE IF NOT EXISTS "externo_tasks" (
     "status" VARCHAR(50) DEFAULT 'pendiente',
     "dailyconsumption" JSONB,
     "displayorder" INTEGER,
+    "partner_id" INTEGER,
     CONSTRAINT fk_project
       FOREIGN KEY("projectid")
 	  REFERENCES "project_project"("id")
-	  ON DELETE CASCADE
+	  ON DELETE CASCADE,
+    CONSTRAINT fk_partner
+      FOREIGN KEY("partner_id")
+      REFERENCES "res_partner"("id")
+      ON DELETE SET NULL
 );
 
 -- Comentarios sobre las columnas de "externo_tasks":
@@ -33,6 +35,7 @@ CREATE TABLE IF NOT EXISTS "externo_tasks" (
 -- "status": Estado actual ('pendiente', 'en-progreso', 'completado').
 -- "dailyconsumption": JSON que almacena el desglose diario del consumo.
 -- "displayorder": Campo para el ordenamiento visual.
+-- "partner_id": Clave foránea al proveedor en "res_partner".
 
 -- Tabla para almacenar las validaciones de las tareas (evidencia fotográfica).
 CREATE TABLE IF NOT EXISTS "externo_task_validations" (
@@ -42,6 +45,7 @@ CREATE TABLE IF NOT EXISTS "externo_task_validations" (
     "date" TIMESTAMP WITH TIME ZONE NOT NULL,
     "imageurl" TEXT NOT NULL,
     "location" VARCHAR(255) NOT NULL,
+    "notes" TEXT,
     CONSTRAINT fk_task
       FOREIGN KEY("taskid")
 	  REFERENCES "externo_tasks"("id")
@@ -59,8 +63,10 @@ CREATE TABLE IF NOT EXISTS "externo_task_validations" (
 -- "date": Fecha y hora del registro.
 -- "imageurl": URL de la imagen de evidencia (Data URI base64).
 -- "location": Coordenadas de geolocalización.
+-- "notes": Descripción textual de la validación.
 
 -- Índices para mejorar el rendimiento de las consultas.
 CREATE INDEX IF NOT EXISTS idx_externo_tasks_projectid ON "externo_tasks" ("projectid");
 CREATE INDEX IF NOT EXISTS idx_externo_task_validations_taskid ON "externo_task_validations" ("taskid");
 CREATE INDEX IF NOT EXISTS idx_externo_task_validations_userid ON "externo_task_validations" ("userid");
+CREATE INDEX IF NOT EXISTS idx_externo_tasks_partner_id ON "externo_tasks" ("partner_id");

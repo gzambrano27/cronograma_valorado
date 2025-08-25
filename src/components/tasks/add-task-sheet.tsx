@@ -13,19 +13,27 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { CalendarIcon, Plus } from "lucide-react"
+import { CalendarIcon, Plus, Check, ChevronsUpDown, Loader2 } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { Calendar } from "../ui/calendar"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import React, { useEffect, useRef, useActionState, useState } from "react"
+import React, { useEffect, useRef, useActionState, useState, useTransition } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { useFormStatus } from "react-dom"
 import { createTask } from "@/lib/actions"
 import { getPartners } from "@/lib/data"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
 import type { Partner } from "@/lib/types"
+import { useDebounce } from "@/hooks/use-debounce"
 
 function SubmitButton() {
     const { pending } = useFormStatus();
@@ -40,20 +48,29 @@ export function AddTaskSheet({ projectId, onSuccess }: { projectId: number, onSu
   const [open, setOpen] = React.useState(false)
   const { toast } = useToast()
   const formRef = useRef<HTMLFormElement>(null);
+
+  const [partnerComboboxOpen, setPartnerComboboxOpen] = useState(false)
+  const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
+
   const [partners, setPartners] = useState<Partner[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 300);
+  const [isPartnerLoading, startPartnerLoading] = useTransition();
+
 
   const [startDate, setStartDate] = React.useState<Date>()
   const [endDate, setEndDate] = React.useState<Date>()
 
   useEffect(() => {
-    async function loadPartners() {
-        if(open) {
-            const fetchedPartners = await getPartners();
+    if (debouncedSearch || partnerComboboxOpen) {
+        startPartnerLoading(async () => {
+            const fetchedPartners = await getPartners(debouncedSearch);
             setPartners(fetchedPartners);
-        }
+        });
+    } else {
+        setPartners([]);
     }
-    loadPartners();
-  }, [open]);
+  }, [debouncedSearch, partnerComboboxOpen]);
 
   const createTaskWithSuccess = async (_prevState: any, formData: FormData) => {
     if (startDate) {
@@ -62,6 +79,10 @@ export function AddTaskSheet({ projectId, onSuccess }: { projectId: number, onSu
     if (endDate) {
         formData.set('endDate', format(endDate, 'yyyy-MM-dd'));
     }
+    if (selectedPartner) {
+        formData.set('partnerId', String(selectedPartner.id));
+    }
+
     const result = await createTask(projectId, formData);
     return result;
   };
@@ -92,8 +113,12 @@ export function AddTaskSheet({ projectId, onSuccess }: { projectId: number, onSu
       formRef.current?.reset();
       setStartDate(undefined);
       setEndDate(undefined);
+      setSelectedPartner(null);
+      setSearchQuery("");
     }
   }, [open]);
+
+  const selectedPartnerName = selectedPartner?.name ?? "Seleccione un proveedor";
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -118,19 +143,75 @@ export function AddTaskSheet({ projectId, onSuccess }: { projectId: number, onSu
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="partnerId">Proveedor/Responsable</Label>
-                    <Select name="partnerId">
-                        <SelectTrigger>
-                            <SelectValue placeholder="Seleccione un proveedor" />
-                        </SelectTrigger>
-                        <SelectContent>
-                           <SelectItem value="null">Sin Asignar</SelectItem>
-                           {partners.map(partner => (
-                               <SelectItem key={partner.id} value={String(partner.id)}>
-                                   {partner.name}
-                               </SelectItem>
-                           ))}
-                        </SelectContent>
-                    </Select>
+                     <Popover open={partnerComboboxOpen} onOpenChange={setPartnerComboboxOpen}>
+                        <PopoverTrigger asChild>
+                            <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={partnerComboboxOpen}
+                            className="w-full justify-between font-normal"
+                            >
+                            <span className="truncate">{selectedPartnerName}</span>
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                            <Command>
+                                <CommandInput
+                                    placeholder="Buscar proveedor..."
+                                    value={searchQuery}
+                                    onValueChange={setSearchQuery}
+                                />
+                                <CommandList>
+                                    {isPartnerLoading && (
+                                        <div className="p-2 flex justify-center items-center">
+                                            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground"/>
+                                        </div>
+                                    )}
+                                    {!isPartnerLoading && partners.length === 0 && (
+                                        <CommandEmpty>No se encontró ningún proveedor.</CommandEmpty>
+                                    )}
+                                    <CommandGroup>
+                                        <CommandItem
+                                            key="no-partner"
+                                            value="null"
+                                            onSelect={() => {
+                                                setSelectedPartner(null)
+                                                setPartnerComboboxOpen(false)
+                                            }}
+                                        >
+                                            <Check
+                                                className={cn(
+                                                "mr-2 h-4 w-4",
+                                                !selectedPartner ? "opacity-100" : "opacity-0"
+                                                )}
+                                            />
+                                            Sin Asignar
+                                        </CommandItem>
+                                        {partners.map((partner) => (
+                                            <CommandItem
+                                                key={partner.id}
+                                                value={partner.name}
+                                                onSelect={() => {
+                                                    setSelectedPartner(partner);
+                                                    setPartnerComboboxOpen(false);
+                                                }}
+                                            >
+                                                <Check
+                                                    className={cn(
+                                                    "mr-2 h-4 w-4",
+                                                    selectedPartner?.id === partner.id ? "opacity-100" : "opacity-0"
+                                                    )}
+                                                />
+                                                {partner.name}
+                                            </CommandItem>
+                                        ))}
+                                    </CommandGroup>
+                                </CommandList>
+                            </Command>
+                        </PopoverContent>
+                    </Popover>
+                    <input type="hidden" name="partnerId" value={selectedPartner?.id ?? ""} />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="quantity">Cantidad</Label>
@@ -198,3 +279,4 @@ export function AddTaskSheet({ projectId, onSuccess }: { projectId: number, onSu
     </Sheet>
   )
 }
+

@@ -22,6 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "../ui/skeleton";
 import dynamic from "next/dynamic";
 import { useSession } from "@/hooks/use-session";
+import { Textarea } from "../ui/textarea";
 
 // Importación dinámica del componente de mapa para evitar errores de SSR,
 // ya que depende de objetos del navegador como `window`.
@@ -133,6 +134,7 @@ export function ValidateTaskDialog({
       if (!isOpen) {
           clearImage();
           setLocation(null);
+          formRef.current?.reset();
       }
   };
 
@@ -145,7 +147,7 @@ export function ValidateTaskDialog({
               {hasValidations ? 'Añadir Nueva Validación' : 'Validar Tarea'}: {task.name}
             </DialogTitle>
             <DialogDescription>
-              Sube una imagen de evidencia y selecciona la ubicación en el mapa.
+              Sube una imagen de evidencia, añade notas y selecciona la ubicación en el mapa.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -174,6 +176,16 @@ export function ValidateTaskDialog({
                         </div>
                     )}
                 </div>
+            </div>
+
+            <div className="space-y-2">
+                <Label htmlFor="notes">Notas de Validación</Label>
+                <Textarea
+                    id="notes"
+                    name="notes"
+                    placeholder="Describe el trabajo realizado, el estado del avance, etc."
+                    rows={3}
+                />
             </div>
 
             <div className="space-y-2">
