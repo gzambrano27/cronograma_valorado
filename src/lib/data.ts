@@ -31,7 +31,7 @@ function processTask(rawTask: RawTask): Task {
     startDate: new Date(rawTask.startdate),
     endDate: new Date(rawTask.enddate),
     status: rawTask.status,
-    dailyConsumption: (rawTask.dailyConsumption || []).map((dc: RawDailyConsumption) => ({
+    dailyConsumption: (rawTask.dailyconsumption || []).map((dc: RawDailyConsumption) => ({
       id: parseInt(dc.id, 10),
       taskId: parseInt(dc.taskid, 10),
       date: new Date(dc.date),
@@ -152,7 +152,7 @@ export async function getTasksByProjectId(id: number): Promise<Task[]> {
           SELECT json_agg(dc.* ORDER BY dc.date)
           FROM "externo_task_daily_consumption" dc
           WHERE dc.taskid = t.id
-        ) as "dailyConsumption"
+        ) as "dailyconsumption"
       FROM "externo_tasks" t
       LEFT JOIN res_partner p ON t.partner_id = p.id
       WHERE t.projectid = $1
@@ -211,31 +211,45 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
       return [];
     }
 
+    const taskIds = tasks.map(t => t.id);
+    if (taskIds.length === 0) return [];
+    
+    // Crear un mapa de tareas para acceder fácilmente a su precio.
+    const taskMap = new Map<number, Task>(tasks.map(t => [t.id, t]));
+
+    // Consultar todo el consumo diario para las tareas del proyecto de una sola vez.
+    const dailyConsumptions = await query<RawDailyConsumption>(`
+        SELECT * FROM externo_task_daily_consumption 
+        WHERE taskid IN (${taskIds.map((_, i) => `$${i + 1}`).join(',')})
+        ORDER BY date
+    `, taskIds);
+
+    if (dailyConsumptions.length === 0) return [];
+
     const valuesByDate = new Map<number, { planned: number; actual: number }>();
 
     let minDate: Date | null = null;
     let maxDate: Date | null = null;
 
-    // Agrupa los valores planificados y reales por fecha.
-    tasks.forEach(task => {
-      if (task.dailyConsumption) {
-        task.dailyConsumption.forEach(dc => {
-          const day = startOfDay(new Date(dc.date));
-          const dayTimestamp = day.getTime();
+    // Agrupar los valores planificados y reales por fecha.
+    for (const dc of dailyConsumptions) {
+        const task = taskMap.get(parseInt(dc.taskid));
+        if (!task) continue;
 
-          if (!valuesByDate.has(dayTimestamp)) {
+        const day = startOfDay(new Date(dc.date));
+        const dayTimestamp = day.getTime();
+
+        if (!valuesByDate.has(dayTimestamp)) {
             valuesByDate.set(dayTimestamp, { planned: 0, actual: 0 });
-          }
-
-          const currentValues = valuesByDate.get(dayTimestamp)!;
-          currentValues.planned += dc.plannedQuantity * task.precio;
-          currentValues.actual += dc.consumedQuantity * task.precio;
-
-          if (!minDate || day < minDate) minDate = day;
-          if (!maxDate || day > maxDate) maxDate = day;
-        });
-      }
-    });
+        }
+        
+        const currentValues = valuesByDate.get(dayTimestamp)!;
+        currentValues.planned += toFloat(dc.planned_quantity) * task.precio;
+        currentValues.actual += toFloat(dc.consumed_quantity) * task.precio;
+        
+        if (!minDate || day < minDate) minDate = day;
+        if (!maxDate || day > maxDate) maxDate = day;
+    }
 
     if (!minDate || !maxDate) {
       return [];
@@ -295,36 +309,48 @@ export async function generateCostSCurveData(tasks: Task[], totalProjectCost: nu
     if (tasks.length === 0 || totalProjectCost <= 0) {
         return [];
     }
+    
+    const taskIds = tasks.map(t => t.id);
+    if (taskIds.length === 0) return [];
 
+    const taskMap = new Map<number, Task>(tasks.map(t => [t.id, t]));
+    const allProviders = new Set<string>(tasks.map(t => t.partnerName || 'Sin Asignar'));
+
+    const dailyConsumptions = await query<RawDailyConsumption>(`
+        SELECT * FROM externo_task_daily_consumption 
+        WHERE taskid IN (${taskIds.map((_, i) => `$${i + 1}`).join(',')})
+        ORDER BY date
+    `, taskIds);
+
+    if (dailyConsumptions.length === 0) return [];
+    
     const valuesByDate = new Map<number, { planned: number; actual: number; providers: { [providerName: string]: number } }>();
-    const allProviders = new Set<string>();
 
     let minDate: Date | null = null;
     let maxDate: Date | null = null;
 
-    tasks.forEach(task => {
-        const providerName = task.partnerName || 'Sin Asignar';
-        allProviders.add(providerName);
-        if (task.dailyConsumption) {
-            task.dailyConsumption.forEach(dc => {
-                const day = startOfDay(new Date(dc.date));
-                const dayTimestamp = day.getTime();
+    for (const dc of dailyConsumptions) {
+        const task = taskMap.get(parseInt(dc.taskid, 10));
+        if (!task) continue;
+        
+        const day = startOfDay(new Date(dc.date));
+        const dayTimestamp = day.getTime();
 
-                if (!valuesByDate.has(dayTimestamp)) {
-                    valuesByDate.set(dayTimestamp, { planned: 0, actual: 0, providers: {} });
-                }
-
-                const dailyData = valuesByDate.get(dayTimestamp)!;
-                dailyData.planned += dc.plannedQuantity * task.cost;
-                const consumedCostForDay = dc.consumedQuantity * task.cost;
-                dailyData.actual += consumedCostForDay;
-                dailyData.providers[providerName] = (dailyData.providers[providerName] || 0) + consumedCostForDay;
-
-                if (!minDate || day < minDate) minDate = day;
-                if (!maxDate || day > maxDate) maxDate = day;
-            });
+        if (!valuesByDate.has(dayTimestamp)) {
+            valuesByDate.set(dayTimestamp, { planned: 0, actual: 0, providers: {} });
         }
-    });
+        
+        const dailyData = valuesByDate.get(dayTimestamp)!;
+        dailyData.planned += toFloat(dc.planned_quantity) * task.cost;
+        const consumedCostForDay = toFloat(dc.consumed_quantity) * task.cost;
+        dailyData.actual += consumedCostForDay;
+        
+        const providerName = task.partnerName || 'Sin Asignar';
+        dailyData.providers[providerName] = (dailyData.providers[providerName] || 0) + consumedCostForDay;
+        
+        if (!minDate || day < minDate) minDate = day;
+        if (!maxDate || day > maxDate) maxDate = day;
+    }
     
     if (!minDate || !maxDate) return [];
 
