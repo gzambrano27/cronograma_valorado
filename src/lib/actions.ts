@@ -1,3 +1,4 @@
+
 'use server';
 
 import type { Project, Task, TaskValidation, DailyConsumption, RawTask, LoginResult, Partner } from './types';
@@ -274,9 +275,6 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   
   const precioAttrDef = extendedAttrDefs.find((attr: any) => getTranslatedName(attr.Alias)?.toLowerCase() === 'precio');
   const precioFieldId = precioAttrDef?.FieldID;
-
-  const costAttrDef = extendedAttrDefs.find((attr: any) => getTranslatedName(attr.Alias)?.toLowerCase() === 'costo programado');
-  const costFieldId = costAttrDef?.FieldID;
   
   const tasks = projectData.Tasks.Task;
 
@@ -320,7 +318,8 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
                 if (priceAttr && priceAttr.Value != null) {
                     const totalTaskPrice = parseFloat(priceAttr.Value);
                     if (!isNaN(totalTaskPrice)) {
-                        precio = totalTaskPrice / quantity;
+                        // El valor en el XML es un total. Calcular el precio unitario.
+                        precio = totalTaskPrice / 100 / quantity;
                     }
                 }
             }
@@ -328,7 +327,8 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
             // --- Obtener Costo Total y calcular unitario ---
             const totalTaskCost = parseFloat(taskXml.Cost);
             if (!isNaN(totalTaskCost) && quantity > 0) {
-                cost = totalTaskCost / quantity;
+                 // El valor en el XML es un total. Calcular el costo unitario.
+                cost = totalTaskCost / 100 / quantity;
             }
         }
 
@@ -382,3 +382,5 @@ export async function updateTaskPartner(taskId: number, partnerId: number | null
     return { success: false, message: 'No se pudo actualizar el proveedor.' };
   }
 }
+
+    
