@@ -275,6 +275,11 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   
   const precioAttrDef = extendedAttrDefs.find((attr: any) => attr.Alias?.toLowerCase() === 'precio');
   const precioFieldId = precioAttrDef?.FieldID;
+
+  // CORRECCIÓN: Usar "Costo Programado" para el costo.
+  const costoProgramadoAttrDef = extendedAttrDefs.find((attr: any) => getTranslatedName(attr.Alias)?.toLowerCase() === 'costo programado');
+  const costoProgramadoFieldId = costoProgramadoAttrDef?.FieldID;
+
   
   const tasks = projectData.Tasks.Task;
 
@@ -318,16 +323,27 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
                         if (!isNaN(parsedPrice)) precio = parsedPrice;
                     }
                 }
+
+                // Obtener Costo (Corregido)
+                if (costoProgramadoFieldId) {
+                    const costAttr = taskXml.ExtendedAttribute.find((attr: any) => attr.FieldID === costoProgramadoFieldId);
+                     if (costAttr && costAttr.Value != null) {
+                        const totalTaskCost = parseFloat(costAttr.Value);
+                        if (!isNaN(totalTaskCost) && quantity > 0) {
+                            cost = totalTaskCost / quantity;
+                        }
+                    }
+                } else {
+                    // Fallback al campo Cost si el atributo extendido no existe.
+                    const totalTaskCost = parseFloat(taskXml.Cost);
+                    if (!isNaN(totalTaskCost) && quantity > 0) {
+                        cost = totalTaskCost / quantity;
+                    }
+                }
             }
 
             // Si cantidad es 0, no es una tarea facturable, saltarla.
             if (quantity === 0) continue;
-            
-            // Obtener Costo y calcular costo unitario
-            const totalTaskCost = parseFloat(taskXml.Cost);
-            if (!isNaN(totalTaskCost) && quantity > 0) {
-                 cost = totalTaskCost / quantity;
-            }
         }
 
 
@@ -381,3 +397,4 @@ export async function updateTaskPartner(taskId: number, partnerId: number | null
     return { success: false, message: 'No se pudo actualizar el proveedor.' };
   }
 }
+
