@@ -65,7 +65,7 @@ export function DailyConsumptionTracker({ task, onSuccess }: DailyConsumptionTra
           day.verifiedQuantity,
           day.details
         );
-        
+
         toast({
           title: "Consumo Guardado",
           description: `El consumo para el ${format(adjustDateForDisplay(day.date), "PPP", { locale: es })} ha sido actualizado.`,
@@ -150,13 +150,13 @@ export function DailyConsumptionTracker({ task, onSuccess }: DailyConsumptionTra
                           value={consumptionDay.details}
                           onChange={(e) => handleInputChange(dateString, 'details', e.target.value)}
                           placeholder="Añadir detalle..."
-                          className="h-8 min-h-8 w-40"
+                          className="h-10 min-h-10 w-55"
                           disabled={isPending}
                         />
                     </TableCell>
                     <TableCell className="text-right">
                     <Button 
-                        size="icon" 
+                        size="icon"
                         variant="default"
                         onClick={() => handleSave(consumptionDay)}
                         disabled={isPending}
