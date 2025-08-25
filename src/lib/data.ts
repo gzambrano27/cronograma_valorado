@@ -382,7 +382,7 @@ export async function getPartners(searchQuery?: string): Promise<Partner[]> {
     let sqlQuery = `
         SELECT id, name
         FROM res_partner
-        WHERE is_company = true OR type = 'contact'
+        WHERE is_company = true
     `;
     const params: any[] = [];
 
@@ -391,7 +391,7 @@ export async function getPartners(searchQuery?: string): Promise<Partner[]> {
         params.push(`%${searchQuery}%`);
     }
 
-    sqlQuery += ` ORDER BY name LIMIT 50`;
+    sqlQuery += ` ORDER BY name`;
 
     const partners = await query<{id: number, name: any}>(sqlQuery, params);
 
