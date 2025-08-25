@@ -143,7 +143,7 @@ export function AddTaskDialog({ projectId, onSuccess }: { projectId: number, onS
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="partnerId">Proveedor/Responsable</Label>
-                     <Popover open={partnerComboboxOpen} onOpenChange={setPartnerComboboxOpen}>
+                     <Popover open={partnerComboboxOpen} onOpenChange={setPartnerComboboxOpen} modal={true}>
                         <PopoverTrigger asChild>
                             <Button
                             variant="outline"
