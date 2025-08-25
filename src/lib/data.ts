@@ -251,7 +251,7 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
     let maxDate: Date | null = null;
 
     for (const dc of dailyConsumptions) {
-        const task = taskMap.get(parseInt(dc.taskid));
+        const task = taskMap.get(parseInt(dc.taskid, 10));
         if (!task) continue;
 
         const day = startOfDay(new Date(dc.date));
@@ -276,8 +276,8 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
     const dateRange = eachDayOfInterval({ start: minDate, end: maxDate });
 
     const finalCurve: SCurveData[] = [];
-    let cumulativePlanned = 0;
-    let cumulativeActual = 0;
+    let cumulativePlannedValue = 0;
+    let cumulativeActualValue = 0;
 
     // Añade un punto de inicio en cero en el día anterior.
     const dayBefore = new Date(minDate.getTime() - 86400000);
@@ -294,26 +294,26 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
       const dayTimestamp = day.getTime();
       const dailyValues = valuesByDate.get(dayTimestamp) || { planned: 0, actual: 0 };
 
-      cumulativePlanned += dailyValues.planned;
-      cumulativeActual += dailyValues.actual;
+      cumulativePlannedValue += dailyValues.planned;
+      cumulativeActualValue += dailyValues.actual;
 
-      const plannedPercent = (cumulativePlanned / totalProjectValue) * 100;
-      const actualPercent = (cumulativeActual / totalProjectValue) * 100;
+      const plannedPercent = (cumulativePlannedValue / totalProjectValue) * 100;
+      const actualPercent = (cumulativeActualValue / totalProjectValue) * 100;
 
       finalCurve.push({
         date: format(day, "d MMM", { locale: es }),
         planned: plannedPercent,
         actual: actualPercent,
-        cumulativePlannedValue: cumulativePlanned,
-        cumulativeActualValue: cumulativeActual,
+        cumulativePlannedValue: cumulativePlannedValue,
+        cumulativeActualValue: cumulativeActualValue,
         deviation: actualPercent - plannedPercent,
       });
     }
 
     return finalCurve.map(point => ({
       ...point,
-      planned: Math.round(point.planned * 100) / 100,
-      actual: Math.round(point.actual * 100) / 100,
+      planned: point.planned ? Math.max(0, point.planned) : 0,
+      actual: point.actual ? Math.max(0, point.actual) : 0,
       deviation: Math.round(point.deviation * 100) / 100,
     }));
 }
