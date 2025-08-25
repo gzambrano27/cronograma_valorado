@@ -159,11 +159,6 @@ export type SCurveData = {
   [key: string]: any; // Permite propiedades dinámicas para los proveedores
 };
 
-// Configuración de la aplicación.
-export type AppConfig = {
-  endpointUrl: string;
-};
-
 // Información de los grupos de usuario de Odoo.
 export type UserGroupInfo = {
     usuario: string;

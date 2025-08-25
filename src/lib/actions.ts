@@ -1,11 +1,10 @@
 
 'use server';
 
-import type { Project, Task, TaskValidation, AppConfig, DailyConsumption, RawTask, LoginResult, Partner } from './types';
+import type { Project, Task, TaskValidation, DailyConsumption, RawTask, LoginResult, Partner } from './types';
 import fs from 'fs/promises';
 import path from 'path';
 import { z } from 'zod';
-import { getAppConfig } from './data';
 import { eachDayOfInterval, format } from 'date-fns';
 import { query } from './db';
 import { revalidatePath } from 'next/cache';
@@ -16,29 +15,6 @@ import { getTranslatedName } from './utils';
 // Estas funciones se ejecutan en el servidor y pueden ser llamadas directamente
 // desde componentes de cliente, simplificando las mutaciones de datos.
 
-const configPath = path.join(process.cwd(), 'src', 'lib', 'config.json');
-
-// Función para escribir en el archivo de configuración.
-async function writeConfig(config: AppConfig): Promise<void> {
-  await fs.writeFile(configPath, JSON.stringify(config, null, 2), 'utf-8');
-}
-
-// Acción para actualizar la configuración de la aplicación.
-export async function updateSettings(formData: FormData) {
-  const url = formData.get('url') as string;
-
-  try {
-    new URL(url);
-  } catch (_) {
-    throw new Error('La URL del endpoint no es válida.');
-  }
-
-  const config = await getAppConfig();
-  config.endpointUrl = url;
-  await writeConfig(config);
-
-  return { success: true };
-}
 
 // Esquema de validación para los datos de una tarea usando Zod.
 const TaskSchema = z.object({

@@ -1,8 +1,6 @@
 
 'use server';
-import type { Project, Task, SCurveData, AppConfig, TaskValidation, RawTask, RawTaskValidation, RawProject, Partner, RawDailyConsumption, DailyConsumption } from './types';
-import fs from 'fs/promises';
-import path from 'path';
+import type { Project, Task, SCurveData, TaskValidation, RawTask, RawTaskValidation, RawProject, Partner, RawDailyConsumption, DailyConsumption } from './types';
 import { eachDayOfInterval, format, startOfDay } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { query } from './db';
@@ -56,17 +54,6 @@ function processTask(rawTask: RawTask): Task {
   };
 }
 
-// Obtiene la configuración de la aplicación desde un archivo JSON.
-export async function getAppConfig(): Promise<AppConfig> {
-  const filePath = path.join(process.cwd(), 'src', 'lib', 'config.json');
-  try {
-    const jsonData = await fs.readFile(filePath, 'utf-8');
-    return JSON.parse(jsonData) as AppConfig;
-  } catch (error) {
-    console.error("No se pudo leer config.json", error);
-    return { endpointUrl: "" };
-  }
-}
 
 // Obtiene todos los proyectos de la base de datos con métricas agregadas.
 export async function getProjects(): Promise<Project[]> {
