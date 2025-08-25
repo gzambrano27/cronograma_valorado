@@ -22,6 +22,7 @@ import {
   useReactTable,
   Row,
   RowSelectionState,
+  ExpandedState,
 } from "@tanstack/react-table"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
@@ -114,6 +115,7 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
                 row.toggleExpanded();
               }}
               className="w-6 h-6 p-0 data-[state=open]:bg-muted"
+              data-state={row.getIsExpanded() ? 'open' : 'closed'}
           >
               {row.getIsExpanded() ? (
                 <ChevronDown className="h-4 w-4" />
@@ -327,7 +329,6 @@ const columnTranslations: Record<string, string> = {
 export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => void }) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [showAll, setShowAll] = React.useState(false);
   const { session } = useSession();
   const isManager = session.user?.isManager ?? false;
   
@@ -376,7 +377,7 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
   }, [isMobile, isManager]);
 
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
-  const [expanded, setExpanded] = React.useState({})
+  const [expanded, setExpanded] = React.useState<ExpandedState>({})
 
   const columns = React.useMemo(() => getColumns(isManager, onSuccess), [isManager, onSuccess]);
 
@@ -393,13 +394,10 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
     onRowSelectionChange: setRowSelection,
     getExpandedRowModel: getExpandedRowModel(),
     onExpandedChange: setExpanded,
+    getSubRows: row => row.children,
     getCanExpand: (row) => {
-        // Allow expansion for rows that have children (groups)
-        // or are at level 5 (to show daily consumption)
         return (row.subRows && row.subRows.length > 0) || row.original.level === 5;
     },
-    enableRowSelection: true,
-    getSubRows: row => row.children,
     state: {
       sorting,
       columnFilters,
@@ -408,10 +406,6 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
       expanded,
     },
   })
-
-  React.useEffect(() => {
-    table.setPageSize(showAll ? data.length : 10);
-  }, [showAll, data.length, table]);
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
   const selectedTasks = table.getFilteredSelectedRowModel().rows.map(row => row.original);
@@ -466,14 +460,6 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
                 ))}
             </SelectContent>
         </Select>
-         <div className="flex items-center space-x-2">
-            <Switch
-              id="show-all-tasks"
-              checked={showAll}
-              onCheckedChange={setShowAll}
-            />
-            <Label htmlFor="show-all-tasks" className="text-sm">Ver todo</Label>
-          </div>
         <div className="flex-1" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -502,7 +488,7 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-md border mt-4">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -528,7 +514,11 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
                 <React.Fragment key={row.id}>
                   <TableRow
                     data-state={row.getIsSelected() && "selected"}
-                    onClick={() => row.toggleSelected(!row.getIsSelected())}
+                    onClick={(e) => {
+                      // Solo permite seleccionar/deseleccionar la fila.
+                      // La expansión se maneja con el botón de la flecha.
+                      row.toggleSelected(!row.getIsSelected())
+                    }}
                     className={cn(
                         "cursor-pointer",
                         row.getCanExpand() && row.original.level < 5 ? "font-semibold bg-muted/30 hover:bg-muted/60" : ""
@@ -538,10 +528,11 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
                       <TableCell key={cell.id} onClick={(e) => {
                           if (cell.column.id === 'expander') {
                             e.stopPropagation();
-                            row.getToggleExpandedHandler()();
+                            row.toggleExpanded();
                           } else if (cell.column.id !== 'select') {
-                              // Allow row selection by clicking on cells
+                              // No hacer nada especial, el onClick de la fila se encarga
                           } else {
+                            // Detener la propagación para el checkbox para evitar que la fila se seleccione/deseleccione dos veces
                             e.stopPropagation();
                           }
                       }}>
@@ -574,29 +565,8 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
           </TableBody>
         </Table>
       </div>
-      {!showAll && table.getPageCount() > 1 && (
-        <div className="flex items-center justify-end space-x-2 py-4">
-            <span className="text-sm text-muted-foreground">
-                Página {table.getState().pagination.pageIndex + 1} de {table.getPageCount()}
-            </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Anterior
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Siguiente
-          </Button>
-        </div>
-      )}
     </div>
   )
 }
+
+    
