@@ -323,7 +323,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
             // If quantity is still 0, it's not a billable task, skip it.
             if (quantity === 0) continue;
             
-            cost = totalTaskCost / quantity;
+            cost = (totalTaskCost / 100) / quantity;
         }
 
 
