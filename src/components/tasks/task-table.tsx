@@ -100,9 +100,7 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
       id: 'expander',
       header: () => null,
       cell: ({ row }) => {
-        if (!row.getCanExpand()) return null;
-
-        return (
+        return row.getCanExpand() ? (
           <Button
               variant="ghost"
               size="icon"
@@ -120,7 +118,7 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
               )}
               <span className="sr-only">{row.getIsExpanded() ? 'Contraer' : 'Expandir'}</span>
           </Button>
-        )
+        ) : null
       },
       size: 40,
     },
@@ -392,7 +390,6 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
     onExpandedChange: setExpanded,
     getSubRows: row => row.children,
     getCanExpand: (row) => {
-        // Can expand if it's a group (level < 5) or if it's a level 5 task to show consumption
         return (row.original.children && row.original.children.length > 0) || row.original.level === 5;
     },
     state: {
@@ -551,5 +548,3 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
     </div>
   )
 }
-
-    
