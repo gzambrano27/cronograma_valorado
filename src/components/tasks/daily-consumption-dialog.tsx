@@ -37,7 +37,7 @@ export function DailyConsumptionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] max-w-5xl">
+      <DialogContent className="w-[95vw] max-w-7xl">
         <DialogHeader>
           <DialogTitle className="font-headline">Desglose de Consumo Diario: {task.name}</DialogTitle>
           <DialogDescription>
