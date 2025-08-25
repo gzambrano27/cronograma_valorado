@@ -5,14 +5,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { CalendarIcon, Plus, Check, ChevronsUpDown, Loader2 } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { Calendar } from "../ui/calendar"
@@ -44,7 +44,7 @@ function SubmitButton() {
     );
 }
 
-export function AddTaskSheet({ projectId, onSuccess }: { projectId: number, onSuccess: () => void }) {
+export function AddTaskDialog({ projectId, onSuccess }: { projectId: number, onSuccess: () => void }) {
   const [open, setOpen] = React.useState(false)
   const { toast } = useToast()
   const formRef = useRef<HTMLFormElement>(null);
@@ -121,21 +121,21 @@ export function AddTaskSheet({ projectId, onSuccess }: { projectId: number, onSu
   const selectedPartnerName = selectedPartner?.name ?? "Seleccione un proveedor";
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
         <Button>
             <Plus className="mr-2 h-4 w-4"/>
             Añadir Tarea
         </Button>
-      </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-lg">
         <form ref={formRef} action={formAction}>
-            <SheetHeader>
-            <SheetTitle className="font-headline">Añadir Nueva Tarea</SheetTitle>
-            <SheetDescription>
+            <DialogHeader>
+            <DialogTitle className="font-headline">Añadir Nueva Tarea</DialogTitle>
+            <DialogDescription>
                 Complete los detalles para la nueva tarea del proyecto.
-            </SheetDescription>
-            </SheetHeader>
+            </DialogDescription>
+            </DialogHeader>
             <div className="grid gap-4 py-4">
                 <div className="space-y-2">
                     <Label htmlFor="name">Nombre de la Tarea</Label>
@@ -270,13 +270,12 @@ export function AddTaskSheet({ projectId, onSuccess }: { projectId: number, onSu
                     </div>
                 </div>
             </div>
-            <SheetFooter>
+            <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
                 <SubmitButton />
-            </SheetFooter>
+            </DialogFooter>
         </form>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   )
 }
-

@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { TaskTable } from "@/components/tasks/task-table";
 import { XmlImport } from "@/components/tasks/xml-import";
 import { DollarSign, CheckCircle, ListTodo, GanttChartSquare, BarChart } from "lucide-react";
-import { AddTaskSheet } from "@/components/tasks/add-task-sheet";
+import { AddTaskDialog } from "@/components/tasks/add-task-dialog";
 import { formatCurrency } from "@/lib/utils";
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Project, Task, SCurveData } from '@/lib/types';
@@ -85,7 +85,7 @@ export default function ProjectPage() {
         </h1>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <XmlImport projectId={id} onSuccess={loadProjectData} />
-          <AddTaskSheet projectId={project.id} onSuccess={loadProjectData} />
+          <AddTaskDialog projectId={project.id} onSuccess={loadProjectData} />
         </div>
       </div>
 
