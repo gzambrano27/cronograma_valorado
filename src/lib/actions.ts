@@ -274,6 +274,9 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   
   const precioAttrDef = extendedAttrDefs.find((attr: any) => getTranslatedName(attr.Alias)?.toLowerCase() === 'precio');
   const precioFieldId = precioAttrDef?.FieldID;
+
+  const costAttrDef = extendedAttrDefs.find((attr: any) => getTranslatedName(attr.Alias)?.toLowerCase() === 'costo programado');
+  const costFieldId = costAttrDef?.FieldID;
   
   const tasks = projectData.Tasks.Task;
 
@@ -311,28 +314,25 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
             // Si la cantidad es 0, no es una tarea facturable, la saltamos.
             if (quantity === 0) continue;
 
-            // --- Obtener Precio (PVP) ---
+            // --- Obtener Precio (PVP) Total y calcular unitario ---
             if (precioFieldId && Array.isArray(taskXml.ExtendedAttribute)) {
-                 const priceAttr = taskXml.ExtendedAttribute.find((attr: any) => attr.FieldID === precioFieldId);
+                const priceAttr = taskXml.ExtendedAttribute.find((attr: any) => attr.FieldID === precioFieldId);
                 if (priceAttr && priceAttr.Value != null) {
                     const totalTaskPrice = parseFloat(priceAttr.Value);
                     if (!isNaN(totalTaskPrice)) {
-                        // El valor del XML es el total, lo dividimos para obtener el unitario
                         precio = totalTaskPrice / quantity;
                     }
                 }
             }
 
-            // --- Obtener Costo ---
+            // --- Obtener Costo Total y calcular unitario ---
             const totalTaskCost = parseFloat(taskXml.Cost);
             if (!isNaN(totalTaskCost) && quantity > 0) {
-                // El valor &lt;Cost&gt; es el total, lo dividimos para obtener el unitario
                 cost = totalTaskCost / quantity;
             }
         }
 
-
-        const taskResult = await query&lt;{id: string}&gt;(`
+        const taskResult = await query<{id: string}>(`
           INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "cost", "startdate", "enddate", "status", "consumedquantity", "level", "parentid")
           VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', 0, $8, $9)
           RETURNING id
@@ -345,7 +345,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
             const dailyConsumptionPlan = createDailyConsumption(startDate, endDate, quantity);
             
             if (dailyConsumptionPlan.length > 0) {
-                const values = dailyConsumptionPlan.map(dc =&gt; `(${newTaskId}, '${format(dc.date, 'yyyy-MM-dd')}', ${dc.plannedQuantity})`).join(', ');
+                const values = dailyConsumptionPlan.map(dc => `(${newTaskId}, '${format(dc.date, 'yyyy-MM-dd')}', ${dc.plannedQuantity})`).join(', ');
                 await query(`
                     INSERT INTO "externo_task_daily_consumption" (taskid, date, planned_quantity)
                     VALUES ${values}
