@@ -19,8 +19,8 @@ import { getTranslatedName } from './utils';
 const TaskSchema = z.object({
     name: z.string().min(3, { message: 'El nombre debe tener al menos 3 caracteres.' }),
     quantity: z.coerce.number().min(0, { message: 'La cantidad no puede ser negativa.' }),
-    cost: z.coerce.number().min(0, { message: 'El costo no puede ser negativo.' }),
-    precio: z.coerce.number().min(0, { message: 'El precio no puede ser negativo.' }),
+    cost: z.coerce.number().min(0, { message: 'El costo no puede ser negativa.' }),
+    precio: z.coerce.number().min(0, { message: 'El precio no puede ser negativa.' }),
     startDate: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: 'Fecha de inicio inválida.' }),
     endDate: z.string().refine((val) => val && !isNaN(Date.parse(val)), { message: 'Fecha de fin inválida.' }),
     partnerId: z.coerce.number().optional(),
@@ -299,39 +299,40 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
         let cost = 0;
         
         if (level === 5) {
-            if (Array.isArray(taskXml.ExtendedAttribute)) {
-                // Obtener Cantidad
-                if (cantidadFieldId) {
-                    const quantityAttr = taskXml.ExtendedAttribute.find((attr: any) => attr.FieldID === cantidadFieldId);
-                    if (quantityAttr && quantityAttr.Value != null) {
-                        const parsedQuantity = parseFloat(quantityAttr.Value);
-                        if (!isNaN(parsedQuantity)) quantity = parsedQuantity;
-                    }
+            // --- Obtener Cantidad ---
+            if (cantidadFieldId && Array.isArray(taskXml.ExtendedAttribute)) {
+                const quantityAttr = taskXml.ExtendedAttribute.find((attr: any) => attr.FieldID === cantidadFieldId);
+                if (quantityAttr && quantityAttr.Value != null) {
+                    const parsedQuantity = parseFloat(quantityAttr.Value);
+                    if (!isNaN(parsedQuantity)) quantity = parsedQuantity;
                 }
-                
-                // Obtener Precio
-                if (precioFieldId) {
-                     const priceAttr = taskXml.ExtendedAttribute.find((attr: any) => attr.FieldID === precioFieldId);
-                    if (priceAttr && priceAttr.Value != null) {
-                        const parsedPrice = parseFloat(priceAttr.Value) / 100;
-                        if (!isNaN(parsedPrice)) precio = parsedPrice;
+            }
+
+            // Si la cantidad es 0, no es una tarea facturable, la saltamos.
+            if (quantity === 0) continue;
+
+            // --- Obtener Precio (PVP) ---
+            if (precioFieldId && Array.isArray(taskXml.ExtendedAttribute)) {
+                 const priceAttr = taskXml.ExtendedAttribute.find((attr: any) => attr.FieldID === precioFieldId);
+                if (priceAttr && priceAttr.Value != null) {
+                    const totalTaskPrice = parseFloat(priceAttr.Value);
+                    if (!isNaN(totalTaskPrice)) {
+                        // El valor del XML es el total, lo dividimos para obtener el unitario
+                        precio = totalTaskPrice / quantity;
                     }
                 }
             }
 
-            // Obtener Costo directamente desde la etiqueta <Cost>
+            // --- Obtener Costo ---
             const totalTaskCost = parseFloat(taskXml.Cost);
             if (!isNaN(totalTaskCost) && quantity > 0) {
+                // El valor &lt;Cost&gt; es el total, lo dividimos para obtener el unitario
                 cost = totalTaskCost / quantity;
             }
-
-
-            // Si cantidad es 0, no es una tarea facturable, saltarla.
-            if (quantity === 0) continue;
         }
 
 
-        const taskResult = await query<{id: string}>(`
+        const taskResult = await query&lt;{id: string}&gt;(`
           INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "cost", "startdate", "enddate", "status", "consumedquantity", "level", "parentid")
           VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', 0, $8, $9)
           RETURNING id
@@ -344,7 +345,7 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
             const dailyConsumptionPlan = createDailyConsumption(startDate, endDate, quantity);
             
             if (dailyConsumptionPlan.length > 0) {
-                const values = dailyConsumptionPlan.map(dc => `(${newTaskId}, '${format(dc.date, 'yyyy-MM-dd')}', ${dc.plannedQuantity})`).join(', ');
+                const values = dailyConsumptionPlan.map(dc =&gt; `(${newTaskId}, '${format(dc.date, 'yyyy-MM-dd')}', ${dc.plannedQuantity})`).join(', ');
                 await query(`
                     INSERT INTO "externo_task_daily_consumption" (taskid, date, planned_quantity)
                     VALUES ${values}
