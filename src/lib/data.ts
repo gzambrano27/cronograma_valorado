@@ -31,6 +31,8 @@ function processTask(rawTask: RawTask): Task {
     startDate: new Date(rawTask.startdate),
     endDate: new Date(rawTask.enddate),
     status: rawTask.status,
+    level: rawTask.level ? parseInt(rawTask.level, 10) : 0,
+    parentId: rawTask.parentid ? parseInt(rawTask.parentid, 10) : null,
     dailyConsumption: (rawTask.dailyconsumption || []).map((dc: RawDailyConsumption) => ({
       id: parseInt(dc.id, 10),
       taskId: parseInt(dc.taskid, 10),
@@ -76,8 +78,8 @@ export async function getProjects(): Promise<Project[]> {
           SUM(quantity * value) AS total_value,
           SUM(consumedquantity * value) AS consumed_value,
           SUM(quantity * cost) AS total_cost,
-          COUNT(id) AS task_count,
-          COUNT(id) FILTER (WHERE status = 'completado') AS completed_tasks
+          COUNT(id) FILTER (WHERE level = 5) AS task_count,
+          COUNT(id) FILTER (WHERE status = 'completado' AND level = 5) AS completed_tasks
         FROM
           externo_tasks
         GROUP BY
@@ -171,38 +173,52 @@ export async function getTasksByProjectId(id: number): Promise<Task[]> {
         });
     });
 
-    if (userIds.size === 0) {
-        return tasks;
+    if (userIds.size > 0) {
+        const userIdsArray = Array.from(userIds);
+        const userPlaceholders = userIdsArray.map((_, i) => `$${i + 1}`).join(',');
+        const usersData = await query<{ id: number, name: any }>(
+            `SELECT u.id, p.name 
+             FROM res_users u
+             JOIN res_partner p ON u.partner_id = p.id
+             WHERE u.id IN (${userPlaceholders})`,
+            userIdsArray
+        );
+
+        const userMap = new Map<number, string>();
+        usersData.forEach(user => {
+            userMap.set(user.id, getTranslatedName(user.name));
+        });
+
+        // Mapear los nombres de usuario de vuelta a las validaciones
+        tasks.forEach(task => {
+            if (task.validations) {
+                task.validations.forEach(validation => {
+                    if (validation.userId) {
+                        validation.username = userMap.get(validation.userId);
+                    }
+                });
+            }
+        });
     }
+    
+    // Construir la jerarquía
+    const taskMap = new Map<number, Task>();
+    const rootTasks: Task[] = [];
 
-    // Consultar los nombres de los usuarios
-    const userIdsArray = Array.from(userIds);
-    const userPlaceholders = userIdsArray.map((_, i) => `$${i + 1}`).join(',');
-    const usersData = await query<{ id: number, name: any }>(
-        `SELECT u.id, p.name 
-         FROM res_users u
-         JOIN res_partner p ON u.partner_id = p.id
-         WHERE u.id IN (${userPlaceholders})`,
-        userIdsArray
-    );
-
-    const userMap = new Map<number, string>();
-    usersData.forEach(user => {
-        userMap.set(user.id, getTranslatedName(user.name));
+    tasks.forEach(task => {
+        task.children = [];
+        taskMap.set(task.id, task);
     });
 
-    // Mapear los nombres de usuario de vuelta a las validaciones
     tasks.forEach(task => {
-        if (task.validations) {
-            task.validations.forEach(validation => {
-                if (validation.userId) {
-                    validation.username = userMap.get(validation.userId);
-                }
-            });
+        if (task.parentId && taskMap.has(task.parentId)) {
+            taskMap.get(task.parentId)!.children!.push(task);
+        } else {
+            rootTasks.push(task);
         }
     });
-    
-    return tasks;
+
+    return rootTasks;
 }
 
 // Genera los datos para el gráfico de Curva "S".

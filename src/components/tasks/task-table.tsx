@@ -20,6 +20,7 @@ import {
   getSortedRowModel,
   getExpandedRowModel,
   useReactTable,
+  Row,
   RowSelectionState,
 } from "@tanstack/react-table"
 import { format } from "date-fns"
@@ -43,7 +44,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import type { Partner, Task } from "@/lib/types"
+import type { Task } from "@/lib/types"
 import { DailyConsumptionTracker } from "./daily-consumption-tracker"
 import { TaskActions } from "./task-actions"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -99,31 +100,6 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
         size: 40,
     },
     {
-      id: 'expander',
-      header: () => null,
-      cell: ({ row }) => {
-        return (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={(e) => {
-              e.stopPropagation();
-              row.getToggleExpandedHandler()();
-            }}
-            className="w-8 p-0 data-[state=open]:bg-muted"
-          >
-            {row.getIsExpanded() ? (
-              <ChevronDown className="h-4 w-4" />
-            ) : (
-              <ChevronRight className="h-4 w-4" />
-            )}
-          </Button>
-        )
-      },
-      enableHiding: false,
-      size: 40,
-    },
-    {
       accessorKey: "name",
       header: ({ column }) => {
         return (
@@ -136,18 +112,53 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
           </Button>
         )
       },
-      cell: ({ row }) => <div className="capitalize font-medium">{row.getValue("name")}</div>,
+      cell: ({ row }) => {
+          const task = row.original;
+          const isGroup = (task.children ?? []).length > 0;
+          const canExpand = row.getCanExpand();
+
+          return (
+             <div 
+                className="flex items-center gap-2 capitalize font-medium"
+                style={{ paddingLeft: `${row.depth * 1.5}rem` }}
+             >
+                {canExpand && (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          row.toggleExpanded();
+                        }}
+                        className="w-6 h-6 p-0 data-[state=open]:bg-muted"
+                    >
+                        {row.getIsExpanded() ? (
+                          <ChevronDown className="h-4 w-4" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4" />
+                        )}
+                        <span className="sr-only">{row.getIsExpanded() ? 'Contraer' : 'Expandir'}</span>
+                    </Button>
+                )}
+                <span className={cn(isGroup && "font-bold")}>{row.getValue("name")}</span>
+             </div>
+          )
+      },
       size: 350,
     },
     {
       accessorKey: "partnerName",
       header: "Proveedor",
-      cell: ({ row }) => <PartnerCell task={row.original} onSuccess={onSuccess} />,
+      cell: ({ row }) => {
+          if (row.original.level < 5) return null;
+          return <PartnerCell task={row.original} onSuccess={onSuccess} />
+      }
     },
     {
       accessorKey: "status",
       header: "Estado",
       cell: ({ row }) => {
+        if (row.original.level < 5) return null;
         const status = row.getValue("status") as Task['status'];
         const translatedStatus = statusTranslations[status] || status;
 
@@ -169,6 +180,7 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
       accessorKey: "quantity",
       header: () => <div className="text-right">Cant. Planificada</div>,
       cell: ({ row }) => {
+        if (row.original.level < 5) return null;
         const quantity = parseFloat(row.getValue("quantity"))
         return <div className="text-right font-mono">{quantity.toLocaleString('es-ES')}</div>
       },
@@ -177,6 +189,7 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
       accessorKey: "consumedQuantity",
       header: () => <div className="text-right">Cant. Consumida</div>,
       cell: ({ row }) => {
+          if (row.original.level < 5) return null;
           const consumed = row.getValue("consumedQuantity") as number;
           return <div className="text-right font-mono">{consumed.toLocaleString('es-ES')}</div>;
       }
@@ -185,6 +198,7 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
       id: "difference",
       header: () => <div className="text-right">Diferencia de Consumo</div>,
       cell: ({ row }) => {
+          if (row.original.level < 5) return null;
           const difference = row.original.quantity - row.original.consumedQuantity;
           return <div className="text-right font-mono">{difference.toLocaleString('es-ES')}</div>;
       }
@@ -197,6 +211,7 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
           accessorKey: "cost",
           header: () => <div className="text-right">Costo</div>,
           cell: ({ row }) => {
+            if (row.original.level < 5) return null;
             const amount = parseFloat(row.getValue("cost"))
             return <div className="text-right font-mono">{formatCurrency(amount)}</div>
           },
@@ -205,6 +220,7 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
           id: "subtotalCostValued",
           header: () => <div className="text-right">Subtotal Costo Valorado</div>,
           cell: ({ row }) => {
+              if (row.original.level < 5) return null;
               const subtotal = row.original.quantity * row.original.cost;
               return <div className="text-right font-mono">{formatCurrency(subtotal)}</div>;
           }
@@ -213,6 +229,7 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
           id: "subtotalCostActual",
           header: () => <div className="text-right">Subtotal Costo Real</div>,
           cell: ({ row }) => {
+              if (row.original.level < 5) return null;
               const subtotal = row.original.consumedQuantity * row.original.cost;
               return <div className="text-right font-mono">{formatCurrency(subtotal)}</div>;
           }
@@ -221,6 +238,7 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
           accessorKey: "precio",
           header: () => <div className="text-right">PVP</div>,
           cell: ({ row }) => {
+            if (row.original.level < 5) return null;
             const amount = parseFloat(row.getValue("precio"))
             return <div className="text-right font-mono">{formatCurrency(amount)}</div>
           },
@@ -229,6 +247,7 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
           id: "subtotalPVPValued",
           header: () => <div className="text-right">Subtotal PVP Valorado</div>,
           cell: ({ row }) => {
+              if (row.original.level < 5) return null;
               const subtotal = row.original.quantity * row.original.precio;
               return <div className="text-right font-mono">{formatCurrency(subtotal)}</div>;
           }
@@ -237,7 +256,8 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
           id: "subtotalPVPActual",
           header: () => <div className="text-right">Subtotal PVP Real</div>,
           cell: ({ row }) => {
-              const subtotal = row.original.consumedQuantity * row.original.precio;
+              if (row.original.level < 5) return null;
+              const subtotal = row.original.consumedQuantity * row.original.cost;
               return <div className="text-right font-mono">{formatCurrency(subtotal)}</div>;
           }
         },
@@ -249,6 +269,7 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
       accessorKey: "startDate",
       header: "Fecha Inicio",
       cell: ({ row }) => {
+        if (row.original.level < 5) return null;
         const date = adjustDateForTimezone(row.getValue("startDate"));
         return format(date, "dd/MM/yyyy", { locale: es });
       },
@@ -257,6 +278,7 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
       accessorKey: "endDate",
       header: "Fecha Fin",
       cell: ({ row }) => {
+        if (row.original.level < 5) return null;
         const date = adjustDateForTimezone(row.getValue("endDate"));
         return format(date, "dd/MM/yyyy", { locale: es });
       },
@@ -264,7 +286,10 @@ const getColumns = (isManager: boolean, onSuccess: () => void): ColumnDef<Task>[
     {
       id: "actions",
       header: () => <div className="text-right pr-4">Acciones</div>,
-      cell: ({ row }) => <TaskActions task={row.original} onSuccess={onSuccess} />,
+      cell: ({ row }) => {
+          if (row.original.level < 5) return null;
+          return <TaskActions task={row.original} onSuccess={onSuccess} />
+      },
       size: 80,
     },
   ]);
@@ -361,7 +386,7 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
     getExpandedRowModel: getExpandedRowModel(),
     onExpandedChange: setExpanded,
     enableRowSelection: true,
-    getRowCanExpand: () => true,
+    getSubRows: row => row.children,
     state: {
       sorting,
       columnFilters,
@@ -491,7 +516,10 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
                   <TableRow
                     data-state={row.getIsSelected() && "selected"}
                     onClick={() => row.toggleSelected(!row.getIsSelected())}
-                    className="cursor-pointer"
+                    className={cn(
+                        "cursor-pointer",
+                        row.getCanExpand() ? "font-semibold bg-muted/30 hover:bg-muted/60" : ""
+                    )}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} onClick={(e) => {
@@ -511,7 +539,7 @@ export function TaskTable({ data, onSuccess }: { data: Task[], onSuccess: () => 
                       </TableCell>
                     ))}
                   </TableRow>
-                  {row.getIsExpanded() && (
+                  {row.getIsExpanded() && row.original.level === 5 && (
                      <TableRow>
                         <TableCell colSpan={row.getVisibleCells().length}>
                            <DailyConsumptionTracker task={row.original} onSuccess={onSuccess} />

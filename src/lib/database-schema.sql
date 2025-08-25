@@ -1,101 +1,51 @@
-select * from externo_tasks
-select * from externo_task_daily_consumption
-select * from externo_task_validations
 
--- Reiniciar IDs de externo_tasks
-ALTER SEQUENCE externo_tasks_id_seq RESTART WITH 1;
-
--- Reiniciar IDs de externo_task_daily_consumption
-ALTER SEQUENCE externo_task_daily_consumption_id_seq RESTART WITH 1;
-
--- Reiniciar IDs de externo_task_validations
-ALTER SEQUENCE externo_task_validations_id_seq RESTART WITH 1;
+-- Tabla para almacenar la configuración de la aplicación, como la URL del endpoint.
+CREATE TABLE IF NOT EXISTS app_config (
+    id SERIAL PRIMARY KEY,
+    key VARCHAR(255) UNIQUE NOT NULL,
+    value TEXT
+);
 
 -- Tabla para almacenar las tareas de los proyectos.
-CREATE TABLE IF NOT EXISTS "externo_tasks" (
-    "id" SERIAL PRIMARY KEY,
-    "projectid" INTEGER NOT NULL,
-    "name" VARCHAR(255) NOT NULL,
-    "quantity" NUMERIC(14, 2) DEFAULT 0,
-    "consumedquantity" NUMERIC(14, 2) DEFAULT 0,
-    "cost" NUMERIC(14, 2) DEFAULT 0,
-    "value" NUMERIC(14, 2) DEFAULT 0,
-    "startdate" TIMESTAMP WITH TIME ZONE,
-    "enddate" TIMESTAMP WITH TIME ZONE,
-    "status" VARCHAR(50) DEFAULT 'pendiente',
-    "displayorder" INTEGER,
-    "partner_id" INTEGER,
-    CONSTRAINT fk_project
-      FOREIGN KEY("projectid")
-	  REFERENCES "project_project"("id")
-	  ON DELETE CASCADE,
-    CONSTRAINT fk_partner
-        FOREIGN KEY("partner_id")
-        REFERENCES "res_partner"("id")
-        ON DELETE SET NULL
+CREATE TABLE IF NOT EXISTS externo_tasks (
+    id SERIAL PRIMARY KEY,
+    projectId INT NOT NULL,
+    name TEXT NOT NULL,
+    quantity NUMERIC(10, 2) NOT NULL,
+    consumedQuantity NUMERIC(10, 2) DEFAULT 0,
+    value NUMERIC(10, 2) NOT NULL, -- PVP
+    cost NUMERIC(10, 2) NOT NULL,
+    startDate DATE NOT NULL,
+    endDate DATE NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'pendiente', -- pendiente, en-progreso, completado
+    partner_id INT,
+    level INT,
+    parentId INT REFERENCES externo_tasks(id) ON DELETE CASCADE
 );
 
--- Tabla para el desglose diario de consumo de las tareas.
-CREATE TABLE IF NOT EXISTS "externo_task_daily_consumption" (
-    "id" SERIAL PRIMARY KEY,
-    "taskid" INTEGER NOT NULL,
-    "date" DATE NOT NULL,
-    "planned_quantity" NUMERIC(14, 2) DEFAULT 0,
-    "consumed_quantity" NUMERIC(14, 2) DEFAULT 0,
-    "verified_quantity" NUMERIC(14, 2) DEFAULT 0,
-    "details" TEXT,
-    CONSTRAINT fk_task_consumption
-      FOREIGN KEY("taskid")
-	  REFERENCES "externo_tasks"("id")
-	  ON DELETE CASCADE,
-    UNIQUE("taskid", "date") -- Asegura que solo haya un registro por tarea y día.
+-- Tabla para almacenar las validaciones de las tareas (imágenes, ubicación, etc.)
+CREATE TABLE IF NOT EXISTS externo_task_validations (
+    id SERIAL PRIMARY KEY,
+    taskId INT NOT NULL REFERENCES externo_tasks(id) ON DELETE CASCADE,
+    date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    imageUrl TEXT NOT NULL, -- Almacenará la imagen en formato base64 Data URI
+    location VARCHAR(255) NOT NULL, -- "lat,lng"
+    userId INT,
+    notes TEXT
 );
 
-
--- Comentarios sobre las columnas de "externo_tasks":
--- "id": Identificador único de la tarea.
--- "projectid": Clave foránea al proyecto en "project_project".
--- "name": Nombre de la tarea.
--- "quantity": Cantidad total planificada.
--- "consumedquantity": Cantidad real consumida total (agregada).
--- "value": Valor unitario (PVP).
--- "startdate": Fecha de inicio planificada.
--- "enddate": Fecha de fin planificada.
--- "status": Estado actual ('pendiente', 'en-progreso', 'completado').
--- "displayorder": Campo para el ordenamiento visual.
--- "partner_id": Clave foránea al proveedor en "res_partner".
-
--- Tabla para almacenar las validaciones de las tareas (evidencia fotográfica).
-CREATE TABLE IF NOT EXISTS "externo_task_validations" (
-    "id" SERIAL PRIMARY KEY,
-    "taskid" INTEGER NOT NULL,
-    "userid" INTEGER,
-    "date" TIMESTAMP WITH TIME ZONE NOT NULL,
-    "imageurl" TEXT NOT NULL,
-    "location" VARCHAR(255) NOT NULL,
-    "notes" TEXT,
-    CONSTRAINT fk_task
-      FOREIGN KEY("taskid")
-	  REFERENCES "externo_tasks"("id")
-	  ON DELETE CASCADE,
-    CONSTRAINT fk_user
-      FOREIGN KEY("userid")
-      REFERENCES "res_users"("id")
-      ON DELETE SET NULL
+-- Tabla para el desglose de consumo diario de cada tarea.
+CREATE TABLE IF NOT EXISTS externo_task_daily_consumption (
+    id SERIAL PRIMARY KEY,
+    taskId INT NOT NULL REFERENCES externo_tasks(id) ON DELETE CASCADE,
+    date DATE NOT NULL,
+    planned_quantity NUMERIC(10, 4) NOT NULL,
+    consumed_quantity NUMERIC(10, 4) DEFAULT 0,
+    verified_quantity NUMERIC(10, 4) DEFAULT 0,
+    details TEXT,
+    UNIQUE(taskId, date) -- Asegura que solo haya un registro por tarea y día.
 );
 
--- Comentarios sobre las columnas de "externo_task_validations":
--- "id": Identificador único de la validación.
--- "taskid": Clave foránea a la tarea en "externo_tasks".
--- "userid": Clave foránea al usuario en "res_users". Se establece en NULL si el usuario se elimina.
--- "date": Fecha y hora del registro.
--- "imageurl": URL de la imagen de evidencia (Data URI base64).
--- "location": Coordenadas de geolocalización.
--- "notes": Descripción textual de la validación.
-
--- Índices para mejorar el rendimiento de las consultas.
-CREATE INDEX IF NOT EXISTS idx_externo_tasks_projectid ON "externo_tasks" ("projectid");
-CREATE INDEX IF NOT EXISTS idx_externo_task_validations_taskid ON "externo_task_validations" ("taskid");
-CREATE INDEX IF NOT EXISTS idx_externo_task_validations_userid ON "externo_task_validations" ("userid");
-CREATE INDEX IF NOT EXISTS idx_externo_tasks_partner_id ON "externo_tasks" ("partner_id");
-CREATE INDEX IF NOT EXISTS idx_externo_task_daily_consumption_taskid ON "externo_task_daily_consumption" ("taskid");
+-- Ejemplo de inserción para la configuración inicial.
+INSERT INTO app_config (key, value) VALUES ('endpointUrl', 'http://localhost:8069')
+ON CONFLICT (key) DO NOTHING;

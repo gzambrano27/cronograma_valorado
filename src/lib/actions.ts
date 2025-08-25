@@ -109,8 +109,8 @@ export async function createTask(projectId: number, formData: FormData): Promise
   
   try {
     const result = await query<{id: string}>(`
-      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "cost", "startdate", "enddate", "status", "consumedquantity", "partner_id")
-      VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', 0, $8)
+      INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "cost", "startdate", "enddate", "status", "consumedquantity", "partner_id", "level")
+      VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', 0, $8, 5)
       RETURNING id
     `, [projectId, name, quantity, precio, cost, start.toISOString(), end.toISOString(), partnerId]);
     
@@ -298,59 +298,78 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
   const cantidadFieldId = cantidadAttrDef?.FieldID;
   const precioAttrDef = extendedAttrDefs.find((attr: any) => attr.Alias?.toLowerCase() === 'precio');
   const precioFieldId = precioAttrDef?.FieldID;
-  const newTasks: Omit<Task, 'id' | 'consumedQuantity' | 'validations' | 'status' | 'dailyConsumption'>[] = [];
+  
   const tasks = projectData.Tasks.Task;
+
+  // Track parent IDs at each level
+  const parentTrack: Record<number, number> = {};
 
   for (const taskXml of tasks) {
     try {
-        if (taskXml.OutlineLevel !== 5 || !taskXml.Name) continue;
+        const level = parseInt(taskXml.OutlineLevel, 10);
+        if (level < 3 || level > 5 || !taskXml.Name) continue;
 
         const startDate = new Date(taskXml.Start);
         const endDate = new Date(taskXml.Finish);
-
         if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) continue;
 
-        const costRaw = taskXml.FixedCost ?? taskXml.Cost;
-        if (costRaw === undefined || costRaw === null) continue;
-        const totalTaskCost = parseFloat(costRaw);
+        let parentId = null;
+        if (level > 3) {
+            parentId = parentTrack[level - 1];
+        }
         
         let quantity = 0;
-        if (cantidadFieldId && Array.isArray(taskXml.ExtendedAttribute)) {
-            const quantityAttr = taskXml.ExtendedAttribute.find((attr: any) => attr.FieldID === cantidadFieldId);
-            if (quantityAttr && quantityAttr.Value != null) {
-                const parsedQuantity = parseFloat(quantityAttr.Value);
-                if (!isNaN(parsedQuantity)) quantity = parsedQuantity;
+        let precio = 0;
+        let cost = 0;
+
+        // Level 5 tasks are the only ones with quantities and costs
+        if (level === 5) {
+            const costRaw = taskXml.FixedCost ?? taskXml.Cost;
+            if (costRaw === undefined || costRaw === null) continue;
+            const totalTaskCost = parseFloat(costRaw);
+            
+            if (cantidadFieldId && Array.isArray(taskXml.ExtendedAttribute)) {
+                const quantityAttr = taskXml.ExtendedAttribute.find((attr: any) => attr.FieldID === cantidadFieldId);
+                if (quantityAttr && quantityAttr.Value != null) {
+                    const parsedQuantity = parseFloat(quantityAttr.Value);
+                    if (!isNaN(parsedQuantity)) quantity = parsedQuantity;
+                }
             }
-        }
-        
-        let totalTaskPrice = 0;
-        if (precioFieldId && Array.isArray(taskXml.ExtendedAttribute)) {
-             const priceAttr = taskXml.ExtendedAttribute.find((attr: any) => attr.FieldID === precioFieldId);
-            if (priceAttr && priceAttr.Value != null) {
-                const parsedPrice = parseFloat(priceAttr.Value) / 100;
-                if (!isNaN(parsedPrice)) totalTaskPrice = parsedPrice;
+            
+            if (precioFieldId && Array.isArray(taskXml.ExtendedAttribute)) {
+                 const priceAttr = taskXml.ExtendedAttribute.find((attr: any) => attr.FieldID === precioFieldId);
+                if (priceAttr && priceAttr.Value != null) {
+                    const parsedPrice = parseFloat(priceAttr.Value) / 100;
+                    if (!isNaN(parsedPrice)) precio = parsedPrice;
+                }
             }
+
+            // If quantity is still 0, it's not a billable task, skip it.
+            if (quantity === 0) continue;
+            
+            cost = totalTaskCost / quantity;
         }
 
-        if (quantity === 0) continue;
-        const cost = quantity > 0 ? totalTaskCost / quantity : 0;
-        const precio = quantity > 0 ? totalTaskPrice / quantity : 0;
 
         const taskResult = await query<{id: string}>(`
-          INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "cost", "startdate", "enddate", "status", "consumedquantity")
-          VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', 0)
+          INSERT INTO "externo_tasks" ("projectid", "name", "quantity", "value", "cost", "startdate", "enddate", "status", "consumedquantity", "level", "parentid")
+          VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', 0, $8, $9)
           RETURNING id
-        `, [projectId, taskXml.Name, quantity, precio, cost, startDate.toISOString(), endDate.toISOString()]);
+        `, [projectId, taskXml.Name, quantity, precio, cost, startDate.toISOString(), endDate.toISOString(), level, parentId]);
 
         const newTaskId = parseInt(taskResult[0].id, 10);
-        const dailyConsumptionPlan = createDailyConsumption(startDate, endDate, quantity);
+        parentTrack[level] = newTaskId;
         
-        if (dailyConsumptionPlan.length > 0) {
-            const values = dailyConsumptionPlan.map(dc => `(${newTaskId}, '${format(dc.date, 'yyyy-MM-dd')}', ${dc.plannedQuantity})`).join(', ');
-            await query(`
-                INSERT INTO "externo_task_daily_consumption" (taskid, date, planned_quantity)
-                VALUES ${values}
-            `);
+        if (level === 5) {
+            const dailyConsumptionPlan = createDailyConsumption(startDate, endDate, quantity);
+            
+            if (dailyConsumptionPlan.length > 0) {
+                const values = dailyConsumptionPlan.map(dc => `(${newTaskId}, '${format(dc.date, 'yyyy-MM-dd')}', ${dc.plannedQuantity})`).join(', ');
+                await query(`
+                    INSERT INTO "externo_task_daily_consumption" (taskid, date, planned_quantity)
+                    VALUES ${values}
+                `);
+            }
         }
 
     } catch (e) {
