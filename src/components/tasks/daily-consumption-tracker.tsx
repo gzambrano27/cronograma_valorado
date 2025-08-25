@@ -20,6 +20,7 @@ import { updateTaskConsumption } from "@/lib/actions";
 import { formatCurrency } from "@/lib/utils";
 import { useSession } from "@/hooks/use-session";
 import { Textarea } from "../ui/textarea";
+import { Loader2, Save } from "lucide-react";
 
 
 interface DailyConsumptionTrackerProps {
@@ -155,11 +156,14 @@ export function DailyConsumptionTracker({ task, onSuccess }: DailyConsumptionTra
                     </TableCell>
                     <TableCell className="text-right">
                     <Button 
-                        size="sm" 
+                        size="icon" 
+                        variant="ghost"
                         onClick={() => handleSave(consumptionDay)}
                         disabled={isPending}
+                        className="h-8 w-8"
                     >
-                        {isPending ? "..." : "Guardar"}
+                        {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                        <span className="sr-only">Guardar</span>
                     </Button>
                     </TableCell>
                 </TableRow>
