@@ -157,10 +157,10 @@ export function DailyConsumptionTracker({ task, onSuccess }: DailyConsumptionTra
                     <TableCell className="text-right">
                     <Button 
                         size="icon" 
-                        variant="ghost"
+                        variant="default"
                         onClick={() => handleSave(consumptionDay)}
                         disabled={isPending}
-                        className="h-8 w-8"
+                        className="h-8 w-8 bg-black hover:bg-black/80 text-white"
                     >
                         {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                         <span className="sr-only">Guardar</span>
