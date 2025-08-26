@@ -312,21 +312,21 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
             // Si la cantidad es 0, no es una tarea facturable, la saltamos.
             if (quantity === 0) continue;
 
+            // --- Obtener Costo ---
+            const totalTaskCost = parseFloat(taskXml.Cost);
+            if (!isNaN(totalTaskCost) && quantity > 0) {
+                 cost = (totalTaskCost / 100) / quantity;
+            }
+
             // --- Obtener Precio (PVP) ---
             if (precioFieldId && Array.isArray(taskXml.ExtendedAttribute)) {
                 const priceAttr = taskXml.ExtendedAttribute.find((attr: any) => attr.FieldID === precioFieldId);
                 if (priceAttr && priceAttr.Value != null) {
                     const totalTaskPrice = parseFloat(priceAttr.Value);
                     if (!isNaN(totalTaskPrice)) {
-                        precio = totalTaskPrice / 100 / quantity;
+                        precio = (totalTaskPrice / 100) / quantity;
                     }
                 }
-            }
-
-            // --- Obtener Costo ---
-            const totalTaskCost = parseFloat(taskXml.Cost);
-            if (!isNaN(totalTaskCost) && quantity > 0) {
-                cost = totalTaskCost / 100 / quantity;
             }
         }
 
