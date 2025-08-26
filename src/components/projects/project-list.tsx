@@ -175,8 +175,8 @@ export default function ProjectList({ projects, view }: ProjectListProps) {
                 {isManager && (
                   <CardFooter className="flex flex-col gap-2 bg-muted/40 p-4 border-t">
                     <div className="flex justify-between items-baseline w-full">
-                      <p className="text-xs text-muted-foreground">Costo Total</p>
-                      <p className="font-bold text-base">{formatCurrency(project.totalCost, 2)}</p>
+                      <p className="text-xs text-muted-foreground">Valor Consumido</p>
+                      <p className="font-bold text-base">{formatCurrency(project.consumedValue, 2)}</p>
                     </div>
                     <div className="flex justify-between items-baseline w-full">
                       <p className="text-xs text-muted-foreground">Valor Total</p>
