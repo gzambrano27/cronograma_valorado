@@ -312,22 +312,20 @@ export async function importTasksFromXML(projectId: number, formData: FormData) 
             // Si la cantidad es 0, no es una tarea facturable, la saltamos.
             if (quantity === 0) continue;
 
-            // --- Obtener Precio (PVP) Total y calcular unitario ---
+            // --- Obtener Precio (PVP) ---
             if (precioFieldId && Array.isArray(taskXml.ExtendedAttribute)) {
                 const priceAttr = taskXml.ExtendedAttribute.find((attr: any) => attr.FieldID === precioFieldId);
                 if (priceAttr && priceAttr.Value != null) {
                     const totalTaskPrice = parseFloat(priceAttr.Value);
                     if (!isNaN(totalTaskPrice)) {
-                        // El valor en el XML es un total. Calcular el precio unitario.
                         precio = totalTaskPrice / 100 / quantity;
                     }
                 }
             }
 
-            // --- Obtener Costo Total y calcular unitario ---
+            // --- Obtener Costo ---
             const totalTaskCost = parseFloat(taskXml.Cost);
             if (!isNaN(totalTaskCost) && quantity > 0) {
-                 // El valor en el XML es un total. Calcular el costo unitario.
                 cost = totalTaskCost / 100 / quantity;
             }
         }

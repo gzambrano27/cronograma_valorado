@@ -351,7 +351,7 @@ export async function generateSCurveData(tasks: Task[], totalProjectValue: numbe
       ...point,
       planned: point.planned ? Math.max(0, point.planned) : 0,
       actual: point.actual ? Math.max(0, point.actual) : 0,
-      deviation: Math.round(point.deviation * 100) / 100,
+      deviation: point.deviation,
     }));
 }
 
